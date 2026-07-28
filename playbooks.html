@@ -282,45 +282,48 @@
   .wep-item:not(:nth-child(3n))::after{content:"";position:absolute;top:31px;right:-32px;width:40px;border-top:2px dashed rgba(11,31,58,.2)}
   .wep-item:not(:nth-child(3n))::before{content:"";position:absolute;top:28px;right:-14px;width:7px;height:7px;border-radius:50%;background:rgba(251,77,10,.5);z-index:1}
 
-  /* ============ 6. testimonials carousel ============ */
-  .tst{background:var(--cream)}
-  .tst-top{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:36px}
-  .tst-top h2{font-family:var(--display);font-weight:800;font-size:clamp(1.8rem,3.2vw,2.5rem);letter-spacing:-.02em;color:var(--charcoal);margin-top:6px}
-  .tst-nav{display:flex;gap:10px;flex:none}
+  /* ============ 6. testimonials carousel (auto-scroll) ============ */
+  .tst{background:var(--cream);overflow:hidden}
+  .tst-kicker{margin-bottom:18px}
+  .tst-top{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:38px}
+  .tst-top h2{font-family:var(--display);font-weight:800;font-size:clamp(1.9rem,3.4vw,2.9rem);line-height:1.04;letter-spacing:-.02em;color:var(--charcoal);margin:0;max-width:640px}
+  .tst-nav{display:flex;gap:10px;flex:none;padding-top:4px}
   .tst-arrow{
-    width:46px;height:46px;border-radius:50%;border:1.5px solid rgba(22,22,22,.18);background:var(--white);
-    color:var(--charcoal);cursor:pointer;display:flex;align-items:center;justify-content:center;
-    transition:background .2s,border-color .2s,opacity .2s,transform .12s;box-shadow:var(--shadow-card);
+    width:46px;height:46px;border-radius:50%;border:0;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:background .22s,transform .18s,box-shadow .22s;
   }
-  .tst-arrow:hover{border-color:var(--charcoal)}
+  .tst-arrow.primary{background:var(--orange);color:#fff;box-shadow:0 10px 24px rgba(251,77,10,.3)}
+  .tst-arrow.primary:hover{background:var(--orange-deep)}
+  .tst-arrow.secondary{background:var(--white);color:var(--charcoal);box-shadow:var(--shadow-card)}
+  .tst-arrow.secondary:hover{background:var(--cream-deep)}
+  .tst-arrow:hover{transform:translateY(-2px)}
   .tst-arrow:active{transform:scale(.92)}
-  .tst-arrow:disabled{opacity:.35;cursor:default}
   .tst-arrow svg{width:19px;height:19px}
-  .tst-track{
-    display:flex;gap:22px;overflow-x:auto;scroll-snap-type:x proximity;scroll-behavior:smooth;
-    padding:4px 4px 10px;margin:-4px -4px 0;scrollbar-width:none;
-  }
-  .tst-track::-webkit-scrollbar{display:none}
+
+  .tst-slider{overflow:hidden;padding:12px 4px 18px;margin:-12px -4px -18px}
+  .tst-track{display:flex;gap:24px;transition:transform .62s cubic-bezier(.2,.75,.2,1);will-change:transform}
   .tst-card{
-    flex:0 0 calc((100% - 44px) / 3);scroll-snap-align:start;box-sizing:border-box;
-    background:var(--white);border:1px solid rgba(22,22,22,.1);border-radius:20px;
-    padding:28px 26px;display:flex;flex-direction:column;
-    box-shadow:0 12px 30px rgba(22,22,22,.05);transition:transform .25s,box-shadow .25s;
+    flex:0 0 calc((100% - 48px) / 3);min-width:0;box-sizing:border-box;
+    background:var(--white);border:1px solid rgba(22,22,22,.08);border-radius:20px;
+    padding:30px 26px 26px;box-shadow:0 14px 34px rgba(22,22,22,.06);
+    transition:transform .26s ease,box-shadow .26s ease;
   }
-  .tst-card:hover{transform:translateY(-5px);box-shadow:0 20px 44px rgba(22,22,22,.1)}
-  .tst-stars{display:flex;gap:3px;color:var(--orange);margin-bottom:16px}
-  .tst-stars svg{width:17px;height:17px}
-  .tst-title{font-family:var(--display);font-weight:700;font-size:1.06rem;line-height:1.3;color:var(--charcoal);margin-bottom:12px}
-  .tst-quote{font-family:"PT Serif",serif;font-style:italic;font-size:.96rem;line-height:1.62;color:var(--ink-soft);margin:0 0 22px;flex:1}
-  .tst-foot{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;padding-top:18px;border-top:1px solid rgba(22,22,22,.09)}
-  .tst-name{font-family:var(--display);font-weight:700;font-size:.95rem;color:var(--charcoal)}
-  .tst-meta{font-size:.78rem;color:var(--ink-soft);margin-top:4px}
-  .tst-verified{
-    flex:none;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;
-    font-family:var(--body);font-size:.72rem;font-weight:600;color:#2E8B57;
-    background:rgba(46,139,87,.1);border:1px solid rgba(46,139,87,.2);border-radius:999px;padding:5px 11px;
-  }
-  .tst-verified svg{width:12px;height:12px}
+  .tst-card:hover{transform:translateY(-8px);box-shadow:0 24px 48px rgba(22,22,22,.12);z-index:4}
+  .tst-head{display:grid;grid-template-columns:52px 1fr auto;align-items:center;column-gap:16px;margin-bottom:20px}
+  .tst-avatar{width:52px;height:52px;border-radius:14px;overflow:hidden;flex:none}
+  .tst-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+  .tst-meta{min-width:0}
+  .tst-name{margin:0;font-family:var(--display);font-size:1.02rem;line-height:1.18;font-weight:700;letter-spacing:-.02em;color:var(--charcoal)}
+  .tst-sub{margin:6px 0 0;font-size:.75rem;line-height:1.3;color:var(--ink-soft);font-weight:500}
+  .tst-mark{font-family:var(--display);font-size:76px;line-height:.66;font-weight:800;color:var(--orange);letter-spacing:-.06em;user-select:none;transform:translateY(10px);align-self:flex-start}
+  .tst-stars{margin:0 0 10px;color:var(--orange);font-size:15px;letter-spacing:3px}
+  .tst-rtitle{margin:0 0 11px;font-family:var(--display);font-size:1.04rem;line-height:1.28;font-weight:700;letter-spacing:-.02em;color:var(--charcoal)}
+  .tst-text{margin:0;font-family:"PT Serif",serif;font-style:italic;font-size:.95rem;line-height:1.56;color:var(--ink-soft)}
+
+  .tst-dots{display:flex;justify-content:center;gap:8px;margin-top:26px}
+  .tst-dot{width:8px;height:8px;border-radius:999px;border:0;background:rgba(22,22,22,.18);cursor:pointer;padding:0;transition:.24s ease}
+  .tst-dot.active{width:26px;background:var(--orange)}
 
   .rv{opacity:0;transform:translateY(24px);transition:opacity .6s,transform .6s}
   .rv.in{opacity:1;transform:none}
@@ -339,12 +342,12 @@
     .wsn-plane{width:96px}
     .wep-grid{grid-template-columns:1fr 1fr;gap:44px 36px}
     .wep-item:not(:nth-child(3n))::after,.wep-item:not(:nth-child(3n))::before{display:none}
-    .tst-card{flex-basis:calc((100% - 22px) / 2)}
+    .tst-card{flex-basis:calc((100% - 24px) / 2)}
   }
   @media (max-width:640px){
     .wsn-cards{grid-template-columns:1fr}
     .wep-grid{grid-template-columns:1fr}
-    .tst-card{flex-basis:86%}
+    .tst-card{flex-basis:100%}
   }
   @media (max-width:900px){
     .shelf{
@@ -684,17 +687,18 @@
 <!-- 6. TESTIMONIALS -->
 <section class="pbk tst">
   <div class="wrap">
+    <p class="eyebrow tst-kicker rv">What students say</p>
     <div class="tst-top rv">
-      <div>
-        <p class="eyebrow">What students say</p>
-        <h2>Revision that earned its place.</h2>
-      </div>
+      <h2>Don't just take our word for it.</h2>
       <div class="tst-nav">
-        <button class="tst-arrow" id="tst-prev" type="button" aria-label="Previous testimonials"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button>
-        <button class="tst-arrow" id="tst-next" type="button" aria-label="Next testimonials"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <button class="tst-arrow primary" id="tst-prev" type="button" aria-label="Previous testimonials"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button>
+        <button class="tst-arrow secondary" id="tst-next" type="button" aria-label="Next testimonials"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
       </div>
     </div>
-    <div class="tst-track rv" id="tst-track"></div>
+    <div class="tst-slider rv">
+      <div class="tst-track" id="tst-track"></div>
+    </div>
+    <div class="tst-dots" id="tst-dots"></div>
   </div>
 </section>
 
@@ -822,10 +826,8 @@
     stack.addEventListener('click', () => setOpen(true));
   })();
 
-  // ---- Testimonials carousel ----
+  // ---- Testimonials carousel (auto-scroll, slides in groups) ----
   (function () {
-    const star = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.6-5 4.4 1.5 6.5L12 17.9 6 20.5l1.5-6.5-5-4.4 6.6-.6z"/></svg>';
-    const check = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
     const T = [
       { stars: 5, title: 'Marketing playbook made revision much easier',
         quote: 'I had my summer placement interview in two days and this helped me revise the important concepts quickly. The examples were simple, practical, and much better than going through scattered notes.',
@@ -843,37 +845,77 @@
         quote: 'Earlier I was switching between class notes, PDFs and random websites. This gave me one clean resource to prepare from, especially for guesstimates and case-based questions.',
         name: 'Neha Agarwal', meta: 'IIM Kashipur · Guesstimates Playbook' }
     ];
+    // brand-tinted monogram avatars (bg, ink) — self-contained SVG data URIs
+    const TINTS = [['%23FFE9DF','%23C93A05'],['%23E7EDF6','%230B1F3A'],['%23FDECE3','%23C93A05'],['%23E7EDF6','%230B1F3A'],['%23EFE9DE','%23161616']];
+    const avatar = (name, i) => {
+      const initials = name.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
+      const [bg, fg] = TINTS[i % TINTS.length];
+      const svg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='" + bg + "'/><text x='50' y='50' dy='.35em' text-anchor='middle' font-family='Inter,Arial,sans-serif' font-size='40' font-weight='700' fill='" + fg + "'>" + initials + "</text></svg>";
+      return "data:image/svg+xml;utf8," + svg;
+    };
+
     const track = document.getElementById('tst-track');
     if (!track) return;
-    track.innerHTML = T.map(t => `<article class="tst-card">
-      <div class="tst-stars" aria-label="${t.stars} out of 5 stars">${star.repeat(t.stars)}</div>
-      <h3 class="tst-title">${t.title}</h3>
-      <p class="tst-quote">${t.quote}</p>
-      <div class="tst-foot">
-        <div>
-          <div class="tst-name">${t.name}</div>
-          <div class="tst-meta">${t.meta}</div>
+    track.innerHTML = T.map((t, i) => `<article class="tst-card">
+      <div class="tst-head">
+        <div class="tst-avatar"><img alt="${t.name}" src="${avatar(t.name, i)}"></div>
+        <div class="tst-meta">
+          <h3 class="tst-name">${t.name}</h3>
+          <p class="tst-sub">${t.meta}</p>
         </div>
-        <span class="tst-verified">${check} Verified</span>
+        <div class="tst-mark" aria-hidden="true">&ldquo;</div>
       </div>
+      <p class="tst-stars" aria-label="${t.stars} out of 5 stars">${'★'.repeat(t.stars)}</p>
+      <h4 class="tst-rtitle">${t.title}</h4>
+      <p class="tst-text">${t.quote}</p>
     </article>`).join('');
 
-    const prev = document.getElementById('tst-prev');
-    const next = document.getElementById('tst-next');
-    const step = () => {
-      const card = track.querySelector('.tst-card');
-      return card ? card.getBoundingClientRect().width + 22 : track.clientWidth;
+    const cards = [...track.children];
+    const dotsWrap = document.getElementById('tst-dots');
+    const prevBtn = document.getElementById('tst-prev');
+    const nextBtn = document.getElementById('tst-next');
+    const slider = track.parentElement;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const AUTO_DELAY = 4500;
+    let current = 0, visible = 3, maxIndex = 0, timer = null;
+
+    const getVisible = () => window.innerWidth <= 640 ? 1 : window.innerWidth <= 1000 ? 2 : 3;
+    const layout = () => {
+      const gap = 24;
+      const w = cards[0].getBoundingClientRect().width;
+      track.style.transform = `translateX(-${current * (w + gap)}px)`;
+      [...dotsWrap.children].forEach((d, i) => d.classList.toggle('active', i === current));
     };
-    const update = () => {
-      const max = track.scrollWidth - track.clientWidth;
-      prev.disabled = track.scrollLeft <= 8;
-      next.disabled = track.scrollLeft >= max - 8;
+    const build = () => {
+      visible = getVisible();
+      maxIndex = Math.max(0, cards.length - visible);
+      if (current > maxIndex) current = maxIndex;
+      dotsWrap.innerHTML = '';
+      for (let i = 0; i <= maxIndex; i++) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'tst-dot' + (i === current ? ' active' : '');
+        b.setAttribute('aria-label', `Show testimonial group ${i + 1}`);
+        b.addEventListener('click', () => { go(i); restart(); });
+        dotsWrap.appendChild(b);
+      }
+      layout();
     };
-    prev.addEventListener('click', () => track.scrollBy({ left: -step(), behavior: 'smooth' }));
-    next.addEventListener('click', () => track.scrollBy({ left: step(), behavior: 'smooth' }));
-    track.addEventListener('scroll', update, { passive: true });
-    window.addEventListener('resize', update);
-    update();
+    const go = (i) => { current = i > maxIndex ? 0 : i < 0 ? maxIndex : i; layout(); };
+    const start = () => { if (reducedMotion || timer || maxIndex === 0) return; timer = setInterval(() => go(current + 1), AUTO_DELAY); };
+    const stop = () => { clearInterval(timer); timer = null; };
+    const restart = () => { stop(); start(); };
+
+    prevBtn.addEventListener('click', () => { go(current - 1); restart(); });
+    nextBtn.addEventListener('click', () => { go(current + 1); restart(); });
+    slider.addEventListener('mouseenter', stop);
+    slider.addEventListener('mouseleave', start);
+    slider.addEventListener('focusin', stop);
+    slider.addEventListener('focusout', start);
+    document.addEventListener('visibilitychange', () => document.hidden ? stop() : start());
+    window.addEventListener('resize', () => { build(); restart(); });
+    build();
+    start();
   })();
 </script>
 <script src="js/nav.js?v=2" defer></script>
