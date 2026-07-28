@@ -7,8 +7,8 @@
 <meta name="description" content="Embark India connects institutes with verified industry experts for guest lectures, workshops and curriculum partnerships. Invite an expert, or become one.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/gl.css?v=7">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600&family=PT+Serif:ital@1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/gl.css?v=8">
 </head>
 <body>
 
@@ -346,6 +346,24 @@
   </div>
 </section>
 
+<!-- TESTIMONIALS -->
+<section class="pbk tst" aria-label="What campuses and students say">
+  <div class="wrap">
+    <p class="eyebrow tst-kicker reveal">Loved by campuses</p>
+    <div class="tst-top reveal">
+      <h2>Don't just take our word for it.</h2>
+      <div class="tst-nav">
+        <button class="tst-arrow primary" id="tst-prev" type="button" aria-label="Previous testimonials"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button>
+        <button class="tst-arrow secondary" id="tst-next" type="button" aria-label="Next testimonials"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      </div>
+    </div>
+    <div class="tst-slider reveal">
+      <div class="tst-track" id="tst-track"></div>
+    </div>
+    <div class="tst-dots" id="tst-dots"></div>
+  </div>
+</section>
+
 <section class="faq" id="faq">
   <div class="wrap">
     <div class="sec-head reveal">
@@ -626,6 +644,99 @@
     }, { threshold: 0.12 });
     reveals.forEach(el => io.observe(el));
   }
+</script>
+<script>
+  // ---- Testimonials carousel (auto-scroll, slides in groups) ----
+  (function () {
+    const T = [
+      { stars: 5, title: 'The speaker we needed, in two days',
+        quote: 'We described the brief on Monday and had a verified marketing leader in front of our final-year batch by Thursday. The turnaround was genuinely impressive.',
+        name: 'Dr. Meera Nair', meta: 'Placement Head · SIBM Pune' },
+      { stars: 5, title: 'Finally, industry that felt real',
+        quote: 'The workshop on go-to-market was not textbook theory — the speaker walked us through a live case from her own desk. I used that structure in my summer interview.',
+        name: 'Rahul Deshpande', meta: 'MBA Final Year · IMT Nagpur' },
+      { stars: 5, title: 'Every speaker was exactly as promised',
+        quote: 'Identity and employment were verified before we confirmed. No last-minute surprises, no paid shortcuts — just a practitioner who knew the subject cold.',
+        name: 'Prof. Anand Iyer', meta: 'Faculty Coordinator · KJ Somaiya' },
+      { stars: 5, title: 'A lecture that turned into internships',
+        quote: 'What started as one guest session became a live project and two internships for our students. The speaker was scouting talent — and found it.',
+        name: 'Sana Qureshi', meta: 'Placement Cell · TAPMI Manipal' },
+      { stars: 5, title: 'Industry connect our directors could measure',
+        quote: 'Prospective students ask who teaches here. Having real practitioners on the timetable is proof we can show — and it shows up at admissions.',
+        name: 'Vikram Reddy', meta: 'Director · Vignana Jyothi Institute' }
+    ];
+    // brand-tinted monogram avatars (bg, ink) — self-contained SVG data URIs
+    const TINTS = [['%23FFE9DF','%23C93A05'],['%23E7EDF6','%230B1F3A'],['%23FDECE3','%23C93A05'],['%23E7EDF6','%230B1F3A'],['%23EFE9DE','%23161616']];
+    const avatar = (name, i) => {
+      const initials = name.replace(/^(Dr\.|Prof\.|Mr\.|Ms\.)\s*/i, '').trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
+      const [bg, fg] = TINTS[i % TINTS.length];
+      const svg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='" + bg + "'/><text x='50' y='50' dy='.35em' text-anchor='middle' font-family='Inter,Arial,sans-serif' font-size='40' font-weight='700' fill='" + fg + "'>" + initials + "</text></svg>";
+      return "data:image/svg+xml;utf8," + svg;
+    };
+
+    const track = document.getElementById('tst-track');
+    if (!track) return;
+    track.innerHTML = T.map((t, i) => `<article class="tst-card">
+      <div class="tst-head">
+        <div class="tst-avatar"><img alt="${t.name}" src="${avatar(t.name, i)}"></div>
+        <div class="tst-meta">
+          <h3 class="tst-name">${t.name}</h3>
+          <p class="tst-sub">${t.meta}</p>
+        </div>
+        <div class="tst-mark" aria-hidden="true">&ldquo;</div>
+      </div>
+      <p class="tst-stars" aria-label="${t.stars} out of 5 stars">${'★'.repeat(t.stars)}</p>
+      <h4 class="tst-rtitle">${t.title}</h4>
+      <p class="tst-text">${t.quote}</p>
+    </article>`).join('');
+
+    const cards = [...track.children];
+    const dotsWrap = document.getElementById('tst-dots');
+    const prevBtn = document.getElementById('tst-prev');
+    const nextBtn = document.getElementById('tst-next');
+    const slider = track.parentElement;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const AUTO_DELAY = 4500;
+    let current = 0, visible = 3, maxIndex = 0, timer = null;
+
+    const getVisible = () => window.innerWidth <= 640 ? 1 : window.innerWidth <= 1000 ? 2 : 3;
+    const layout = () => {
+      const gap = 24;
+      const w = cards[0].getBoundingClientRect().width;
+      track.style.transform = `translateX(-${current * (w + gap)}px)`;
+      [...dotsWrap.children].forEach((d, i) => d.classList.toggle('active', i === current));
+    };
+    const build = () => {
+      visible = getVisible();
+      maxIndex = Math.max(0, cards.length - visible);
+      if (current > maxIndex) current = maxIndex;
+      dotsWrap.innerHTML = '';
+      for (let i = 0; i <= maxIndex; i++) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'tst-dot' + (i === current ? ' active' : '');
+        b.setAttribute('aria-label', `Show testimonial group ${i + 1}`);
+        b.addEventListener('click', () => { go(i); restart(); });
+        dotsWrap.appendChild(b);
+      }
+      layout();
+    };
+    const go = (i) => { current = i > maxIndex ? 0 : i < 0 ? maxIndex : i; layout(); };
+    const start = () => { if (reducedMotion || timer || maxIndex === 0) return; timer = setInterval(() => go(current + 1), AUTO_DELAY); };
+    const stop = () => { clearInterval(timer); timer = null; };
+    const restart = () => { stop(); start(); };
+
+    prevBtn.addEventListener('click', () => { go(current - 1); restart(); });
+    nextBtn.addEventListener('click', () => { go(current + 1); restart(); });
+    slider.addEventListener('mouseenter', stop);
+    slider.addEventListener('mouseleave', start);
+    slider.addEventListener('focusin', stop);
+    slider.addEventListener('focusout', start);
+    document.addEventListener('visibilitychange', () => document.hidden ? stop() : start());
+    window.addEventListener('resize', () => { build(); restart(); });
+    build();
+    start();
+  })();
 </script>
 <script src="js/nav.js?v=2" defer></script>
 </body>
