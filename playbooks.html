@@ -563,11 +563,30 @@
   .shop-head h2 span{color:var(--orange)}
   .shop-head p{font-size:1rem;color:var(--ink-soft);margin-top:8px;max-width:460px}
   .shop-tools{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:26px}
-  .shop-filter,.shop-sort{display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--ink-soft)}
-  .shop-sort{margin-left:auto}
-  .shop-tools label{white-space:nowrap}
-  .shop-tools select{font:600 .82rem var(--body);color:var(--charcoal);border:1.5px solid rgba(11,31,58,.16);border-radius:10px;padding:8px 12px;background:#fff;cursor:pointer}
-  .shop-tools select:focus-visible{outline:2px solid var(--orange);outline-offset:1px}
+  .shop-tabs{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .shop-tabwrap{position:relative}
+  .shop-tab{
+    display:inline-flex;align-items:center;gap:7px;border:1.5px solid rgba(11,31,58,.16);background:#fff;color:var(--charcoal);
+    font:600 .84rem/1 var(--body);border-radius:999px;padding:9px 16px;cursor:pointer;transition:.2s;white-space:nowrap;
+  }
+  .shop-tab:hover{border-color:var(--navy)}
+  .shop-tab[aria-selected="true"]{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .shop-caret{font-size:.66rem;transition:transform .2s;line-height:1}
+  .shop-tab[aria-expanded="true"] .shop-caret{transform:rotate(180deg)}
+  .shop-menu{
+    position:absolute;top:calc(100% + 8px);left:0;z-index:20;min-width:220px;max-height:296px;overflow-y:auto;
+    background:#fff;border:1px solid rgba(11,31,58,.12);border-radius:14px;box-shadow:0 18px 40px rgba(11,31,58,.16);padding:6px;
+  }
+  .shop-menu[hidden]{display:none}
+  .shop-menu button{
+    display:flex;width:100%;align-items:center;justify-content:space-between;gap:10px;border:0;background:transparent;text-align:left;
+    font:500 .84rem var(--body);color:var(--charcoal);padding:9px 12px;border-radius:9px;cursor:pointer;transition:.15s;
+  }
+  .shop-menu button:hover{background:var(--cream)}
+  .shop-menu button[aria-current="true"]{background:var(--orange-soft);color:var(--orange-deep);font-weight:600}
+  .shop-menu-price{font-size:.76rem;color:var(--ink-soft)}
+  .shop-sort{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--ink-soft)}
+  .shop-sort select{font:600 .82rem var(--body);color:var(--charcoal);border:1.5px solid rgba(11,31,58,.16);border-radius:10px;padding:8px 12px;background:#fff;cursor:pointer}
   .shop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:20px}
   .pb-buy{
     display:flex;flex-direction:column;background:#fff;border:1px solid rgba(11,31,58,.09);border-radius:18px;
@@ -640,13 +659,16 @@
       </div>
     </div>
     <div class="shop-tools">
-      <div class="shop-filter">
-        <label for="shopType">Filter by type</label>
-        <select id="shopType">
-          <option value="all">All playbooks</option>
-          <option value="interview">Interview playbooks</option>
-          <option value="case">Case playbooks</option>
-        </select>
+      <div class="shop-tabs" id="shopTabs" role="tablist" aria-label="Filter playbooks">
+        <button class="shop-tab" role="tab" data-cat="all" aria-selected="true">All</button>
+        <div class="shop-tabwrap">
+          <button class="shop-tab" role="tab" data-cat="interview" aria-selected="false" aria-haspopup="true" aria-expanded="false">Interview playbooks <span class="shop-caret" aria-hidden="true">▾</span></button>
+          <div class="shop-menu" id="menu-interview" role="menu" hidden></div>
+        </div>
+        <div class="shop-tabwrap">
+          <button class="shop-tab" role="tab" data-cat="case" aria-selected="false" aria-haspopup="true" aria-expanded="false">Case playbooks <span class="shop-caret" aria-hidden="true">▾</span></button>
+          <div class="shop-menu" id="menu-case" role="menu" hidden></div>
+        </div>
       </div>
       <div class="shop-sort">
         <label for="shopSort">Sort by</label>
@@ -766,14 +788,14 @@
   ];
   const COVERS=["linear-gradient(150deg,#2E6BFF,#1D4ED8)","linear-gradient(150deg,#0B1F3A,#16345C)","linear-gradient(150deg,#1D4ED8,#1740A8)","linear-gradient(150deg,#5B8CFF,#2E6BFF)","linear-gradient(150deg,#16345C,#0B1F3A)","linear-gradient(150deg,#2E6BFF,#5B8CFF)"];
   const grid=document.getElementById("shopGrid");
-  const typeSel=document.getElementById("shopType");
+  const tabsEl=document.getElementById("shopTabs");
   const sortSel=document.getElementById("shopSort");
   if(!grid) return;
-  let cat="all", sort="popular";
+  let cat="all", sub=null, sort="popular";
   const inr=n=>"₹"+n;
 
   function view(){
-    let list=P.filter(p=>cat==="all"||p.cat===cat);
+    let list=P.filter(p=>sub?p.id===sub:(cat==="all"||p.cat===cat));
     if(sort==="price-asc")list=list.slice().sort((a,b)=>a.price-b.price);
     else if(sort==="price-desc")list=list.slice().sort((a,b)=>b.price-a.price);
     else if(sort==="rating")list=list.slice().sort((a,b)=>b.rating-a.rating);
@@ -796,7 +818,41 @@
   }
   view();
 
-  typeSel.addEventListener("change",()=>{cat=typeSel.value;view();});
+  // build sub-menus for the grouped tabs
+  const menus={interview:document.getElementById("menu-interview"),case:document.getElementById("menu-case")};
+  Object.keys(menus).forEach(c=>{
+    const items=P.filter(p=>p.cat===c);
+    menus[c].innerHTML=
+      `<button role="menuitem" data-sub="" data-cat="${c}">All ${c} playbooks</button>`+
+      items.map(p=>`<button role="menuitem" data-sub="${p.id}" data-cat="${c}"><span>${p.title}</span><span class="shop-menu-price">${inr(p.price)}</span></button>`).join("");
+  });
+  const tabBtns=[...tabsEl.querySelectorAll(".shop-tab")];
+  function closeMenus(except){
+    Object.values(menus).forEach(m=>{m.hidden=true;});
+    tabBtns.forEach(b=>{if(b!==except)b.setAttribute("aria-expanded","false");});
+  }
+  function selectCat(c,s){
+    cat=c; sub=s||null;
+    tabBtns.forEach(b=>b.setAttribute("aria-selected",String(b.dataset.cat===c)));
+    Object.keys(menus).forEach(mc=>[...menus[mc].children].forEach(it=>
+      it.setAttribute("aria-current",String(mc===c && (it.dataset.sub||"")===(sub||"")))));
+    view();
+  }
+  tabBtns.forEach(b=>b.addEventListener("click",()=>{
+    const c=b.dataset.cat;
+    if(c==="all"){closeMenus();selectCat("all",null);return;}
+    const willOpen=menus[c].hidden;
+    closeMenus(b);
+    menus[c].hidden=!willOpen;
+    b.setAttribute("aria-expanded",String(willOpen));
+    selectCat(c,null);
+  }));
+  Object.keys(menus).forEach(c=>menus[c].addEventListener("click",e=>{
+    const it=e.target.closest("[data-sub]"); if(!it)return;
+    selectCat(c,it.dataset.sub||null);
+    closeMenus();
+  }));
+  document.addEventListener("click",e=>{if(!tabsEl.contains(e.target))closeMenus();});
   sortSel.addEventListener("change",()=>{sort=sortSel.value;view();});
 
   // ---- modal ----
