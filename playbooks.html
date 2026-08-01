@@ -555,6 +555,293 @@
   </div>
 </section>
 
+<!-- 3.5 EXPLORE ALL PLAYBOOKS (shop grid + buy modal) -->
+<style>
+  .shop{padding:60px 0 64px;background:linear-gradient(180deg,#FFFFFF 0%,var(--cream) 100%)}
+  .shop-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:22px}
+  .shop-head h2{font-family:var(--display);font-weight:800;font-size:clamp(1.9rem,3.4vw,2.7rem);letter-spacing:-.02em;color:var(--charcoal)}
+  .shop-head h2 span{color:var(--orange)}
+  .shop-head p{font-size:1rem;color:var(--ink-soft);margin-top:8px;max-width:460px}
+  .shop-tools{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:26px}
+  .shop-tabs{display:flex;gap:8px;flex-wrap:wrap}
+  .shop-tab{
+    border:1.5px solid rgba(11,31,58,.16);background:#fff;color:var(--charcoal);
+    font:600 .84rem/1 var(--body);border-radius:999px;padding:9px 16px;cursor:pointer;transition:.2s;
+  }
+  .shop-tab:hover{border-color:var(--navy)}
+  .shop-tab[aria-selected="true"]{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .shop-sort{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--ink-soft)}
+  .shop-sort select{font:600 .82rem var(--body);color:var(--charcoal);border:1.5px solid rgba(11,31,58,.16);border-radius:10px;padding:8px 10px;background:#fff;cursor:pointer}
+  .shop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:20px}
+  .pb-buy{
+    display:flex;flex-direction:column;background:#fff;border:1px solid rgba(11,31,58,.09);border-radius:18px;
+    overflow:hidden;box-shadow:0 8px 22px rgba(22,22,22,.05);transition:transform .22s,box-shadow .22s;
+  }
+  .pb-buy:hover{transform:translateY(-5px);box-shadow:0 20px 44px rgba(11,31,58,.12)}
+  .pb-cover{position:relative;height:132px;padding:18px;display:flex;flex-direction:column;justify-content:space-between;color:#fff;overflow:hidden}
+  .pb-cover::after{content:"";position:absolute;right:-30px;top:-30px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,.12)}
+  .pb-cover .pb-tag{align-self:flex-start;font:700 .58rem/1 var(--body);letter-spacing:.1em;text-transform:uppercase;background:rgba(255,255,255,.2);padding:5px 9px;border-radius:999px;position:relative;z-index:1}
+  .pb-cover .pb-cover-t{font-family:var(--display);font-weight:800;font-size:1.12rem;line-height:1.1;letter-spacing:-.01em;position:relative;z-index:1}
+  .pb-body{padding:16px 18px 0;flex:1;display:flex;flex-direction:column}
+  .pb-body h3{font-family:var(--display);font-weight:700;font-size:1.02rem;color:var(--charcoal);line-height:1.2}
+  .pb-meta{display:flex;align-items:center;gap:10px;margin:8px 0 10px;font-size:.76rem;color:var(--ink-soft)}
+  .pb-meta .pb-star{color:var(--orange);font-weight:700}
+  .pb-blurb{font-size:.82rem;line-height:1.5;color:var(--ink-soft);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .pb-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 18px}
+  .pb-price{font-family:var(--display);font-weight:800;font-size:1.3rem;color:var(--charcoal)}
+  .pb-price s{font-family:var(--body);font-weight:500;font-size:.82rem;color:var(--ink-soft);margin-left:6px}
+  .pb-buybtn{border:0;background:var(--orange-deep);color:#fff;font:600 .84rem var(--body);border-radius:11px;padding:10px 16px;cursor:pointer;transition:.2s;white-space:nowrap}
+  .pb-buybtn:hover{background:var(--orange);transform:translateY(-1px)}
+
+  /* ---- buy modal ---- */
+  .pbm{position:fixed;inset:0;z-index:200;display:none;place-items:center;padding:20px}
+  .pbm.open{display:grid}
+  .pbm-back{position:absolute;inset:0;background:rgba(8,15,26,.62);backdrop-filter:blur(4px)}
+  .pbm-card{
+    position:relative;z-index:1;width:min(880px,100%);max-height:90vh;overflow:hidden;background:#fff;border-radius:22px;
+    display:grid;grid-template-columns:1.15fr 1fr;box-shadow:0 40px 100px rgba(0,0,0,.35);animation:pbm-rise .3s cubic-bezier(.2,.8,.25,1.1) both;
+  }
+  @keyframes pbm-rise{from{opacity:0;transform:translateY(24px) scale(.98)}to{opacity:1;transform:none}}
+  .pbm-left{padding:30px 30px 34px;overflow-y:auto}
+  .pbm-ey{font:700 .64rem/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--orange-deep)}
+  .pbm-left h3{font-family:var(--display);font-weight:800;font-size:1.5rem;letter-spacing:-.01em;color:var(--charcoal);margin:10px 0 12px}
+  .pbm-intro{font-size:.92rem;line-height:1.55;color:var(--ink-soft);margin-bottom:18px}
+  .pbm-list{list-style:none;display:flex;flex-direction:column;gap:12px}
+  .pbm-list li{position:relative;padding-left:28px;font-size:.86rem;line-height:1.5;color:var(--charcoal)}
+  .pbm-list li::before{content:"";position:absolute;left:0;top:1px;width:19px;height:19px;border-radius:50%;background:var(--orange-soft);color:var(--orange-deep);}
+  .pbm-list li::after{content:"✓";position:absolute;left:4px;top:1px;font-size:.72rem;font-weight:800;color:var(--orange-deep)}
+  .pbm-note{margin-top:16px;font-size:.8rem;line-height:1.5;color:var(--ink-soft);background:#F4F7FC;border-radius:12px;padding:12px 14px}
+  .pbm-right{background:linear-gradient(180deg,#0B1F3A 0%,#08172B 100%);color:#fff;padding:28px 26px;display:flex;flex-direction:column}
+  .pbm-demo{font:700 .62rem/1 var(--body);letter-spacing:.08em;text-transform:uppercase;color:#0B1F3A;background:var(--orange);align-self:flex-start;padding:5px 10px;border-radius:999px;margin-bottom:16px}
+  .pbm-sum{display:flex;justify-content:space-between;align-items:baseline;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.14);font-size:.9rem}
+  .pbm-sum b{font-family:var(--display);font-size:1.5rem}
+  .pbm-sum small{color:rgba(244,247,252,.6);display:block;font-size:.72rem;margin-top:3px}
+  .pbm-pay-tabs{display:flex;gap:8px;margin:18px 0 14px}
+  .pbm-pay-tab{flex:1;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.06);color:#fff;font:600 .78rem var(--body);border-radius:10px;padding:9px;cursor:pointer;transition:.2s}
+  .pbm-pay-tab[aria-selected="true"]{background:#fff;color:var(--navy);border-color:#fff}
+  .pbm-field{margin-bottom:11px}
+  .pbm-field label{display:block;font-size:.68rem;letter-spacing:.04em;text-transform:uppercase;color:rgba(244,247,252,.6);margin-bottom:5px}
+  .pbm-field input{width:100%;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;border-radius:10px;padding:11px 12px;font:500 .9rem var(--body)}
+  .pbm-field input::placeholder{color:rgba(244,247,252,.4)}
+  .pbm-row{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+  .pbm-paybtn{margin-top:16px;border:0;background:var(--orange);color:#0B1F3A;font:700 .95rem var(--body);border-radius:12px;padding:13px;cursor:pointer;transition:.2s}
+  .pbm-paybtn:hover{background:#fff}
+  .pbm-secure{margin-top:12px;font-size:.72rem;color:rgba(244,247,252,.55);text-align:center}
+  .pbm-msg{margin-top:10px;font-size:.76rem;color:var(--orange);text-align:center;min-height:16px}
+  .pbm-close{position:absolute;z-index:3;top:14px;right:14px;width:34px;height:34px;border:0;border-radius:50%;background:rgba(255,255,255,.9);cursor:pointer;font-size:20px;line-height:1;color:#0B1F3A}
+  @media (max-width:720px){
+    .pbm-card{grid-template-columns:1fr;max-height:92vh;overflow-y:auto}
+    .pbm-left{padding:26px 22px}
+  }
+</style>
+<section class="shop" id="explore-playbooks" aria-label="Explore all playbooks">
+  <div class="wrap">
+    <div class="shop-head">
+      <div>
+        <p class="eyebrow">The library</p>
+        <h2>Explore <span>all playbooks</span>.</h2>
+        <p>Find the right playbook for your interview preparation.</p>
+      </div>
+    </div>
+    <div class="shop-tools">
+      <div class="shop-tabs" id="shopTabs" role="tablist" aria-label="Filter playbooks by type">
+        <button class="shop-tab" role="tab" data-cat="all" aria-selected="true">All</button>
+        <button class="shop-tab" role="tab" data-cat="interview" aria-selected="false">Interview playbooks</button>
+        <button class="shop-tab" role="tab" data-cat="case" aria-selected="false">Case playbooks</button>
+      </div>
+      <div class="shop-sort">
+        <label for="shopSort">Sort by</label>
+        <select id="shopSort">
+          <option value="popular">Most popular</option>
+          <option value="price-asc">Price: low to high</option>
+          <option value="price-desc">Price: high to low</option>
+          <option value="rating">Rating</option>
+        </select>
+      </div>
+    </div>
+    <div class="shop-grid" id="shopGrid"></div>
+  </div>
+
+  <!-- buy modal -->
+  <div class="pbm" id="pbm" role="dialog" aria-modal="true" aria-labelledby="pbmTitle">
+    <div class="pbm-back" data-close></div>
+    <div class="pbm-card">
+      <button class="pbm-close" data-close aria-label="Close">&times;</button>
+      <div class="pbm-left">
+        <p class="pbm-ey" id="pbmEy">Playbook</p>
+        <h3 id="pbmTitle">Playbook</h3>
+        <p class="pbm-intro" id="pbmIntro"></p>
+        <ul class="pbm-list" id="pbmList"></ul>
+        <p class="pbm-note" id="pbmNote" hidden></p>
+      </div>
+      <div class="pbm-right">
+        <span class="pbm-demo">Demo · payments not live yet</span>
+        <div class="pbm-sum">
+          <div><span id="pbmSumName">Playbook</span><small>Lifetime access · instant download</small></div>
+          <b id="pbmSumPrice">₹499</b>
+        </div>
+        <div class="pbm-pay-tabs" role="tablist" aria-label="Payment method">
+          <button class="pbm-pay-tab" role="tab" aria-selected="true" data-pay="card">Card</button>
+          <button class="pbm-pay-tab" role="tab" aria-selected="false" data-pay="upi">UPI</button>
+        </div>
+        <div id="pbmPayCard">
+          <div class="pbm-field"><label>Card number</label><input type="text" inputmode="numeric" placeholder="1234 5678 9012 3456" autocomplete="off"></div>
+          <div class="pbm-field"><label>Name on card</label><input type="text" placeholder="Your name" autocomplete="off"></div>
+          <div class="pbm-row">
+            <div class="pbm-field"><label>Expiry</label><input type="text" placeholder="MM / YY" autocomplete="off"></div>
+            <div class="pbm-field"><label>CVV</label><input type="text" inputmode="numeric" placeholder="•••" autocomplete="off"></div>
+          </div>
+        </div>
+        <div id="pbmPayUpi" hidden>
+          <div class="pbm-field"><label>UPI ID</label><input type="text" placeholder="yourname@upi" autocomplete="off"></div>
+        </div>
+        <button class="pbm-paybtn" id="pbmPay">Pay <span id="pbmPayAmt">₹499</span></button>
+        <p class="pbm-msg" id="pbmMsg" role="status"></p>
+        <p class="pbm-secure">🔒 Secure checkout — connect Razorpay to accept real payments.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+(function(){
+  const P = [
+    {id:"marketing",title:"Marketing",cat:"interview",tag:"Interview",meta:"42 topics · 120+ Qs",rating:4.7,price:499,
+     intro:"Revise how brands understand customers, create value, communicate effectively, and drive sustainable business growth.",
+     bullets:["Marketing fundamentals, consumer behaviour, segmentation, targeting, positioning, branding and the marketing mix","Digital marketing, SEO, social media, influencer marketing, promotions and channel strategies","Practical concepts and frameworks commonly discussed in marketing, brand and growth interviews"]},
+    {id:"sales",title:"Sales",cat:"interview",tag:"Interview",meta:"38 topics · 110+ Qs",rating:4.6,price:499,
+     intro:"Understand how businesses identify prospects, convert opportunities, manage relationships, and build repeatable revenue.",
+     bullets:["Sales funnels, customer buying stages, lead nurturing and conversion fundamentals","CRM, customer relationships, sales planning and post-purchase engagement","Practical preparation for sales, business development and revenue-focused interview questions"],
+     note:"Covers the customer journey from awareness and interest through purchase and loyalty, along with funnel-building activities."},
+    {id:"statistics",title:"Statistics",cat:"interview",tag:"Interview",meta:"30 topics · 90+ Qs",rating:4.6,price:499,
+     intro:"Build the statistical foundation needed to interpret data, explain results, and answer analytical interview questions.",
+     bullets:["Mean, median, mode, variance, standard deviation and frequency distributions","Probability, sampling methods, distributions and statistical reasoning","Clear explanations of formulas and concepts used in analytics, research and business interviews"],
+     note:"Begins with descriptive statistics and measures of central tendency and variability before progressing to probability and sampling."},
+    {id:"finance",title:"Finance",cat:"interview",tag:"Interview",meta:"48 topics · 150+ Qs",rating:4.8,price:499,
+     intro:"Revise the essential financial concepts used to understand performance, evaluate decisions, and discuss business value.",
+     bullets:["Balance sheets, income statements, cash-flow statements and financial performance","Time value of money, discounting, compounding and investment decisions","Financial ratios covering liquidity, solvency, profitability and operational efficiency"],
+     note:"Covers the principal financial statements and their role in assessing a company's financial health."},
+    {id:"analytics",title:"Analytics",cat:"interview",tag:"Interview",meta:"40 topics · 120+ Qs",rating:4.7,price:499,
+     intro:"Learn how raw data becomes meaningful insight, business recommendations, and better management decisions.",
+     bullets:["Data collection, cleaning, transformation, analysis, interpretation and visualisation","Descriptive, diagnostic, predictive and prescriptive analytics","Regression, cohort, factor, time-series and other widely used analytical techniques"],
+     note:"Follows the complete analysis process and explains how results become actionable business insights."},
+    {id:"economics",title:"Economics",cat:"interview",tag:"Interview",meta:"34 topics · 95+ Qs",rating:4.6,price:499,
+     intro:"Understand how markets, government decisions and economic forces influence businesses, customers and prices.",
+     bullets:["Supply, demand, equilibrium, elasticity and the factors influencing market prices","Capitalist, socialist and mixed economies, along with major economic sectors","Fiscal policy, monetary policy, inflation, trade and macroeconomic decision-making"],
+     note:"Begins with supply and demand and explains how these forces shape prices and market conditions."},
+    {id:"supply-chain",title:"Supply Chain",cat:"interview",tag:"Interview",meta:"32 topics · 85+ Qs",rating:4.6,price:499,
+     intro:"Revise how organisations plan, source, produce, move and manage goods efficiently from supplier to customer.",
+     bullets:["Planning, sourcing, manufacturing, delivery, returns and supply-chain models","Inventory management, EOQ, reorder points, ABC analysis, JIT and MRP","Quality, sustainability, global supply chains and data-driven inventory decisions"],
+     note:"Covers the complete supply-chain journey and major approaches to inventory optimisation."},
+    {id:"market-research",title:"Market Research",cat:"interview",tag:"Interview",meta:"28 topics · 80+ Qs",rating:4.6,price:499,
+     intro:"Learn how businesses understand customers, evaluate markets, analyse competitors and make evidence-based decisions.",
+     bullets:["Primary and secondary research, surveys, qualitative and quantitative methods","Market segmentation, customer insights, competitor analysis and emerging trends","Practical use of behavioural data, feedback, social media, website data and market evidence"],
+     note:"Covers research design, segmentation, competitive analysis and the interpretation of market information."},
+    {id:"consulting",title:"Consulting",cat:"interview",tag:"Interview",meta:"36 topics · 100+ Qs",rating:4.7,price:499,
+     intro:"Build the business knowledge, structured thinking and communication foundation expected in consulting-oriented roles.",
+     bullets:["Types of consulting, career paths, consultant responsibilities and essential professional skills","PESTEL, Porter's Five Forces, McKinsey 7S and process-improvement frameworks","Client management, communication, problem-solving and emerging consulting trends"],
+     note:"Includes competitive-analysis and organisational frameworks such as Porter's Five Forces and McKinsey 7S."},
+    {id:"strategy",title:"Strategy",cat:"interview",tag:"Interview",meta:"36 topics · 100+ Qs",rating:4.7,price:499,
+     intro:"Understand how organisations choose where to compete, create advantage and prepare for long-term growth.",
+     bullets:["Strategic-thinking fundamentals, vision, planning, risk evaluation and decision-making","SWOT and other frameworks used to assess businesses, markets and opportunities","Competition, growth, adaptability and the development of practical strategic recommendations"],
+     note:"Presents strategic thinking as the combination of observation, planning, problem-solving and adaptability."},
+    {id:"product-management",title:"Product Management",cat:"interview",tag:"Interview",meta:"40 topics · 110+ Qs",rating:4.7,price:499,
+     intro:"Learn how products move from customer problem and initial idea to launch, adoption and continuous improvement.",
+     bullets:["Product strategy, customer needs, competition, market fit and profitability","Ideation, validation, prototyping, MVP development, launch and product improvement","Personas, roadmaps, KPIs, OKRs, product analytics and cross-functional collaboration"],
+     note:"Follows the product journey from idea development through validation, prototyping, release and iteration."},
+    {id:"project-management",title:"Project Management",cat:"interview",tag:"Interview",meta:"30 topics · 85+ Qs",rating:4.6,price:499,
+     intro:"Revise how projects are planned, delivered, monitored and protected against delays, risks and execution failures.",
+     bullets:["Project planning, scope, scheduling, stakeholders, resources and delivery fundamentals","Risk identification, impact assessment, mitigation planning and continuous monitoring","Risk avoidance, reduction, transfer and acceptance strategies with practical applications"],
+     note:"Explains the complete risk-management process, from identification through mitigation and monitoring."},
+    {id:"guesstimates",title:"Guesstimates",cat:"case",tag:"Case",meta:"25 questions · 60+ examples",rating:4.6,price:399,
+     intro:"Practise breaking unfamiliar estimation questions into logical assumptions, manageable calculations and defensible answers.",
+     bullets:["Population, demand, revenue, capacity, consumption and market-sizing problems","Assumption building, segmentation, rounding, sanity checks and structured calculations","Complete worked approaches showing how to communicate reasoning, not merely the final number"],
+     note:"Emphasises logical assumptions, simplified calculations and explaining the approach clearly to the interviewer."},
+    {id:"market-entry",title:"Market Entry",cat:"case",tag:"Case",meta:"12 case studies",rating:4.6,price:499,
+     intro:"Learn how to decide whether a company should enter a new market and how it should proceed.",
+     bullets:["Market attractiveness, customers, competition, company capabilities and product fit","Market sizing, expected profitability, barriers to entry and operational feasibility","Entry choices including organic expansion, acquisition, partnership and joint ventures"],
+     note:"Teaches students to evaluate opportunity, viability and feasibility before recommending an entry strategy."},
+    {id:"pricing",title:"Pricing",cat:"case",tag:"Case",meta:"10 case studies",rating:4.7,price:499,
+     intro:"Practise determining what a product or service should cost using commercial logic and customer value.",
+     bullets:["Cost-based, competitor-based and value-based pricing approaches","Fixed and variable costs, R&D recovery, margins, elasticity and willingness to pay","Final recommendations supported by calculations, risks, considerations and next steps"],
+     note:"Compares multiple pricing approaches and connects costs, competition and perceived customer value."}
+  ];
+  const COVERS=["linear-gradient(150deg,#2E6BFF,#1D4ED8)","linear-gradient(150deg,#0B1F3A,#16345C)","linear-gradient(150deg,#1D4ED8,#1740A8)","linear-gradient(150deg,#5B8CFF,#2E6BFF)","linear-gradient(150deg,#16345C,#0B1F3A)","linear-gradient(150deg,#2E6BFF,#5B8CFF)"];
+  const grid=document.getElementById("shopGrid");
+  const tabs=document.getElementById("shopTabs");
+  const sortSel=document.getElementById("shopSort");
+  if(!grid) return;
+  let cat="all", sort="popular";
+  const inr=n=>"₹"+n;
+
+  function view(){
+    let list=P.filter(p=>cat==="all"||p.cat===cat);
+    if(sort==="price-asc")list=list.slice().sort((a,b)=>a.price-b.price);
+    else if(sort==="price-desc")list=list.slice().sort((a,b)=>b.price-a.price);
+    else if(sort==="rating")list=list.slice().sort((a,b)=>b.rating-a.rating);
+    grid.innerHTML=list.map((p,i)=>`
+      <article class="pb-buy">
+        <div class="pb-cover" style="background:${COVERS[P.indexOf(p)%COVERS.length]}">
+          <span class="pb-tag">${p.tag}</span>
+          <span class="pb-cover-t">${p.title}</span>
+        </div>
+        <div class="pb-body">
+          <h3>${p.title} Playbook</h3>
+          <div class="pb-meta"><span class="pb-star">★ ${p.rating.toFixed(1)}</span><span>${p.meta}</span></div>
+          <p class="pb-blurb">${p.intro}</p>
+        </div>
+        <div class="pb-foot">
+          <span class="pb-price">${inr(p.price)}</span>
+          <button class="pb-buybtn" data-buy="${p.id}">Buy now</button>
+        </div>
+      </article>`).join("");
+  }
+  view();
+
+  tabs.addEventListener("click",e=>{
+    const b=e.target.closest("[data-cat]"); if(!b)return;
+    cat=b.dataset.cat;
+    [...tabs.children].forEach(t=>t.setAttribute("aria-selected",String(t===b)));
+    view();
+  });
+  sortSel.addEventListener("change",()=>{sort=sortSel.value;view();});
+
+  // ---- modal ----
+  const pbm=document.getElementById("pbm");
+  const byId=id=>document.getElementById(id);
+  function open(p){
+    byId("pbmEy").textContent=p.tag+" playbook";
+    byId("pbmTitle").textContent=p.title;
+    byId("pbmIntro").textContent=p.intro;
+    byId("pbmList").innerHTML=p.bullets.map(b=>`<li>${b}</li>`).join("");
+    const note=byId("pbmNote");
+    if(p.note){note.textContent=p.note;note.hidden=false;}else{note.hidden=true;}
+    byId("pbmSumName").textContent=p.title+" Playbook";
+    byId("pbmSumPrice").textContent=inr(p.price);
+    byId("pbmPayAmt").textContent=inr(p.price);
+    byId("pbmMsg").textContent="";
+    pbm.classList.add("open");
+    document.body.style.overflow="hidden";
+  }
+  function close(){pbm.classList.remove("open");document.body.style.overflow="";}
+  grid.addEventListener("click",e=>{
+    const b=e.target.closest("[data-buy]"); if(!b)return;
+    const p=P.find(x=>x.id===b.dataset.buy); if(p)open(p);
+  });
+  pbm.addEventListener("click",e=>{if(e.target.hasAttribute("data-close"))close();});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&pbm.classList.contains("open"))close();});
+
+  // payment method toggle
+  pbm.querySelectorAll("[data-pay]").forEach(t=>t.addEventListener("click",()=>{
+    pbm.querySelectorAll("[data-pay]").forEach(x=>x.setAttribute("aria-selected",String(x===t)));
+    byId("pbmPayCard").hidden=t.dataset.pay!=="card";
+    byId("pbmPayUpi").hidden=t.dataset.pay!=="upi";
+  }));
+  byId("pbmPay").addEventListener("click",()=>{
+    byId("pbmMsg").textContent="Demo only — connect Razorpay to accept real payments.";
+  });
+})();
+</script>
+
 <!-- 4. WHY STUDENTS NEED THESE PLAYBOOKS -->
 <section class="pbk pbk-alt">
   <div class="wrap">
