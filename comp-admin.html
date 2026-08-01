@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/gl.css?v=8">
+<link rel="stylesheet" href="css/gl.css?v=9">
 <style>
   .adm-banner{background:var(--charcoal);color:var(--cream);padding:14px 0;font-size:.85rem}
   .adm-banner .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
@@ -56,7 +56,7 @@
     border-radius:12px;margin-bottom:8px;cursor:pointer;transition:border-color .15s;
   }
   .check-team:hover{border-color:rgba(22,22,22,.35)}
-  .check-team input{width:19px;height:19px;accent-color:#FB4D0A}
+  .check-team input{width:19px;height:19px;accent-color:#2E6BFF}
   .check-team b{font-size:.92rem}
   .check-team small{color:var(--ink-soft);font-size:.78rem}
   .adm-sect{
@@ -71,7 +71,7 @@
   }
   .inst-opt{display:flex;gap:9px;align-items:center;font-size:.85rem;cursor:pointer;padding:4px 6px;border-radius:8px}
   .inst-opt:hover{background:var(--cream)}
-  .inst-opt input{width:17px;height:17px;accent-color:#FB4D0A;flex:none}
+  .inst-opt input{width:17px;height:17px;accent-color:#2E6BFF;flex:none}
   .adm-note{font-size:.82rem;color:var(--ink-soft);background:var(--cream);border-radius:10px;padding:11px 14px;margin-top:14px}
   .save-ok{display:none;color:var(--green);font-weight:600;font-size:.88rem;margin-left:12px}
   .save-ok.show{display:inline}
@@ -122,7 +122,7 @@
 <nav class="nav" id="site-nav" aria-label="Main">
   <div class="nav-inner">
     <div class="nav-brand">
-      <a class="wordmark" href="index.html" aria-label="Embark India home">e<span class="mba">MBA</span>rk<svg class="wm-flag" viewBox="0 0 13 15" aria-hidden="true"><path d="M1.5 15V1" stroke="#161616" stroke-width="1.6" stroke-linecap="round"/><path d="M1.5 1.2h9.5l-2.8 3 2.8 3H1.5z" fill="#FB4D0A"/></svg></a>
+      <a class="wordmark" href="index.html" aria-label="Embark India home">e<span class="mba">MBA</span>rk<svg class="wm-flag" viewBox="0 0 13 15" aria-hidden="true"><path d="M1.5 15V1" stroke="#161616" stroke-width="1.6" stroke-linecap="round"/><path d="M1.5 1.2h9.5l-2.8 3 2.8 3H1.5z" fill="#2E6BFF"/></svg></a>
       <span class="nav-service">Competition admin</span>
     </div>
     <ul class="nav-links">
@@ -205,7 +205,7 @@
           <div class="field"><label>Description</label><input id="rw-second-desc" type="text"></div>
           <div class="field"><label>Other benefits</label><input id="rw-second-ben" type="text"></div>
         </div>
-        <div class="field"><label style="display:flex;align-items:center;gap:10px;cursor:pointer"><input type="checkbox" id="cf-ppo" style="width:18px;height:18px;accent-color:#FB4D0A">PPO / PPI track</label></div>
+        <div class="field"><label style="display:flex;align-items:center;gap:10px;cursor:pointer"><input type="checkbox" id="cf-ppo" style="width:18px;height:18px;accent-color:#2E6BFF">PPO / PPI track</label></div>
         <div class="field"></div>
         <div class="field"><label>Host logo (square image)</label><input id="cf-logo" type="file" accept="image/*"><small id="cf-logo-now" style="font-size:.75rem;color:var(--ink-soft)"></small></div>
         <div class="field"><label>Banner images (up to 3, wide)</label><input id="cf-banners" type="file" accept="image/*" multiple><small id="cf-banners-now" style="font-size:.75rem;color:var(--ink-soft)"></small></div>
@@ -295,8 +295,8 @@
   <svg class="foot-path" viewBox="0 0 1200 90" preserveAspectRatio="none" aria-hidden="true">
     <path class="fp-line" d="M-20 70 C 180 20, 360 85, 560 48 S 920 12, 1128 44" fill="none"/>
     <g transform="translate(1128 44)">
-      <path d="M0 2V-30" stroke="#FAF7F2" stroke-width="2.4" stroke-linecap="round"/>
-      <path d="M0 -29h21l-6.2 6.6 6.2 6.6H0z" fill="#FB4D0A"/>
+      <path d="M0 2V-30" stroke="#F4F7FC" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M0 -29h21l-6.2 6.6 6.2 6.6H0z" fill="#2E6BFF"/>
     </g>
   </svg>
   <div class="wrap">
@@ -438,7 +438,7 @@
       <div class="field"><label>Round name</label><input type="text" class="rd-name" value="${esc(r.name || 'Round ' + roundCount)}"></div>
       <div class="field"><label>Opens</label><input type="datetime-local" class="rd-open" value="${r.opens ? toLocal(r.opens) : ''}"></div>
       <div class="field" style="grid-column:3/-1"><label>Closes — the round's timer <span class="req">*</span></label><input type="datetime-local" class="rd-close" value="${r.closes ? toLocal(r.closes) : ''}"></div>
-      <div class="field" style="grid-column:1/3"><label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-top:8px"><input type="checkbox" class="rd-upload" style="width:18px;height:18px;accent-color:#FB4D0A" ${r.type !== 'event' ? 'checked' : ''}>Students upload a submission in this round</label></div>
+      <div class="field" style="grid-column:1/3"><label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-top:8px"><input type="checkbox" class="rd-upload" style="width:18px;height:18px;accent-color:#2E6BFF" ${r.type !== 'event' ? 'checked' : ''}>Students upload a submission in this round</label></div>
       <div class="field" style="grid-column:3/-1"><label>Event / session link (for non-upload rounds)</label><input type="url" class="rd-link" value="${esc(r.link || '')}" placeholder="https://…"></div>
       <div class="field" style="grid-column:1/-1"><label>Round description</label><input type="text" class="rd-brief" value="${esc(r.brief || '')}" placeholder="What must teams submit — or what happens — in this round?"></div>`;
     $('rounds-editor').appendChild(div);

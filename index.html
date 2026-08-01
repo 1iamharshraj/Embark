@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600&family=PT+Serif:ital@1&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/gl.css?v=8">
+<link rel="stylesheet" href="css/gl.css?v=9">
 <style>
   /* ---------- hero carousel ---------- */
   .hcar{position:relative;background:var(--cream);overflow:hidden}
@@ -91,7 +91,7 @@
   }
   .hslide.anim .pf{opacity:1;translate:0 0;transition-delay:var(--d)}
   .pf-comp{
-    top:8px;left:4%;width:200px;border-radius:16px;background:linear-gradient(150deg,#FF7038,#FB4D0A);
+    top:8px;left:4%;width:200px;border-radius:16px;background:linear-gradient(150deg,#5B8CFF,#2E6BFF);
     color:#fff;padding:16px 18px;rotate:-5deg;
   }
   .pf-comp b{font-family:var(--display);font-weight:700;font-size:.92rem;display:block;line-height:1.25}
@@ -100,13 +100,13 @@
     top:44px;right:6%;width:180px;border-radius:14px;background:var(--charcoal);color:var(--cream);
     padding:16px;rotate:4deg;
   }
-  .pf-deck .bar{height:7px;border-radius:99px;background:rgba(250,247,242,.28);margin-top:8px}
+  .pf-deck .bar{height:7px;border-radius:99px;background:rgba(244,247,252,.28);margin-top:8px}
   .pf-deck .bar:nth-child(2){width:82%}
   .pf-deck .bar:nth-child(3){width:60%}
   .pf-deck .bar:nth-child(4){width:72%;background:var(--orange)}
   .pf-deck small{font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;opacity:.7}
   .pf-cert{
-    top:172px;left:12%;width:230px;border-radius:10px;background:#FFFDF6;
+    top:172px;left:12%;width:230px;border-radius:10px;background:#FBFCFE;
     border:2.5px dashed var(--orange);padding:18px;text-align:center;rotate:-2deg;
   }
   .pf-cert b{font-family:var(--display);font-weight:800;font-size:.9rem;display:block}
@@ -211,7 +211,7 @@
   .partner:hover{filter:none;opacity:1;transform:translateY(-2px)}
   .partner img{width:26px;height:26px;object-fit:contain}
   .partner b{
-    font-family:var(--body);font-weight:600;font-size:.88rem;color:#3D3B36;white-space:nowrap;
+    font-family:var(--body);font-weight:600;font-size:.88rem;color:#363B43;white-space:nowrap;
   }
 
   /* ---------- reality grid ---------- */
@@ -222,16 +222,16 @@
     border:1px solid rgba(22,22,22,.14);border-radius:22px;overflow:hidden;
   }
   .rcell{
-    background:#F8F5EC;padding:24px 24px 22px;position:relative;overflow:hidden;
+    background:#EEF3FA;padding:24px 24px 22px;position:relative;overflow:hidden;
     min-height:132px;display:flex;flex-direction:column;justify-content:center;
     transition:background .35s;
   }
   .rcell::before{
     content:"";position:absolute;inset:0;pointer-events:none;
-    background-image:radial-gradient(rgba(251,77,10,.32) 1.2px,transparent 1.7px);
+    background-image:radial-gradient(rgba(46,107,255,.32) 1.2px,transparent 1.7px);
     background-size:11px 11px;opacity:0;transition:opacity .4s;
   }
-  .rcell:hover{background:#FFFDF4}
+  .rcell:hover{background:#FBFCFE}
   .rcell:hover::before{opacity:1}
   .rc-num{
     font-family:var(--display);font-weight:800;font-size:clamp(1.5rem,2.4vw,2.1rem);
@@ -298,11 +298,11 @@
     background:var(--charcoal);color:var(--cream);text-decoration:none;
     display:flex;flex-direction:column;justify-content:center;
   }
-  .rbrand::before{background-image:radial-gradient(rgba(251,77,10,.5) 1.2px,transparent 1.7px)}
+  .rbrand::before{background-image:radial-gradient(rgba(46,107,255,.5) 1.2px,transparent 1.7px)}
   .rbrand:hover{background:#131313}
   .rbrand .rb-mark{font-family:var(--display);font-weight:800;font-size:1.5rem;letter-spacing:-.02em;position:relative;z-index:1}
   .rbrand .rb-mark .mba{color:var(--orange)}
-  .rbrand .rc-desc{color:rgba(250,247,242,.7)}
+  .rbrand .rc-desc{color:rgba(244,247,252,.7)}
   .rbrand .rb-go{
     position:relative;z-index:1;margin-top:10px;font-size:.8rem;font-weight:600;color:var(--orange);
     display:inline-flex;align-items:center;gap:6px;opacity:0;translate:-8px 0;transition:all .35s .1s;
@@ -364,37 +364,37 @@
 
   /* ============================================================
      NAVY & LOGICAL ORANGE — palette test (home page only)
-     primary navy #0B1F3A · accent #FB4D0A · buttons #C93A05
-     bg ivory #FAF7F2 · cards #FFFFFF · text #161616 · muted #6B7280
+     primary navy #0B1F3A · accent #2E6BFF · buttons #1D4ED8
+     bg ivory #F4F7FC · cards #FFFFFF · text #161616 · muted #6B7280
      ============================================================ */
   :root{
-    --cream:#FAF7F2;
-    --cream-deep:#EFE9DE;
+    --cream:#F4F7FC;
+    --cream-deep:#E7EDF6;
     --white:#FFFFFF;
     --charcoal:#161616;
     --ink-soft:#6B7280;
     --navy:#0B1F3A;
     --navy-soft:#E7EDF6;
     --navy-deep:#08172B;
-    --orange:#FB4D0A;
-    --orange-deep:#C93A05;
-    --orange-soft:#FFE9DF;
+    --orange:#2E6BFF;
+    --orange-deep:#1D4ED8;
+    --orange-soft:#E5EDFF;
     --green:#0B1F3A;
     --green-soft:#E7EDF6;
     --green-deep:#08172B;
   }
-  body{background:#FAF7F2}
-  .nav{background:rgba(250,247,242,.9)}
-  .btn-primary{background:#C93A05;box-shadow:0 6px 18px rgba(201,58,5,.28)}
-  .btn-primary:hover{background:#A93104}
+  body{background:#F4F7FC}
+  .nav{background:rgba(244,247,252,.9)}
+  .btn-primary{background:#1D4ED8;box-shadow:0 6px 18px rgba(29,78,216,.28)}
+  .btn-primary:hover{background:#1740A8}
   .ng-cta{background:var(--navy)}
   .ng-cta:hover{background:var(--navy-deep)}
 
   /* hero */
   .hslide:nth-child(1) .hero-blob path,
-  .hslide:nth-child(2) .hero-blob path{fill:#FB4D0A}
+  .hslide:nth-child(2) .hero-blob path{fill:#2E6BFF}
   .hslide:nth-child(3) .hero-blob path{fill:#0B1F3A}
-  .hslide:nth-child(4) .hero-blob path{fill:#FB4D0A}
+  .hslide:nth-child(4) .hero-blob path{fill:#2E6BFF}
   .hslide .hero-blob{opacity:.16 !important}
   .rm-path{stroke:var(--navy)}
   .rm-chip .dot{background:var(--orange)}
@@ -405,25 +405,25 @@
   .di-g{background:var(--navy-soft);color:var(--navy)}
   .dash-item .tickmark{color:var(--navy)}
   .dash-live{color:var(--navy);background:var(--navy-soft)}
-  .pf-comp{background:linear-gradient(150deg,#FF7038,#FB4D0A)}
+  .pf-comp{background:linear-gradient(150deg,#5B8CFF,#2E6BFF)}
   .pf-deck{background:var(--navy)}
   .pf-deck .bar:nth-child(4){background:var(--orange)}
   .pf-cert{border-color:var(--orange)}
   .pf-cert .seal{background:var(--orange)}
   .pf-badge{background:var(--navy)}
-  .feed-item:nth-child(2) .fdot{background:#FB4D0A !important}
+  .feed-item:nth-child(2) .fdot{background:#2E6BFF !important}
   .feed-item:nth-child(3) .fdot{background:#0B1F3A !important}
-  .feed-item:nth-child(4) .fdot{background:#C93A05 !important}
+  .feed-item:nth-child(4) .fdot{background:#1D4ED8 !important}
   .feed-item:nth-child(5) .fdot{background:#6B7280 !important}
   .feed-item:nth-child(6) .fdot{background:#0B1F3A !important}
-  .feed-item:nth-child(7) .fdot{background:#FB4D0A !important}
+  .feed-item:nth-child(7) .fdot{background:#2E6BFF !important}
 
   /* reality grid */
   .rcell{background:#FFFFFF}
-  .rcell:hover{background:#FFFDFA}
-  .rcell::before{background-image:radial-gradient(rgba(251,77,10,.3) 1.2px,transparent 1.7px)}
+  .rcell:hover{background:#FBFCFE}
+  .rcell::before{background-image:radial-gradient(rgba(46,107,255,.3) 1.2px,transparent 1.7px)}
   .rcell:hover .rc-num{color:var(--orange-deep)}
-  .rcenter{background:#FAF7F2}
+  .rcenter{background:#F4F7FC}
   .rcenter h2 em{color:var(--orange)}
   .rcenter .rpill{color:var(--navy);border-color:rgba(11,31,58,.45)}
   .rc-funnel path{stroke:var(--navy)}
@@ -432,8 +432,8 @@
   .rbrand:hover{background:var(--navy-deep)}
   .rbrand .rb-mark .mba{color:var(--orange)}
   .rbrand .rb-go{color:var(--orange)}
-  .rbrand::before{background-image:radial-gradient(rgba(251,77,10,.5) 1.2px,transparent 1.7px)}
-  .rbrand .rc-desc{color:rgba(250,247,242,.7)}
+  .rbrand::before{background-image:radial-gradient(rgba(46,107,255,.5) 1.2px,transparent 1.7px)}
+  .rbrand .rc-desc{color:rgba(244,247,252,.7)}
 
   /* statement band */
   .nextgen{background:#FFFFFF}
@@ -442,7 +442,7 @@
 
   /* service cards: navy/orange alternation */
   .svc-card{background:#FFFFFF}
-  .svc{background:#FAF7F2}
+  .svc{background:#F4F7FC}
   .svc-grid .svc-card:nth-child(odd) .svc-icon{background:var(--navy-soft);color:var(--navy)}
   .svc-grid .svc-card:nth-child(odd) .svc-outcome{background:var(--navy-soft);color:var(--navy)}
   .svc-grid .svc-card:nth-child(odd) .svc-go{color:var(--navy)}
@@ -450,28 +450,28 @@
   .svc-grid .svc-card:nth-child(even) .svc-icon{background:var(--orange-soft);color:var(--orange-deep)}
   .svc-grid .svc-card:nth-child(even) .svc-outcome{background:var(--orange-soft);color:var(--orange-deep)}
   .svc-grid .svc-card:nth-child(even) .svc-go{color:var(--orange-deep)}
-  .svc-grid .svc-card:nth-child(even):hover{box-shadow:0 18px 40px rgba(251,77,10,.22)}
+  .svc-grid .svc-card:nth-child(even):hover{box-shadow:0 18px 40px rgba(46,107,255,.22)}
   .svc-grid .svc-card:nth-child(1) h3 span{background:var(--orange-soft) !important;color:var(--orange-deep) !important}
 
   .soon-sec,.pstrip-sec{background:#FFFFFF}
 
   /* final CTA card */
   .final-home .fh-card{background:var(--navy)}
-  .final-home .fh-card p{color:rgba(250,247,242,.75)}
-  .final-home .fh-blob.l path,.final-home .fh-blob.r path{fill:#FB4D0A}
+  .final-home .fh-card p{color:rgba(244,247,252,.75)}
+  .final-home .fh-blob.l path,.final-home .fh-blob.r path{fill:#2E6BFF}
   .final-home .fh-card h2 .accent{color:var(--orange)}
-  .final-home .btn-light{background:#FAF7F2;color:var(--navy)}
+  .final-home .btn-light{background:#F4F7FC;color:var(--navy)}
 
   /* ---------- section rhythm: alternating bands + tighter spacing ---------- */
   .posters{background:#F1F1F1}
   .partners{background:#FFFFFF;padding:56px 0 60px}
-  .reality{background:#FAF7F2;padding:76px 0}
+  .reality{background:#F4F7FC;padding:76px 0}
   .rcell{background:#FFFFFF}
-  .rcenter{background:#F6F2EA}
+  .rcenter{background:#ECF1F9}
   .nextgen{background:#FFFFFF;padding:80px 0 72px}
   .ng-top{margin-bottom:64px}
   body .pstrip-sec{background:#F1F1F1;padding:72px 0}
-  body .final-home{background:#FAF7F2;padding:72px 0 84px}
+  body .final-home{background:#F4F7FC;padding:72px 0 84px}
 
   /* ---------- creative floating nav ---------- */
   body .nav{
@@ -480,7 +480,7 @@
     padding:0 12px;
   }
   body .nav-inner{
-    background:rgba(250,247,242,.82);backdrop-filter:blur(16px);
+    background:rgba(244,247,252,.82);backdrop-filter:blur(16px);
     border:1px solid rgba(22,22,22,.08);border-radius:999px;
     box-shadow:0 6px 24px rgba(11,31,58,.07);
     padding:13px 30px;max-width:none;
@@ -488,7 +488,7 @@
   }
   body .nav-inner .nav-links{margin-left:auto}
   .nav.scrolled .nav-inner{
-    background:rgba(250,247,242,.95);
+    background:rgba(244,247,252,.95);
     box-shadow:0 12px 36px rgba(11,31,58,.14);
   }
   /* wordmark flag plant */
@@ -524,7 +524,7 @@
   .nav-burger svg{width:22px;height:22px}
   .mob-menu{
     display:none;max-width:1080px;margin:8px auto 0;
-    background:rgba(250,247,242,.97);backdrop-filter:blur(16px);
+    background:rgba(244,247,252,.97);backdrop-filter:blur(16px);
     border:1px solid rgba(22,22,22,.08);border-radius:22px;
     box-shadow:0 14px 40px rgba(11,31,58,.16);padding:12px;
   }
@@ -533,7 +533,7 @@
     display:block;text-decoration:none;color:var(--charcoal);font-weight:600;
     font-size:1rem;padding:13px 18px;border-radius:14px;
   }
-  .mob-menu a:hover{background:rgba(251,77,10,.08);color:var(--orange-deep)}
+  .mob-menu a:hover{background:rgba(46,107,255,.08);color:var(--orange-deep)}
   @media (max-width:860px){
     .nav-burger{display:flex;align-items:center}
     body .nav-inner{padding:7px 8px 7px 20px}
@@ -554,7 +554,7 @@
     transition:transform .22s,box-shadow .22s;
   }
   .svc-card:hover{transform:translateY(-7px)}
-  .svc-card.c-orange:hover{box-shadow:0 18px 40px rgba(251,77,10,.25)}
+  .svc-card.c-orange:hover{box-shadow:0 18px 40px rgba(46,107,255,.25)}
   .svc-card.c-green:hover{box-shadow:0 18px 40px rgba(11,31,58,.25)}
   .svc-card.c-dark:hover{box-shadow:0 18px 40px rgba(22,22,22,.28)}
   .svc-card:hover .svc-go svg{transform:translateX(5px)}
@@ -592,7 +592,7 @@
   .pstrip::-webkit-scrollbar{display:none}
   .pcard{
     flex:0 0 300px;height:238px;border-radius:28px;position:relative;overflow:hidden;
-    scroll-snap-align:start;padding:26px 28px;text-decoration:none;color:#1B1710;
+    scroll-snap-align:start;padding:26px 28px;text-decoration:none;color:#14171F;
     display:block;will-change:transform;
     transition:transform .45s cubic-bezier(.22,.9,.3,1.2),box-shadow .35s;
     opacity:0;translate:0 46px;rotate:2.5deg;
@@ -605,7 +605,7 @@
   .pcard:hover .part{transform:scale(1.14) rotate(-5deg) translateY(-6px)}
   .pcard:hover .pb1{transform:scale(1.25) rotate(14deg)}
   .pcard:hover .pb2{transform:scale(1.2) rotate(-10deg)}
-  .pcard:hover .pgo{background:#1B1710;color:#fff;gap:11px}
+  .pcard:hover .pgo{background:#14171F;color:#fff;gap:11px}
   .pcard h3{
     font-family:var(--display);font-weight:800;font-size:1.5rem;line-height:1.1;
     letter-spacing:-.015em;max-width:82%;position:relative;z-index:2;
@@ -630,21 +630,21 @@
   .pgo{
     position:absolute;left:24px;bottom:20px;z-index:2;
     display:inline-flex;align-items:center;gap:7px;
-    font-size:.82rem;font-weight:600;color:#1B1710;
+    font-size:.82rem;font-weight:600;color:#14171F;
     background:rgba(255,255,255,.78);border-radius:999px;padding:9px 16px;
     transition:background .3s,color .3s,gap .3s;
   }
   .pgo svg{width:15px;height:15px}
   /* palettes — soft two-tone gradients */
-  .pc-1{background:linear-gradient(150deg,#FBCEDD 0%,#F5A9C6 100%)}
+  .pc-1{background:linear-gradient(150deg,#DCE7FF 0%,#8FB0FF 100%)}
   .pc-2{background:linear-gradient(150deg,#DDEEC6 0%,#C2E09E 100%)}
-  .pc-3{background:linear-gradient(150deg,#FCF6C0 0%,#F7EC90 100%)}
-  .pc-4{background:linear-gradient(150deg,#E4D8F3 0%,#CDB9E7 100%)}
-  .pc-5{background:linear-gradient(150deg,#FDE0C3 0%,#F9C99A 100%)}
+  .pc-3{background:linear-gradient(150deg,#E9F0FE 0%,#D6E2FF 100%)}
+  .pc-4{background:linear-gradient(150deg,#DCE7FF 0%,#B8CCFF 100%)}
+  .pc-5{background:linear-gradient(150deg,#DCE7FF 0%,#B8CCFF 100%)}
   .pc-6{background:linear-gradient(150deg,#D2EAF7 0%,#AFD9EE 100%)}
   .pc-7{background:linear-gradient(150deg,#D4EFE5 0%,#B4E2D1 100%)}
-  .pc-8{background:linear-gradient(150deg,#FAD8CB 0%,#F3BBA6 100%)}
-  .pc-9{background:linear-gradient(150deg,#F7EAC4 0%,#EEDB9C 100%)}
+  .pc-8{background:linear-gradient(150deg,#DCE7FF 0%,#B8CCFF 100%)}
+  .pc-9{background:linear-gradient(150deg,#E5EDFF 0%,#CFDCFF 100%)}
   @media (prefers-reduced-motion:reduce){
     .pcard{opacity:1;translate:0 0;rotate:0deg;transition:none}
     .pblob,.part{animation:none;transition:none}
@@ -676,8 +676,8 @@
   .st-3 .st-icon{color:var(--charcoal)}
   .st-4{background:#FBE3E3}
   .st-4 .st-icon{color:#A03D3D}
-  .st-5{background:#E9E4F2}
-  .st-5 .st-icon{color:#5B4A80}
+  .st-5{background:#E5EDFF}
+  .st-5 .st-icon{color:#2A3F7A}
 
   /* ---------- final CTA ---------- */
   .final-home{padding:20px 0 96px}
@@ -687,7 +687,7 @@
   }
   .fh-card h2{color:#fff;font-size:clamp(1.8rem,4.4vw,3rem);max-width:640px;margin:0 auto 14px}
   .fh-card h2 .accent{color:var(--orange)}
-  .fh-card p{color:rgba(250,247,242,.72);max-width:460px;margin:0 auto 34px}
+  .fh-card p{color:rgba(244,247,252,.72);max-width:460px;margin:0 auto 34px}
   .fh-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1}
   .fh-blob{position:absolute;pointer-events:none;opacity:.15}
   .fh-blob.l{left:-70px;top:-60px;width:250px}
@@ -721,7 +721,7 @@
   .ng-kicker::after{content:"";display:block;width:74px;border-top:3px solid var(--orange);margin-top:12px}
   body .ng-top h2{color:#FFFFFF;font-size:clamp(1.9rem,3.8vw,2.9rem)}
   body .ng-top h2 em{color:var(--orange)}
-  body .ng-right p{color:rgba(250,247,242,.75)}
+  body .ng-right p{color:rgba(244,247,252,.75)}
   body .ng-cta{background:var(--orange)}
   body .ng-cta:hover{background:var(--orange-deep)}
   body .ng-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
@@ -732,7 +732,7 @@
   }
   body .ng-stat:hover{transform:translateY(-6px)}
   body .ng-num,body .ng-num.acc{color:var(--orange);font-size:clamp(1.9rem,3vw,2.5rem)}
-  body .ng-stat p{color:#3D3B36;margin-top:12px;max-width:none}
+  body .ng-stat p{color:#363B43;margin-top:12px;max-width:none}
   .dotwave{position:absolute;left:0;right:0;pointer-events:none;width:100%}
   .dotwave.dark{top:60px;height:110%;opacity:.5}
   .dotwave.light{bottom:-30px;height:240px;opacity:.5}
@@ -746,29 +746,29 @@
   /* ---------- reality grid polish ---------- */
   body .ng-stat{padding:36px 32px 40px !important;border-radius:10px}
   body .ng-num,body .ng-num.acc{font-size:clamp(2.1rem,3.2vw,2.8rem);line-height:1;display:block}
-  body .ng-stat p{margin-top:22px;font-size:.94rem;line-height:1.5;color:#4A4842}
+  body .ng-stat p{margin-top:22px;font-size:.94rem;line-height:1.5;color:#464C56}
   body .rcell{padding:26px 24px;min-height:124px;gap:2px}
   /* descriptions always visible, hover just warms them */
   body .rc-desc{opacity:.75;translate:0 0;transition:opacity .3s,color .3s}
-  body .rcell:hover .rc-desc{opacity:1;color:#3D3B36}
+  body .rcell:hover .rc-desc{opacity:1;color:#363B43}
   /* exam chips always visible */
-  body .rc-chips span{scale:1;background:#F4F1EA;border-color:rgba(22,22,22,.12);transition:background .25s,border-color .25s}
-  body .rcell:hover .rc-chips span{background:var(--orange-soft);border-color:rgba(251,77,10,.35)}
+  body .rc-chips span{scale:1;background:#EAF0F8;border-color:rgba(22,22,22,.12);transition:background .25s,border-color .25s}
+  body .rcell:hover .rc-chips span{background:var(--orange-soft);border-color:rgba(46,107,255,.35)}
   /* funnel: tucked into the corner, out of the title's way */
   body .rc-funnel{top:auto;bottom:12px;right:12px;translate:0 0;width:40px;height:54px;opacity:.55}
   body .rcell:hover .rc-funnel{opacity:.95}
   /* brand cell: restore navy (was losing cascade to the white cell rule) */
-  body .rcell.rbrand{background:var(--navy);color:#FAF7F2}
+  body .rcell.rbrand{background:var(--navy);color:#F4F7FC}
   body .rcell.rbrand:hover{background:var(--navy-deep)}
-  body .rcell.rbrand .rc-desc{color:rgba(250,247,242,.75);opacity:1}
-  body .rcell.rbrand:hover .rc-desc{color:rgba(250,247,242,.9)}
+  body .rcell.rbrand .rc-desc{color:rgba(244,247,252,.75);opacity:1}
+  body .rcell.rbrand:hover .rc-desc{color:rgba(244,247,252,.9)}
 
   /* ---------- spotlight pill ---------- */
   .spot-pill{
     display:inline-flex;align-items:center;gap:8px;
     font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
     color:var(--orange-deep);background:var(--orange-soft);
-    border:1px solid rgba(251,77,10,.3);border-radius:999px;padding:7px 15px;margin-bottom:14px;
+    border:1px solid rgba(46,107,255,.3);border-radius:999px;padding:7px 15px;margin-bottom:14px;
   }
   .spot-pill svg{width:13px;height:13px}
 
@@ -813,7 +813,7 @@
   }
   .col-btn:hover{background:var(--orange-deep);gap:12px}
   @media (prefers-reduced-motion:reduce){.col-row{animation:none}}
-  body .final-home{background:#FAF7F2}
+  body .final-home{background:#F4F7FC}
   @media (max-width:960px){
     .col-card{flex-basis:250px}
   }
@@ -850,7 +850,7 @@
 
 <nav class="nav" id="site-nav" aria-label="Main">
   <div class="nav-inner">
-    <a class="wordmark" href="index.html" aria-label="Embark India home">e<span class="mba">MBA</span>rk<svg class="wm-flag" viewBox="0 0 13 15" aria-hidden="true"><path d="M1.5 15V1" stroke="#161616" stroke-width="1.6" stroke-linecap="round"/><path d="M1.5 1.2h9.5l-2.8 3 2.8 3H1.5z" fill="#FB4D0A"/></svg></a>
+    <a class="wordmark" href="index.html" aria-label="Embark India home">e<span class="mba">MBA</span>rk<svg class="wm-flag" viewBox="0 0 13 15" aria-hidden="true"><path d="M1.5 15V1" stroke="#161616" stroke-width="1.6" stroke-linecap="round"/><path d="M1.5 1.2h9.5l-2.8 3 2.8 3H1.5z" fill="#2E6BFF"/></svg></a>
     <ul class="nav-links">
       <li><a href="mentorship.html">Mentorship</a></li>
       <li><a href="competitions.html">Competitions</a></li>
@@ -876,7 +876,7 @@
 
     <!-- Slide 1: platform promise -->
     <section class="hslide">
-      <svg class="hero-blob" style="top:-130px;right:-140px;width:320px;opacity:.9" viewBox="0 0 330 300" aria-hidden="true"><path fill="#FB4D0A" d="M236 20c46 25 86 70 82 114-4 44-52 88-106 102-53 14-110-4-142-42C38 156 32 98 58 60 84 21 142 3 182 6c20 2 38 7 54 14Z"/></svg>
+      <svg class="hero-blob" style="top:-130px;right:-140px;width:320px;opacity:.9" viewBox="0 0 330 300" aria-hidden="true"><path fill="#2E6BFF" d="M236 20c46 25 86 70 82 114-4 44-52 88-106 102-53 14-110-4-142-42C38 156 32 98 58 60 84 21 142 3 182 6c20 2 38 7 54 14Z"/></svg>
       <div class="wrap">
         <div class="hs-copy">
           <p class="eyebrow">The platform</p>
@@ -905,7 +905,7 @@
 
     <!-- Slide 2: mentorship -->
     <section class="hslide">
-      <svg class="hero-blob" style="bottom:-150px;left:-150px;width:300px;opacity:.45" viewBox="0 0 300 270" aria-hidden="true"><path fill="#FB4D0A" d="M246 27c35 27 57 73 49 112-8 40-46 73-90 86-45 13-95 6-125-22C50 175 40 126 55 86 69 46 107 16 150 9c37-6 70 0 96 18Z"/></svg>
+      <svg class="hero-blob" style="bottom:-150px;left:-150px;width:300px;opacity:.45" viewBox="0 0 300 270" aria-hidden="true"><path fill="#2E6BFF" d="M246 27c35 27 57 73 49 112-8 40-46 73-90 86-45 13-95 6-125-22C50 175 40 126 55 86 69 46 107 16 150 9c37-6 70 0 96 18Z"/></svg>
       <div class="wrap">
         <div class="hs-copy">
           <p class="eyebrow">Mentorship — the flagship</p>
@@ -935,7 +935,7 @@
 
     <!-- Slide 3: proof-building -->
     <section class="hslide">
-      <svg class="hero-blob" style="top:-140px;left:-140px;width:300px;opacity:.5" viewBox="0 0 330 300" aria-hidden="true"><path fill="#FB4D0A" d="M236 20c46 25 86 70 82 114-4 44-52 88-106 102-53 14-110-4-142-42C38 156 32 98 58 60 84 21 142 3 182 6c20 2 38 7 54 14Z"/></svg>
+      <svg class="hero-blob" style="top:-140px;left:-140px;width:300px;opacity:.5" viewBox="0 0 330 300" aria-hidden="true"><path fill="#2E6BFF" d="M236 20c46 25 86 70 82 114-4 44-52 88-106 102-53 14-110-4-142-42C38 156 32 98 58 60 84 21 142 3 182 6c20 2 38 7 54 14Z"/></svg>
       <div class="wrap">
         <div class="hs-copy">
           <p class="eyebrow">Proof-building</p>
@@ -960,7 +960,7 @@
 
     <!-- Slide 4: opportunities -->
     <section class="hslide">
-      <svg class="hero-blob" style="bottom:-140px;right:-150px;width:310px;opacity:.5" viewBox="0 0 300 270" aria-hidden="true"><path fill="#FB4D0A" d="M246 27c35 27 57 73 49 112-8 40-46 73-90 86-45 13-95 6-125-22C50 175 40 126 55 86 69 46 107 16 150 9c37-6 70 0 96 18Z"/></svg>
+      <svg class="hero-blob" style="bottom:-140px;right:-150px;width:310px;opacity:.5" viewBox="0 0 300 270" aria-hidden="true"><path fill="#2E6BFF" d="M246 27c35 27 57 73 49 112-8 40-46 73-90 86-45 13-95 6-125-22C50 175 40 126 55 86 69 46 107 16 150 9c37-6 70 0 96 18Z"/></svg>
       <div class="wrap">
         <div class="hs-copy">
           <p class="eyebrow">Opportunities</p>
@@ -974,11 +974,11 @@
         <div class="hs-visual">
           <div class="feed" aria-hidden="true">
             <div class="feed-head"><b>Opportunity feed</b><span class="feed-live">Live</span></div>
-            <div class="feed-item" style="--d:.3s"><span class="fdot" style="background:#FB4D0A"></span>Internship alert<small>just now</small></div>
+            <div class="feed-item" style="--d:.3s"><span class="fdot" style="background:#2E6BFF"></span>Internship alert<small>just now</small></div>
             <div class="feed-item" style="--d:.5s"><span class="fdot" style="background:#0B1F3A"></span>Marketing role · Mumbai<small>2m</small></div>
             <div class="feed-item" style="--d:.7s"><span class="fdot" style="background:#B42318"></span>Finance role · Gurgaon<small>8m</small></div>
-            <div class="feed-item" style="--d:.9s"><span class="fdot" style="background:#F2B01E"></span>Guest lecture · D2C brands<small>14m</small></div>
-            <div class="feed-item" style="--d:1.1s"><span class="fdot" style="background:#5B4A80"></span>Mock interview slot open<small>21m</small></div>
+            <div class="feed-item" style="--d:.9s"><span class="fdot" style="background:#5B8CFF"></span>Guest lecture · D2C brands<small>14m</small></div>
+            <div class="feed-item" style="--d:1.1s"><span class="fdot" style="background:#2A3F7A"></span>Mock interview slot open<small>21m</small></div>
             <div class="feed-item" style="--d:1.3s"><span class="fdot" style="background:#0A66C2"></span>Industry session · Analytics<small>32m</small></div>
           </div>
         </div>
@@ -1030,10 +1030,10 @@
     }
     .lc-card:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(11,31,58,.12)}
     .lc-bar{flex:none;width:6px;align-self:stretch;border-radius:3px}
-    .lb-orange{background:linear-gradient(180deg,#FF7038,#C93A05)}
+    .lb-orange{background:linear-gradient(180deg,#5B8CFF,#1D4ED8)}
     .lb-green{background:linear-gradient(180deg,#16345C,#08172B)}
     .lb-dark{background:linear-gradient(180deg,#2A2A2A,#101010)}
-    .lb-charcoal{background:linear-gradient(180deg,#101010,#FB4D0A)}
+    .lb-charcoal{background:linear-gradient(180deg,#101010,#2E6BFF)}
     .lc-card b{display:block;font-family:var(--display);font-weight:700;font-size:.98rem;line-height:1.3}
     .lc-card small{color:var(--ink-soft);font-size:.78rem}
     .lc-go{margin-left:auto;flex:none;color:var(--orange-deep);font-weight:600;font-size:.85rem;white-space:nowrap}
@@ -1093,9 +1093,9 @@
         <span class="rc-desc">Lakhs compete for limited quality outcomes.</span>
         <svg class="rc-funnel" viewBox="0 0 54 72" aria-hidden="true">
           <path d="M4 4h46L33 30v34l-12-8V30z" fill="none" stroke="#0B1F3A" stroke-width="2.5" stroke-linejoin="round"/>
-          <circle class="fdrop" cx="27" cy="10" r="3" fill="#FB4D0A"/>
-          <circle class="fdrop" cx="20" cy="8" r="2.4" fill="#FB4D0A"/>
-          <circle class="fdrop" cx="34" cy="9" r="2.4" fill="#FB4D0A"/>
+          <circle class="fdrop" cx="27" cy="10" r="3" fill="#2E6BFF"/>
+          <circle class="fdrop" cx="20" cy="8" r="2.4" fill="#2E6BFF"/>
+          <circle class="fdrop" cx="34" cy="9" r="2.4" fill="#2E6BFF"/>
         </svg>
       </div>
       <!-- middle band -->
@@ -1217,8 +1217,8 @@
         <defs><pattern id="dotsw3" width="9" height="9" patternUnits="userSpaceOnUse"><circle cx="2.2" cy="2.2" r="1.4" fill="rgba(255,255,255,.3)"/></pattern></defs>
         <path d="M-60 120 C 260 20, 520 190, 820 90 S 1150 -20, 1380 60" fill="none" stroke="url(#dotsw3)" stroke-width="70"/>
       </svg>
-      <svg class="fh-blob l" viewBox="0 0 260 240" aria-hidden="true"><path fill="#FB4D0A" d="M186 14c38 20 72 56 68 92-3 37-44 74-88 85-44 12-90-3-116-34C24 126 20 78 41 47 63 15 110 1 143 3c17 1 31 5 43 11Z"/></svg>
-      <svg class="fh-blob r" viewBox="0 0 300 270" aria-hidden="true"><path fill="#FB4D0A" d="M246 27c35 27 57 73 49 112-8 40-46 73-90 86-45 13-95 6-125-22C50 175 40 126 55 86 69 46 107 16 150 9c37-6 70 0 96 18Z"/></svg>
+      <svg class="fh-blob l" viewBox="0 0 260 240" aria-hidden="true"><path fill="#2E6BFF" d="M186 14c38 20 72 56 68 92-3 37-44 74-88 85-44 12-90-3-116-34C24 126 20 78 41 47 63 15 110 1 143 3c17 1 31 5 43 11Z"/></svg>
+      <svg class="fh-blob r" viewBox="0 0 300 270" aria-hidden="true"><path fill="#2E6BFF" d="M246 27c35 27 57 73 49 112-8 40-46 73-90 86-45 13-95 6-125-22C50 175 40 126 55 86 69 46 107 16 150 9c37-6 70 0 96 18Z"/></svg>
       <div class="fh-inner">
         <h2>Start before you <span class="accent">feel ready</span>.</h2>
         <p>That's how every good MBA journey begins. Pick a door — the rest unfolds from there.</p>
@@ -1235,8 +1235,8 @@
   <svg class="foot-path" viewBox="0 0 1200 90" preserveAspectRatio="none" aria-hidden="true">
     <path class="fp-line" d="M-20 70 C 180 20, 360 85, 560 48 S 920 12, 1128 44" fill="none"/>
     <g transform="translate(1128 44)">
-      <path d="M0 2V-30" stroke="#FAF7F2" stroke-width="2.4" stroke-linecap="round"/>
-      <path d="M0 -29h21l-6.2 6.6 6.2 6.6H0z" fill="#FB4D0A"/>
+      <path d="M0 2V-30" stroke="#F4F7FC" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M0 -29h21l-6.2 6.6 6.2 6.6H0z" fill="#2E6BFF"/>
     </g>
   </svg>
   <div class="wrap">
@@ -1443,7 +1443,7 @@
 
   // ----- pastel service strip -----
   (() => {
-    const CH = '#241F17', OR = '#FB4D0A', GR = '#0B1F3A', GO = '#F2B01E', WH = '#FFFFFF';
+    const CH = '#1A1E28', OR = '#2E6BFF', GR = '#0B1F3A', GO = '#5B8CFF', WH = '#FFFFFF';
     const ART = {
       trophy: `<rect x="8" y="30" width="60" height="44" rx="6" fill="${CH}"/><path d="M26 44l-8 8 8 8M42 44l8 8-8 8" stroke="${WH}" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="24" y="74" width="28" height="7" rx="3" fill="#9CA3AF"/><path d="M60 26h24v14a12 12 0 0 1-24 0z" fill="${OR}"/><path d="M60 30h-7a7 7 0 0 0 7 10M84 30h7a7 7 0 0 1-7 10" stroke="${OR}" stroke-width="5" fill="none"/><rect x="67" y="50" width="10" height="12" fill="${OR}"/><rect x="60" y="62" width="24" height="7" rx="3" fill="${GO}"/>`,
       mic: `<rect x="10" y="18" width="44" height="30" rx="12" fill="${WH}"/><circle cx="24" cy="33" r="3" fill="${CH}"/><circle cx="33" cy="33" r="3" fill="${CH}"/><circle cx="42" cy="33" r="3" fill="${CH}"/><path d="M20 48l-4 10 12-8" fill="${WH}"/><rect x="58" y="26" width="20" height="34" rx="10" fill="${CH}"/><path d="M52 50a16 16 0 0 0 32 0" stroke="${CH}" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M68 68v12M56 82h24" stroke="${CH}" stroke-width="5" stroke-linecap="round"/>`,

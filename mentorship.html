@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600&family=PT+Serif:ital@0;1&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/gl.css?v=8">
+<link rel="stylesheet" href="css/gl.css?v=9">
 <style>
   /* ---------- hero ---------- */
   .m-hero{position:relative;padding:80px 0 64px;overflow:hidden}
@@ -40,7 +40,7 @@
   .s-chip:hover{border-color:rgba(22,22,22,.3)}
   .s-chip[aria-selected="true"]{background:var(--charcoal);border-color:var(--charcoal)}
   .s-chip[aria-selected="true"] b{color:var(--cream)}
-  .s-chip[aria-selected="true"] small{color:rgba(250,247,242,.65)}
+  .s-chip[aria-selected="true"] small{color:rgba(244,247,252,.65)}
   .stage-reco{
     margin-top:22px;padding:16px 22px;border-radius:14px;background:var(--orange-soft);
     color:var(--orange-deep);font-size:.95rem;display:none;text-align:left;
@@ -68,7 +68,7 @@
     transition:all .25s;box-shadow:0 0 0 8px var(--white);
   }
   .jt-node:hover .jt-dot{border-style:solid;border-color:var(--orange)}
-  .jt-node.lit .jt-dot{background:var(--orange);border:none;color:#fff;box-shadow:0 0 0 8px var(--white),0 8px 20px rgba(251,77,10,.35)}
+  .jt-node.lit .jt-dot{background:var(--orange);border:none;color:#fff;box-shadow:0 0 0 8px var(--white),0 8px 20px rgba(46,107,255,.35)}
   .jt-node b{font-family:var(--display);font-weight:700;font-size:.98rem;letter-spacing:-.01em;line-height:1.25}
   .jt-node small{font-size:.78rem;color:var(--ink-soft);line-height:1.4}
   .jt-node.dim{opacity:.45}
@@ -97,7 +97,7 @@
   }
   .ph-outcome svg{width:15px;height:15px;flex:none}
   .ph-includes{list-style:none;display:grid;gap:11px}
-  .ph-includes li{display:flex;gap:11px;font-size:.94rem;color:#3A352C;align-items:flex-start}
+  .ph-includes li{display:flex;gap:11px;font-size:.94rem;color:#2C323E;align-items:flex-start}
   .ph-includes svg{width:17px;height:17px;flex:none;color:var(--orange);margin-top:2px}
   .ph-side{display:flex;flex-direction:column;gap:18px;position:relative;z-index:1}
   .ph-mentors{background:var(--cream);border-radius:18px;padding:22px 24px}
@@ -128,23 +128,23 @@
   .stories-sec .eyebrow{color:var(--orange-soft)}
   .stories-sec .eyebrow::before{border-color:var(--orange)}
   .stories-sec h2{color:#fff}
-  .stories-sec .sec-head p{color:rgba(250,247,242,.65)}
+  .stories-sec .sec-head p{color:rgba(244,247,252,.65)}
   .story-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
   .story-card{
-    background:rgba(250,247,242,.06);border:1px solid rgba(250,247,242,.15);
+    background:rgba(244,247,252,.06);border:1px solid rgba(244,247,252,.15);
     border-radius:22px;padding:30px 28px;display:flex;flex-direction:column;gap:14px;
     transition:background .25s,transform .25s;
   }
-  .story-card:hover{background:rgba(250,247,242,.1);transform:translateY(-5px)}
+  .story-card:hover{background:rgba(244,247,252,.1);transform:translateY(-5px)}
   .story-phase{
     align-self:flex-start;font-size:.7rem;font-weight:600;letter-spacing:.1em;
     text-transform:uppercase;color:var(--orange);
-    border:1px solid rgba(251,77,10,.5);border-radius:999px;padding:4px 11px;
+    border:1px solid rgba(46,107,255,.5);border-radius:999px;padding:4px 11px;
   }
   .story-card h3{color:#fff;font-size:1.2rem;font-weight:700;line-height:1.3}
-  .story-card blockquote{font-family:"PT Serif",serif;font-style:italic;font-size:.94rem;color:rgba(250,247,242,.75);line-height:1.6}
-  .story-who{margin-top:auto;font-size:.82rem;color:rgba(250,247,242,.55)}
-  .stories-note{text-align:center;font-size:.8rem;color:rgba(250,247,242,.4);margin-top:30px}
+  .story-card blockquote{font-family:"PT Serif",serif;font-style:italic;font-size:.94rem;color:rgba(244,247,252,.75);line-height:1.6}
+  .story-who{margin-top:auto;font-size:.82rem;color:rgba(244,247,252,.55)}
+  .stories-note{text-align:center;font-size:.8rem;color:rgba(244,247,252,.4);margin-top:30px}
 
   /* ---------- mentor carousel ---------- */
   .mentors-sec{padding:92px 0;background:var(--white)}
@@ -175,7 +175,7 @@
   .mc-tags span{font-size:.72rem;font-weight:500;background:#fff;border-radius:999px;padding:4px 10px;color:var(--ink-soft)}
   .mc-meta{display:flex;align-items:center;gap:14px;font-size:.82rem;color:var(--ink-soft)}
   .mc-meta b{color:var(--charcoal)}
-  .mc-meta .star{color:#BA7517}
+  .mc-meta .star{color:#1D4ED8}
   .mentor-card .btn{margin-top:auto}
   .mc-nav{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:28px}
 
@@ -223,7 +223,7 @@
   .rung .rung-tag{font-size:.74rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
   .rung p{font-size:.9rem;color:var(--ink-soft)}
   .rung ul{list-style:none;display:grid;gap:9px;margin:6px 0}
-  .rung li{display:flex;gap:9px;font-size:.87rem;color:#3A352C;align-items:flex-start}
+  .rung li{display:flex;gap:9px;font-size:.87rem;color:#2C323E;align-items:flex-start}
   .rung li svg{width:15px;height:15px;flex:none;color:var(--green);margin-top:3px}
   .rung .price-line{font-family:var(--display);font-weight:700;font-size:1.05rem;margin-top:auto}
   .rung .price-line small{display:block;font-family:var(--body);font-weight:400;font-size:.78rem;color:var(--ink-soft);margin-top:3px}
@@ -233,11 +233,11 @@
   }
   .rung.flagship h3{color:#fff}
   .rung.flagship .rung-tag{color:var(--orange)}
-  .rung.flagship p{color:rgba(250,247,242,.7)}
-  .rung.flagship li{color:rgba(250,247,242,.85)}
+  .rung.flagship p{color:rgba(244,247,252,.7)}
+  .rung.flagship li{color:rgba(244,247,252,.85)}
   .rung.flagship li svg{color:var(--orange)}
   .rung.flagship .price-line{color:#fff}
-  .rung.flagship .price-line small{color:rgba(250,247,242,.6)}
+  .rung.flagship .price-line small{color:rgba(244,247,252,.6)}
   .rung .flag-badge{
     position:absolute;top:-13px;left:50%;transform:translateX(-50%);
     background:var(--orange);color:#fff;font-size:.72rem;font-weight:600;
@@ -327,7 +327,7 @@
 <nav class="nav" id="site-nav" aria-label="Main">
   <div class="nav-inner">
     <div class="nav-brand">
-      <a class="wordmark" href="index.html" aria-label="Embark India home">e<span class="mba">MBA</span>rk<svg class="wm-flag" viewBox="0 0 13 15" aria-hidden="true"><path d="M1.5 15V1" stroke="#161616" stroke-width="1.6" stroke-linecap="round"/><path d="M1.5 1.2h9.5l-2.8 3 2.8 3H1.5z" fill="#FB4D0A"/></svg></a>
+      <a class="wordmark" href="index.html" aria-label="Embark India home">e<span class="mba">MBA</span>rk<svg class="wm-flag" viewBox="0 0 13 15" aria-hidden="true"><path d="M1.5 15V1" stroke="#161616" stroke-width="1.6" stroke-linecap="round"/><path d="M1.5 1.2h9.5l-2.8 3 2.8 3H1.5z" fill="#2E6BFF"/></svg></a>
       <span class="nav-service">Mentorship</span>
     </div>
     <ul class="nav-links">
@@ -355,10 +355,10 @@
 <!-- 6.1 HERO -->
 <header class="m-hero">
   <svg class="hero-blob" style="position:absolute;top:-130px;right:-140px;width:320px;opacity:.9" viewBox="0 0 330 300" aria-hidden="true">
-    <path fill="#FB4D0A" d="M236 20c46 25 86 70 82 114-4 44-52 88-106 102-53 14-110-4-142-42C38 156 32 98 58 60 84 21 142 3 182 6c20 2 38 7 54 14Z"/>
+    <path fill="#2E6BFF" d="M236 20c46 25 86 70 82 114-4 44-52 88-106 102-53 14-110-4-142-42C38 156 32 98 58 60 84 21 142 3 182 6c20 2 38 7 54 14Z"/>
   </svg>
   <svg class="hero-blob" style="position:absolute;bottom:-140px;left:-150px;width:290px;opacity:.4" viewBox="0 0 300 270" aria-hidden="true">
-    <path fill="#FB4D0A" d="M246 27c35 27 57 73 49 112-8 40-46 73-90 86-45 13-95 6-125-22C50 175 40 126 55 86 69 46 107 16 150 9c37-6 70 0 96 18Z"/>
+    <path fill="#2E6BFF" d="M246 27c35 27 57 73 49 112-8 40-46 73-90 86-45 13-95 6-125-22C50 175 40 126 55 86 69 46 107 16 150 9c37-6 70 0 96 18Z"/>
   </svg>
   <div class="wrap">
     <p class="eyebrow" style="justify-content:center">The flagship — end-to-end mentorship</p>
@@ -601,8 +601,8 @@
   <svg class="foot-path" viewBox="0 0 1200 90" preserveAspectRatio="none" aria-hidden="true">
     <path class="fp-line" d="M-20 70 C 180 20, 360 85, 560 48 S 920 12, 1128 44" fill="none"/>
     <g transform="translate(1128 44)">
-      <path d="M0 2V-30" stroke="#FAF7F2" stroke-width="2.4" stroke-linecap="round"/>
-      <path d="M0 -29h21l-6.2 6.6 6.2 6.6H0z" fill="#FB4D0A"/>
+      <path d="M0 2V-30" stroke="#F4F7FC" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M0 -29h21l-6.2 6.6 6.2 6.6H0z" fill="#2E6BFF"/>
     </g>
   </svg>
   <div class="wrap">
@@ -914,7 +914,7 @@
               <span class="mc-college" style="margin-top:5px">${starSvg} ${m.rating} · ${m.sessions} sessions</span>
             </div>
           </div>
-          <p style="font-size:.92rem;margin-top:14px;color:#3A352C"><b>Why this match:</b> ${why}</p>
+          <p style="font-size:.92rem;margin-top:14px;color:#2C323E"><b>Why this match:</b> ${why}</p>
           <a class="btn btn-primary btn-sm" style="margin-top:16px" href="mentor-profile.html?m=${m.slug}">See profile &amp; book</a>
         </div>
         <p class="match-note">This match is also on its way to your email and WhatsApp (prototype: simulated). Not the right fit? Reply and we'll re-match — free.</p>`;

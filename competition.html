@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/gl.css?v=8">
+<link rel="stylesheet" href="css/gl.css?v=9">
 <style>
   [hidden]{display:none!important}
   body{background:#FFFFFF}
@@ -20,7 +20,7 @@
   }
   .hd-sec::before{
     content:"";position:absolute;top:-90px;right:6%;width:360px;height:360px;
-    border:1.5px solid rgba(251,77,10,.35);transform:rotate(45deg);border-radius:36px;pointer-events:none;
+    border:1.5px solid rgba(46,107,255,.35);transform:rotate(45deg);border-radius:36px;pointer-events:none;
   }
   .hd-sec::after{
     content:"";position:absolute;bottom:-80px;left:-60px;width:280px;height:280px;
@@ -40,7 +40,7 @@
   .comp-chip{
     display:inline-flex;align-items:center;gap:8px;
     font-size:.7rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
-    color:#FF8A5C;border:1px solid rgba(251,77,10,.6);border-radius:999px;padding:6px 16px;
+    color:#7FA6FF;border:1px solid rgba(46,107,255,.6);border-radius:999px;padding:6px 16px;
   }
   .comp-chip svg{width:14px;height:14px}
   .st-chip{font-size:.68rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;border-radius:999px;padding:6px 14px}
@@ -48,13 +48,13 @@
   .st-live::before{content:"\25CF";margin-right:5px;color:#D92D20}
   .st-upcoming{background:#fff;color:var(--charcoal)}
   .st-closed{background:rgba(255,255,255,.16);color:rgba(255,255,255,.9)}
-  .ppo-chip{font-size:.68rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;background:rgba(251,77,10,.18);color:#FFB894;border-radius:999px;padding:6px 14px}
+  .ppo-chip{font-size:.68rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;background:rgba(46,107,255,.18);color:#B8CCFF;border-radius:999px;padding:6px 14px}
 
   /* icon fact columns — one line on desktop */
   .hd-facts{display:flex;flex-wrap:nowrap;gap:12px 0;margin-top:22px}
   .hd-fact{display:flex;gap:10px;align-items:flex-start;padding:0 18px;border-left:1px solid rgba(255,255,255,.14);min-width:0}
   .hd-fact:first-child{border-left:none;padding-left:0}
-  .hd-fact svg{width:18px;height:18px;color:#FF8A5C;flex:none;margin-top:3px}
+  .hd-fact svg{width:18px;height:18px;color:#7FA6FF;flex:none;margin-top:3px}
   .hd-fact small{display:block;font-size:.62rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:3px;white-space:nowrap}
   .hd-fact b{display:block;font-size:.88rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px}
   .hd-divider{border-top:1px solid rgba(255,255,255,.12);margin:20px 0 18px}
@@ -101,10 +101,10 @@
     font-size:10rem;line-height:1;color:transparent;-webkit-text-stroke:1.5px rgba(255,255,255,.22);pointer-events:none;
   }
   .bnr-fallback h2{color:#fff;font-size:clamp(1.3rem,3vw,2rem);max-width:60%;margin:0}
-  .bn-orange{background:linear-gradient(135deg,#FF7038,#FB4D0A 55%,#C93A05)}
+  .bn-orange{background:linear-gradient(135deg,#5B8CFF,#2E6BFF 55%,#1D4ED8)}
   .bn-green{background:linear-gradient(135deg,#16345C,#0B1F3A 60%,#08172B)}
   .bn-dark{background:linear-gradient(135deg,#2A2A2A,#161616 60%,#101010)}
-  .bn-charcoal{background-image:radial-gradient(rgba(251,77,10,.25) 1.5px,transparent 1.9px);background-size:13px 13px;background-color:#101010}
+  .bn-charcoal{background-image:radial-gradient(rgba(46,107,255,.25) 1.5px,transparent 1.9px);background-size:13px 13px;background-color:#101010}
   .bnr-nav{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px}
   .bnr-dash{width:30px;height:4px;border-radius:2px;background:rgba(255,255,255,.25);transition:background .25s;border:none;cursor:pointer;padding:0}
   .bnr-dash.on{background:#fff}
@@ -154,16 +154,16 @@
     display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;
   }
   .coach-band h2{color:#fff;margin:0 0 8px;font-size:1.5rem}
-  .coach-band p{color:rgba(250,247,242,.72);font-size:.95rem;max-width:560px;margin:0}
+  .coach-band p{color:rgba(244,247,252,.72);font-size:.95rem;max-width:560px;margin:0}
   .d-block{background:var(--white);border-radius:24px;box-shadow:var(--shadow-card);padding:34px 36px;margin-bottom:24px;scroll-margin-top:170px}
   .d-block h2{font-size:1.45rem;margin-bottom:18px}
   .d-block h3.sub{font-size:1.02rem;font-weight:700;margin:26px 0 12px}
-  .d-block p{color:#3A352C;font-size:.96rem;margin-bottom:12px}
+  .d-block p{color:#2C323E;font-size:.96rem;margin-bottom:12px}
   .d-list{list-style:none;display:grid;gap:10px}
-  .d-list li{display:flex;gap:10px;font-size:.93rem;color:#3A352C;align-items:flex-start}
+  .d-list li{display:flex;gap:10px;font-size:.93rem;color:#2C323E;align-items:flex-start}
   .d-list svg{width:16px;height:16px;flex:none;color:var(--orange);margin-top:3px}
   .inst-grid{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:8px 20px}
-  .inst-grid li{display:flex;gap:9px;font-size:.9rem;color:#3A352C;align-items:flex-start}
+  .inst-grid li{display:flex;gap:9px;font-size:.9rem;color:#2C323E;align-items:flex-start}
   .inst-grid svg{width:15px;height:15px;flex:none;color:var(--navy);margin-top:3px}
   .prize-row{display:flex;justify-content:space-between;gap:14px;padding:13px 0;border-bottom:1px dashed rgba(22,22,22,.15);font-size:.94rem}
   .prize-row:last-child{border-bottom:none}
@@ -216,7 +216,7 @@
   .ric svg{width:46px;height:46px}
   .rup{
     border:2px dashed var(--orange);border-radius:16px;padding:18px 16px;text-align:center;
-    width:100%;background:#FFF9F5;display:flex;flex-direction:column;gap:8px;align-items:center;
+    width:100%;background:#F7FAFE;display:flex;flex-direction:column;gap:8px;align-items:center;
   }
   .rup > svg{width:34px;height:34px;color:var(--orange-deep)}
   .rup b{font-size:.95rem}
@@ -245,7 +245,7 @@
   }
   .tl-ico svg{width:22px;height:22px}
   .tl-item.past .tl-ico{background:var(--navy);color:#fff}
-  .tl-item.next .tl-ico{background:var(--orange);color:#fff;box-shadow:0 0 0 5px #fff,0 8px 20px rgba(251,77,10,.4)}
+  .tl-item.next .tl-ico{background:var(--orange);color:#fff;box-shadow:0 0 0 5px #fff,0 8px 20px rgba(46,107,255,.4)}
   .tl-card{
     margin-top:16px;background:#fff;border:1px solid rgba(22,22,22,.08);border-radius:14px;
     box-shadow:var(--shadow-card);padding:14px 12px;width:100%;
@@ -276,7 +276,7 @@
   .rwd-gold::before{content:"";position:absolute;left:-20px;top:50%;transform:translateY(-50%);width:170px;height:170px;border-radius:50%;background:radial-gradient(circle,rgba(255,190,60,.5),transparent 68%);pointer-events:none}
   .rwd-silver{background:linear-gradient(125deg,#37517A 0%,#1C2E4A 60%,#101D31 100%);box-shadow:0 16px 36px rgba(17,29,49,.35)}
   .rwd-silver::before{content:"";position:absolute;left:-20px;top:50%;transform:translateY(-50%);width:170px;height:170px;border-radius:50%;background:radial-gradient(circle,rgba(215,228,245,.42),transparent 68%);pointer-events:none}
-  .rwd-bronze{background:linear-gradient(125deg,#E07B33 0%,#B4530E 58%,#7C3A10 100%);box-shadow:0 16px 36px rgba(140,79,29,.4)}
+  .rwd-bronze{background:linear-gradient(125deg,#2E6BFF 0%,#1D4ED8 58%,#16345C 100%);box-shadow:0 16px 36px rgba(140,79,29,.4)}
   .rwd-bronze::before{content:"";position:absolute;left:-20px;top:50%;transform:translateY(-50%);width:170px;height:170px;border-radius:50%;background:radial-gradient(circle,rgba(255,225,185,.4),transparent 68%);pointer-events:none}
 
   .rwd-perks{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:14px;margin-top:18px}
@@ -432,7 +432,7 @@
 <nav class="nav" id="site-nav" aria-label="Main">
   <div class="nav-inner">
     <div class="nav-brand">
-      <a class="wordmark" href="index.html" aria-label="Embark India home">e<span class="mba">MBA</span>rk<svg class="wm-flag" viewBox="0 0 13 15" aria-hidden="true"><path d="M1.5 15V1" stroke="#161616" stroke-width="1.6" stroke-linecap="round"/><path d="M1.5 1.2h9.5l-2.8 3 2.8 3H1.5z" fill="#FB4D0A"/></svg></a>
+      <a class="wordmark" href="index.html" aria-label="Embark India home">e<span class="mba">MBA</span>rk<svg class="wm-flag" viewBox="0 0 13 15" aria-hidden="true"><path d="M1.5 15V1" stroke="#161616" stroke-width="1.6" stroke-linecap="round"/><path d="M1.5 1.2h9.5l-2.8 3 2.8 3H1.5z" fill="#2E6BFF"/></svg></a>
       <span class="nav-service">Competitions</span>
     </div>
     <ul class="nav-links">
@@ -579,8 +579,8 @@
   <svg class="foot-path" viewBox="0 0 1200 90" preserveAspectRatio="none" aria-hidden="true">
     <path class="fp-line" d="M-20 70 C 180 20, 360 85, 560 48 S 920 12, 1128 44" fill="none"/>
     <g transform="translate(1128 44)">
-      <path d="M0 2V-30" stroke="#FAF7F2" stroke-width="2.4" stroke-linecap="round"/>
-      <path d="M0 -29h21l-6.2 6.6 6.2 6.6H0z" fill="#FB4D0A"/>
+      <path d="M0 2V-30" stroke="#F4F7FC" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M0 -29h21l-6.2 6.6 6.2 6.6H0z" fill="#2E6BFF"/>
     </g>
   </svg>
   <div class="wrap">
@@ -846,9 +846,9 @@
         <path stroke="${s1}" stroke-width="1.6" stroke-linecap="round" opacity=".85" d="M8 22v5M5.5 24.5h5M56 20v4M54 22h4"/>
       </svg>`;
     const RANKS = {
-      winner: ['rwd-gold', 'Winner', ['#FFE08A', '#F0A500', '#9C5E00']],
+      winner: ['rwd-gold', 'Winner', ['#C7D8FF', '#2E6BFF', '#1740A8']],
       runner: ['rwd-silver', 'First Runner-up', ['#F4F7FB', '#C3CFDD', '#7E90A9']],
-      second: ['rwd-bronze', 'Second Runner-up', ['#FFD9AC', '#D98E4A', '#7C4A1E']]
+      second: ['rwd-bronze', 'Second Runner-up', ['#C7D8FF', '#7FA6FF', '#1D3B6E']]
     };
     const cards = ranks.map(p => {
       const [cls, defTitle, stops] = RANKS[p.key] || RANKS.winner;
@@ -1199,15 +1199,15 @@
     const cv = document.createElement('canvas');
     cv.width = 1400; cv.height = 990;
     const x = cv.getContext('2d');
-    x.fillStyle = '#FAF7F2'; x.fillRect(0, 0, 1400, 990);
-    x.strokeStyle = '#FB4D0A'; x.lineWidth = 5; x.setLineDash([16, 12]);
+    x.fillStyle = '#F4F7FC'; x.fillRect(0, 0, 1400, 990);
+    x.strokeStyle = '#2E6BFF'; x.lineWidth = 5; x.setLineDash([16, 12]);
     x.strokeRect(45, 45, 1310, 900);
     x.setLineDash([]);
     x.fillStyle = '#161616';
     x.font = '800 54px "Bricolage Grotesque", sans-serif';
     x.textAlign = 'center';
     x.fillText('e', 640, 140);
-    x.fillStyle = '#FB4D0A'; x.fillText('MBA', 700, 140);
+    x.fillStyle = '#2E6BFF'; x.fillText('MBA', 700, 140);
     x.fillStyle = '#161616'; x.fillText('rk', 768, 140);
     x.font = '500 22px Inter, sans-serif'; x.fillStyle = '#6B7280';
     x.fillText('E M B A R K   I N D I A   ·   C A S E   C O M P E T I T I O N S', 700, 185);
@@ -1230,7 +1230,7 @@
     x.fillText('Certificate ID: EMB-' + Math.random().toString(36).slice(2, 10).toUpperCase() + '  ·  verify at embarkindia.in', 700, 905);
     if (kind === 'winner') {
       x.beginPath(); x.arc(1180, 780, 70, 0, Math.PI * 2);
-      x.fillStyle = '#FB4D0A'; x.fill();
+      x.fillStyle = '#2E6BFF'; x.fill();
       x.fillStyle = '#fff'; x.font = '800 56px "Bricolage Grotesque", sans-serif';
       x.fillText('#' + rank, 1180, 800);
     }
