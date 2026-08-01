@@ -127,7 +127,7 @@
 
   /* ============ section scaffolding (brand) ============ */
   .pbk{padding:96px 0;position:relative}
-  .pbk-alt{background:var(--white)}
+  .pbk-alt{background:var(--white);padding:32px 0}
 
   /* ============ 2. domain carousel strip ============ */
   .mq-sec{background:var(--white);padding:32px 0}
@@ -175,10 +175,13 @@
   /* --- fanned stack (collapsed) --- */
   .cats-stack{position:relative;height:412px;perspective:1500px}
   .cats-stack .cat-card{
-    position:absolute;top:50%;left:0;width:214px;height:392px;transform-origin:center;
+    position:absolute;top:50%;left:0;width:272px;height:392px;transform-origin:center;
     transition:transform .5s cubic-bezier(.33,.9,.4,1.02),filter .5s;will-change:transform;
   }
   .cats-stack .cat-explore{display:none}
+  /* fanned stack = clean cover images only: no text overlay, no tint shade */
+  .cats-stack .cat-body{display:none}
+  .cats-stack .cat-card::before{display:none}
 
   /* --- card (shared by stack + grid) --- */
   .cat-card{
@@ -234,15 +237,15 @@
   .wsn-head h2 span{color:var(--orange)}
   .wsn-rule{width:54px;height:4px;border-radius:2px;background:var(--orange);margin:16px 0}
   .wsn-head p{font-size:1rem;color:var(--ink-soft);max-width:440px;line-height:1.6}
-  .wsn-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:36px}
+  .wsn-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:14px}
   .wsn-card{
-    background:var(--white);border:1px solid rgba(22,22,22,.1);border-radius:18px;padding:24px 20px;
+    background:var(--white);border:1px solid rgba(22,22,22,.1);border-radius:18px;padding:16px 18px;
     box-shadow:0 10px 26px rgba(22,22,22,.05);transition:transform .25s,box-shadow .25s;
   }
   .wsn-card:hover{transform:translateY(-6px);box-shadow:0 18px 42px rgba(22,22,22,.1)}
-  .wsn-ico{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center}
-  .wsn-ico svg{width:27px;height:27px}
-  .wsn-num{font-family:"Anton",sans-serif;font-size:.82rem;letter-spacing:.06em;margin:18px 0 8px;display:inline-block}
+  .wsn-ico{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+  .wsn-ico svg{width:22px;height:22px}
+  .wsn-num{font-family:"Anton",sans-serif;font-size:.82rem;letter-spacing:.06em;margin:12px 0 6px;display:inline-block}
   .wsn-card h3{font-family:var(--display);font-weight:700;font-size:1.06rem;line-height:1.22;color:var(--charcoal);margin-bottom:10px}
   .wsn-card p{font-size:.85rem;line-height:1.55;color:var(--ink-soft)}
   .wsn-card p b{color:var(--charcoal);font-weight:600}
@@ -265,14 +268,14 @@
   .wsn-plane{position:absolute;right:22px;bottom:20px;width:120px;color:var(--orange);opacity:.9;pointer-events:none}
 
   /* ============ 5. why embark playbooks (feature grid) ============ */
-  .wep{background:linear-gradient(180deg,#FFFFFF 0%,#F3F7FD 100%)}
-  .wep-head{text-align:center;max-width:640px;margin:0 auto 58px}
+  .wep{background:linear-gradient(180deg,#FFFFFF 0%,#F3F7FD 100%);padding:32px 0}
+  .wep-head{text-align:center;max-width:640px;margin:0 auto 20px}
   .wep-head h2{font-family:var(--display);font-weight:800;font-size:clamp(2rem,4vw,3rem);letter-spacing:-.02em;color:var(--charcoal)}
   .wep-head p{font-size:1.05rem;color:var(--ink-soft);margin-top:12px}
-  .wep-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:52px 44px;max-width:940px;margin:0 auto}
+  .wep-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px 44px;max-width:940px;margin:0 auto}
   .wep-item{text-align:center;position:relative}
   .wep-ico{
-    width:62px;height:62px;border-radius:18px;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;
+    width:52px;height:52px;border-radius:16px;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;
     background:#fff;color:var(--navy);box-shadow:0 10px 24px rgba(11,31,58,.1);transition:transform .25s,color .25s;
   }
   .wep-item:hover .wep-ico{transform:translateY(-4px);color:var(--orange)}
