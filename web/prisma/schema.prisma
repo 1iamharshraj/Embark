@@ -1,0 +1,252 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String
+  password      String
+  college       String    @default("")
+  isAdmin       Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  registrations     Registration[]
+  submissions       Submission[]
+  progress          PlaybookProgress[]
+  orders            Order[]
+  bookingRequests   BookingRequest[]
+}
+
+model Competition {
+  id                     String   @id
+  title                  String
+  host                   String   @default("Embark India")
+  category               String   @default("General Management")
+  banner                 String   @default("orange")
+  fee                    Int      @default(0)
+  teamMin                Int      @default(1)
+  teamMax                Int      @default(4)
+  eligibility            String   @default("")
+  about                  String   @default("")
+  rules                  String[] @default([])
+  prizes                 Json?
+  ppo                    Boolean  @default(false)
+  beginner               Boolean  @default(false)
+  draft                  Boolean  @default(true)
+  regOpen                DateTime
+  regClose               DateTime
+  startAt                DateTime
+  endAt                  DateTime
+  resultAt               DateTime?
+  rounds                 Json
+  eligibilityCriteria    String[] @default([])
+  teamStructure          String[] @default([])
+  institutes             String[] @default([])
+  compStructure          String[] @default([])
+  submissionGuidelines   String[] @default([])
+  contacts               Json?
+  aboutHost              String   @default("")
+  faqs                   Json?
+  viewBoost              Int      @default(0)
+  banners                String[] @default([])
+  views                  Int      @default(0)
+  seedRegs               Int      @default(0)
+
+  registrations Registration[]
+  submissions   Submission[]
+  advancements  Advancement[]
+  winners       Winner[]
+}
+
+model Registration {
+  id        String   @id @default(cuid())
+  userId    String
+  compId    String
+  teamName  String
+  members   Json
+  createdAt DateTime @default(now())
+
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  competition Competition   @relation(fields: [compId], references: [id], onDelete: Cascade)
+  submissions Submission[]
+  advancements Advancement[]
+  winner      Winner?
+
+  @@unique([userId, compId])
+}
+
+model Submission {
+  id        String   @id @default(cuid())
+  compId    String
+  regId     String
+  userId    String
+  roundIdx  Int
+  filePath  String?
+  link      String?
+  note      String   @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  competition  Competition   @relation(fields: [compId], references: [id], onDelete: Cascade)
+  registration Registration  @relation(fields: [regId], references: [id], onDelete: Cascade)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([regId, roundIdx])
+}
+
+model Advancement {
+  compId    String
+  regId     String
+  roundIdx  Int
+  createdAt DateTime @default(now())
+
+  competition  Competition  @relation(fields: [compId], references: [id], onDelete: Cascade)
+  registration Registration @relation(fields: [regId], references: [id], onDelete: Cascade)
+
+  @@id([compId, regId, roundIdx])
+}
+
+model Winner {
+  compId    String
+  regId     String @unique
+  rank      Int
+  teamName  String
+  createdAt DateTime @default(now())
+
+  competition  Competition  @relation(fields: [compId], references: [id], onDelete: Cascade)
+  registration Registration @relation(fields: [regId], references: [id], onDelete: Cascade)
+
+  @@id([compId, regId])
+}
+
+model Playbook {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  theme       String
+  category    String
+  tagline     String
+  oneLiner    String
+  content     Json
+  price       Int      @default(499)
+  rating      Float    @default(4.6)
+  meta        String
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  progress PlaybookProgress[]
+  orders   Order[]
+}
+
+model PlaybookProgress {
+  id         String   @id @default(cuid())
+  userId     String
+  playbookId String
+  checked    Int[]    @default([])
+  updatedAt  DateTime @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  playbook Playbook @relation(fields: [playbookId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, playbookId])
+}
+
+model Order {
+  id               String   @id @default(cuid())
+  userId           String
+  playbookId       String
+  amount           Int
+  status           String   @default("pending")
+  paymentId        String?
+  paymentSignature String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  playbook Playbook @relation(fields: [playbookId], references: [id], onDelete: Cascade)
+}
+
+model Mentor {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  name          String
+  image         String
+  role          String
+  company       String
+  college       String
+  batch         String
+  tier          String
+  phases        Int[]
+  streams       String[]
+  rating        Float
+  sessions      Int
+  years         Int
+  price         Int
+  guestLectures Boolean  @default(false)
+  expertise     String[]
+  bio           String
+  reviewText    String
+  reviewWho     String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  bookingRequests BookingRequest[]
+}
+
+model BookingRequest {
+  id        String   @id @default(cuid())
+  userId    String
+  mentorId  String
+  topic     String
+  status    String   @default("pending")
+  amount    Int?
+  paymentId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mentor Mentor @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+}
+
+model SpeakerApplication {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  role        String
+  company     String
+  linkedIn    String
+  experience  String
+  vertical    String
+  city        String?
+  format      String
+  topics      String
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model LectureRequest {
+  id            String   @id @default(cuid())
+  institute     String
+  name          String
+  email         String
+  phone         String?
+  vertical      String
+  engagement    String
+  format        String
+  dates         String?
+  audienceSize  String
+  budget        String
+  message       String?
+  status        String   @default("pending")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
