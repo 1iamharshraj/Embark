@@ -3,9 +3,9 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-import { mkdir, writeFile } from "fs/promises";
-import { join } from "path";
 import { parseRounds } from "@/lib/competition";
+import { uploadFile } from "@/lib/storage";
+
 
 const submitSchema = z.object({
   roundIdx: z.number().int().min(0, "Invalid round index"),
@@ -57,13 +57,10 @@ export async function POST(request: Request, { params }: { params: { id: string 
 
     if (file && file instanceof File && file.size > 0) {
       const filename = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
-      const relDir = join("uploads", session.user.id, compId, `round${roundIdx}`);
-      const absDir = join(process.cwd(), relDir);
-      await mkdir(absDir, { recursive: true });
-      const absPath = join(absDir, filename);
+      const key = `uploads/${session.user.id}/${compId}/round${roundIdx}/${filename}`;
       const bytes = new Uint8Array(await file.arrayBuffer());
-      await writeFile(absPath, bytes);
-      filePath = join(relDir, filename).replace(/\\/g, "/");
+      await uploadFile(Buffer.from(bytes), key, "application/octet-stream");
+      filePath = key;
     }
   } else {
     let body: unknown;

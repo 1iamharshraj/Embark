@@ -14,14 +14,19 @@
     "verify:phase3": "tsx scripts/verify-phase-3.ts",
     "verify:phase4": "tsx scripts/verify-phase-4.ts",
     "verify:phase5": "tsx scripts/verify-phase-5.ts",
+    "verify:phase6": "tsx scripts/verify-phase-6.ts",
+    "migrate:supabase": "tsx scripts/migrate-supabase.ts",
     "db:seed": "tsx prisma/seed.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1106.0",
+    "@aws-sdk/s3-request-presigner": "^3.1106.0",
     "@hookform/resolvers": "^3.9.0",
     "@prisma/client": "^5.22.0",
+    "@supabase/supabase-js": "^2.112.2",
     "bcryptjs": "^3.0.3",
     "canvas": "^3.2.3",
     "date-fns": "^4.4.0",
@@ -33,6 +38,7 @@
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.84.0",
+    "sharp": "^0.35.3",
     "sonner": "^2.0.7",
     "tsx": "^4.23.11",
     "zod": "^3.23.8"
