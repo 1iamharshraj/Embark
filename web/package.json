@@ -9,6 +9,7 @@
     "lint": "next lint",
     "postinstall": "prisma generate || true",
     "verify": "tsx scripts/verify-phase-0.ts",
+    "verify:phase1": "tsx scripts/verify-phase-1.ts",
     "db:seed": "tsx prisma/seed.ts"
   },
   "prisma": {

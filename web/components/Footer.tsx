@@ -8,8 +8,8 @@ const serviceLinks = [
 ];
 
 const involvedLinks = [
-  { href: "/invite-expert", label: "Invite an expert" },
-  { href: "/become-speaker", label: "Become a speaker" },
+  { href: "/invite-an-expert", label: "Invite an expert" },
+  { href: "/become-a-speaker", label: "Become a speaker" },
   { href: "/mentorship", label: "Book a free intro call" },
   { href: "/auth/signin", label: "Sign in / My account" },
   { href: "/admin", label: "Organiser admin" },

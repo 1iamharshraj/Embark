@@ -22,6 +22,19 @@ export const metadata: Metadata = {
   title: "Embark India — Your MBA journey starts here",
   description:
     "Embark India: guest lectures from verified industry experts, stream playbooks, and plain-spoken MBA guidance. Tell us where you are in the journey — we'll point you right.",
+  manifest: "/manifest.json",
+  icons: {
+    icon: "/favicon.svg",
+    apple: "/icon-192.svg",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+  },
+};
+
+export const viewport = {
+  themeColor: "#2E6BFF",
 };
 
 export default function RootLayout({

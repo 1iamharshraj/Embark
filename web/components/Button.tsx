@@ -11,6 +11,7 @@ interface ButtonProps {
   href?: string;
   type?: "button" | "submit" | "reset";
   onClick?: () => void;
+  disabled?: boolean;
   className?: string;
 }
 
@@ -38,20 +39,21 @@ export default function Button({
   href,
   type = "button",
   onClick,
+  disabled,
   className = "",
 }: ButtonProps) {
-  const classes = `${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className}`;
+  const classes = `${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className} ${disabled ? "opacity-60 cursor-not-allowed" : ""}`;
 
   if (href) {
     return (
-      <Link href={href} className={classes}>
+      <Link href={href} className={classes} aria-disabled={disabled}>
         {children}
       </Link>
     );
   }
 
   return (
-    <button type={type} onClick={onClick} className={classes}>
+    <button type={type} onClick={onClick} disabled={disabled} className={classes}>
       {children}
     </button>
   );
