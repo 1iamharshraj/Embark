@@ -8,6 +8,7 @@ interface CompetitionCardProps {
   fee: number;
   status: string;
   poster?: string;
+  registrationCount?: number;
 }
 
 const bannerGradients: Record<string, string> = {
@@ -24,6 +25,7 @@ export default function CompetitionCard({
   banner,
   fee,
   status,
+  registrationCount,
 }: CompetitionCardProps) {
   return (
     <Link
@@ -42,7 +44,12 @@ export default function CompetitionCard({
         </div>
       </div>
       <div className="p-4 flex items-center justify-between">
-        <span className="text-sm text-inkSoft">{fee > 0 ? `Fee: ₹${fee}` : "Free"}</span>
+        <div className="text-sm text-inkSoft">
+          <span>{fee > 0 ? `Fee: ₹${fee}` : "Free"}</span>
+          {typeof registrationCount === "number" && (
+            <span className="ml-3 text-charcoal font-medium">{registrationCount} registered</span>
+          )}
+        </div>
         <span
           className={`text-xs font-semibold uppercase tracking-wider rounded-full px-3 py-1 ${
             status === "Live"

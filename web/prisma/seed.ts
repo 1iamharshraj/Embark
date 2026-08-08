@@ -1159,7 +1159,7 @@ function makeCompetitions(now: Date) {
           name: "Round 2 — Full solution",
           brief:
             "Complete 12-slide strategy: portfolio, pricing, channel and media plan with financials.",
-          opens: iso(addDays(now, 5)),
+          opens: iso(addHours(now, -1)),
           closes: iso(addDays(now, 8)),
         },
         {

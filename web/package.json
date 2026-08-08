@@ -11,6 +11,7 @@
     "verify": "tsx scripts/verify-phase-0.ts",
     "verify:phase1": "tsx scripts/verify-phase-1.ts",
     "verify:phase2": "tsx scripts/verify-phase-2.ts",
+    "verify:phase3": "tsx scripts/verify-phase-3.ts",
     "db:seed": "tsx prisma/seed.ts"
   },
   "prisma": {
@@ -20,6 +21,7 @@
     "@hookform/resolvers": "^3.9.0",
     "@prisma/client": "^5.22.0",
     "bcryptjs": "^3.0.3",
+    "canvas": "^3.2.3",
     "date-fns": "^4.4.0",
     "next": "14.2.35",
     "next-auth": "^4.24.15",

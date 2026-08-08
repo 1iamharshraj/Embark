@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     "Live and upcoming MBA case competitions built for real career outcomes. Register solo or as a team, submit within timed rounds, track results — with coaching to help you win.",
 };
 
-function compStatus(now: Date, regOpen: Date, regClose: Date, endAt: Date) {
+function compStatus(now: Date, regOpen: Date, regClose: Date, startAt: Date, endAt: Date) {
   if (now < regOpen) return "Upcoming";
   if (now >= regOpen && now <= regClose) return "Live";
   if (now > regClose && now < endAt) return "Running";
@@ -70,7 +70,12 @@ export default async function CompetitionsPage() {
   const now = new Date();
   const raw = await prisma.competition.findMany({
     where: { draft: false },
-    orderBy: { regOpen: "asc" },
+    orderBy: { startAt: "asc" },
+    include: {
+      _count: {
+        select: { registrations: true },
+      },
+    },
   });
 
   const competitions = raw.map((c) => ({
@@ -79,7 +84,8 @@ export default async function CompetitionsPage() {
     category: c.category,
     banner: c.banner,
     fee: c.fee,
-    status: compStatus(now, c.regOpen, c.regClose, c.endAt),
+    status: compStatus(now, c.regOpen, c.regClose, c.startAt, c.endAt),
+    registrationCount: (c._count?.registrations ?? 0) + c.seedRegs,
   }));
 
   return (
@@ -141,6 +147,7 @@ export default async function CompetitionsPage() {
                   banner={c.banner}
                   fee={c.fee}
                   status={c.status}
+                  registrationCount={c.registrationCount}
                 />
               ))}
             </div>
