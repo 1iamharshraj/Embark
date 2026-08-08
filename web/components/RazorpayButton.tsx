@@ -38,11 +38,13 @@ interface CreateOrderResponse {
   amount: number;
   currency: string;
   dbOrderId: string;
-  playbook: { slug: string; name: string; price: number };
+  playbook?: { slug: string; name: string; price: number };
 }
 
 interface RazorpayButtonProps {
-  playbook: { slug: string; name: string; price: number };
+  type?: "playbook" | "mentorship";
+  playbook?: { slug: string; name: string; price: number };
+  bookingRequestId?: string;
   label?: string;
   onSuccess?: () => void;
   className?: string;
@@ -51,8 +53,10 @@ interface RazorpayButtonProps {
 }
 
 export default function RazorpayButton({
+  type: typeProp,
   playbook,
-  label = `Buy now for ₹${playbook.price}`,
+  bookingRequestId,
+  label,
   onSuccess,
   className = "",
   variant = "primary",
@@ -60,13 +64,32 @@ export default function RazorpayButton({
 }: RazorpayButtonProps) {
   const [loading, setLoading] = useState(false);
 
+  const type = typeProp ?? (bookingRequestId ? "mentorship" : "playbook");
+  const itemName = type === "mentorship" ? playbook?.name ?? "Mentorship" : playbook?.name ?? "";
+  const displayLabel =
+    label ?? (type === "mentorship" ? `Pay now for ${itemName}` : `Buy now for ₹${playbook?.price ?? 0}`);
+
   async function handleClick() {
+    if (type === "playbook" && !playbook?.slug) {
+      alert("Playbook details missing.");
+      return;
+    }
+    if (type === "mentorship" && !bookingRequestId) {
+      alert("Booking details missing.");
+      return;
+    }
+
     setLoading(true);
     try {
+      const body =
+        type === "mentorship"
+          ? JSON.stringify({ type: "mentorship", bookingRequestId })
+          : JSON.stringify({ type: "playbook", playbookSlug: playbook!.slug });
+
       const res = await fetch("/api/orders/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ playbookSlug: playbook.slug }),
+        body,
       });
       const data = (await res.json()) as CreateOrderResponse | { error: string };
       if (!res.ok || !("orderId" in data)) {
@@ -85,7 +108,7 @@ export default function RazorpayButton({
         amount: data.amount,
         currency: data.currency,
         name: "Embark India",
-        description: playbook.name,
+        description: type === "mentorship" ? `Mentorship with ${itemName}` : itemName,
         order_id: data.orderId,
         handler: async (response: RazorpayResponse) => {
           const verifyRes = await fetch("/api/orders/verify", {
@@ -122,7 +145,7 @@ export default function RazorpayButton({
 
   return (
     <Button onClick={handleClick} disabled={loading} variant={variant} size={size} className={className}>
-      {loading ? "Please wait…" : label}
+      {loading ? "Please wait…" : displayLabel}
     </Button>
   );
 }

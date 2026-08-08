@@ -66,6 +66,23 @@ export default async function AccountPage() {
             </div>
           )}
 
+          <div className="flex flex-wrap gap-2 mb-8">
+            {[
+              { href: "/account", label: "Profile" },
+              { href: "/account/orders", label: "Orders" },
+              { href: "/account/mentorship", label: "Mentorship" },
+              { href: "/account/requests", label: "Requests" },
+            ].map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="px-4 py-2 rounded-full text-sm font-semibold bg-white border border-charcoal/8 text-charcoal hover:border-orange/40 transition"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+
           <div className="grid lg:grid-cols-[1fr_1fr] gap-6 mb-10">
             <div className="bg-white rounded-2xl shadow-[0_2px_8px_rgba(22,22,22,0.06),0_12px_32px_rgba(22,22,22,0.07)] p-6 sm:p-8">
               <h2 className="font-display font-bold text-xl text-charcoal mb-1">

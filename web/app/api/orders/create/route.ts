@@ -5,9 +5,22 @@ import { prisma } from "@/lib/prisma";
 import { getRazorpayInstance } from "@/lib/razorpay";
 import { z } from "zod";
 
-const createSchema = z.object({
-  playbookSlug: z.string().min(1, "Playbook slug is required"),
-});
+const createSchema = z
+  .object({
+    type: z.enum(["playbook", "mentorship"]).default("playbook"),
+    playbookSlug: z.string().optional(),
+    bookingRequestId: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.type === "playbook") return !!data.playbookSlug;
+      return !!data.bookingRequestId;
+    },
+    {
+      message: "playbookSlug is required for playbook orders, bookingRequestId for mentorship orders",
+      path: ["type"],
+    }
+  );
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
@@ -30,34 +43,88 @@ export async function POST(request: Request) {
     );
   }
 
-  const { playbookSlug } = parsed.data;
+  const { type, playbookSlug, bookingRequestId } = parsed.data;
 
-  const playbook = await prisma.playbook.findUnique({
-    where: { slug: playbookSlug },
-  });
+  let orderData: {
+    userId: string;
+    type: "playbook" | "mentorship";
+    amount: number;
+    playbookId?: string;
+    bookingRequestId?: string;
+  };
 
-  if (!playbook) {
-    return NextResponse.json({ error: "Playbook not found" }, { status: 404 });
-  }
+  let itemName: string;
+  let itemSlug: string | undefined;
 
-  const existingPaid = await prisma.order.findFirst({
-    where: { userId: session.user.id, playbookId: playbook.id, status: "paid" },
-  });
+  if (type === "playbook") {
+    const playbook = await prisma.playbook.findUnique({
+      where: { slug: playbookSlug },
+    });
+    if (!playbook) {
+      return NextResponse.json({ error: "Playbook not found" }, { status: 404 });
+    }
 
-  if (existingPaid) {
-    return NextResponse.json({ error: "Already purchased" }, { status: 409 });
+    const existingPaid = await prisma.order.findFirst({
+      where: { userId: session.user.id, playbookId: playbook.id, status: "paid" },
+    });
+    if (existingPaid) {
+      return NextResponse.json({ error: "Already purchased" }, { status: 409 });
+    }
+
+    orderData = {
+      userId: session.user.id,
+      type: "playbook",
+      amount: playbook.price,
+      playbookId: playbook.id,
+    };
+    itemName = playbook.name;
+    itemSlug = playbook.slug;
+  } else {
+    const booking = await prisma.bookingRequest.findUnique({
+      where: { id: bookingRequestId },
+      include: { mentor: true },
+    });
+    if (!booking) {
+      return NextResponse.json({ error: "Booking request not found" }, { status: 404 });
+    }
+    if (booking.userId !== session.user.id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    if (booking.status !== "confirmed") {
+      return NextResponse.json(
+        { error: "Booking must be confirmed before payment" },
+        { status: 400 }
+      );
+    }
+    if (booking.amount == null || booking.amount <= 0) {
+      return NextResponse.json({ error: "Invalid booking amount" }, { status: 400 });
+    }
+
+    const existingPaid = await prisma.order.findFirst({
+      where: { bookingRequestId: booking.id, status: "paid" },
+    });
+    if (existingPaid) {
+      return NextResponse.json({ error: "Booking already paid" }, { status: 409 });
+    }
+
+    orderData = {
+      userId: session.user.id,
+      type: "mentorship",
+      amount: booking.amount,
+      bookingRequestId: booking.id,
+    };
+    itemName = booking.mentor.name;
+    itemSlug = booking.mentor.slug;
   }
 
   const order = await prisma.order.create({
     data: {
-      userId: session.user.id,
-      playbookId: playbook.id,
-      amount: playbook.price,
+      ...orderData,
       status: "pending",
     },
   });
 
-  const amountPaise = playbook.price * 100;
+  const amountPaise = order.amount * 100;
   const keyId = process.env.RAZORPAY_KEY_ID || "rzp_test_...";
 
   try {
@@ -74,27 +141,24 @@ export async function POST(request: Request) {
       amount: amountPaise,
       currency: "INR",
       dbOrderId: order.id,
-      playbook: {
-        id: playbook.id,
-        slug: playbook.slug,
-        name: playbook.name,
-        price: playbook.price,
-      },
+      type,
+      playbook:
+        type === "playbook"
+          ? { id: order.playbookId, slug: itemSlug, name: itemName, price: order.amount }
+          : undefined,
     });
   } catch {
-    // Fall back to test-mode response when keys are invalid/missing.
     return NextResponse.json({
       orderId: `test_order_${order.id}`,
       keyId,
       amount: amountPaise,
       currency: "INR",
       dbOrderId: order.id,
-      playbook: {
-        id: playbook.id,
-        slug: playbook.slug,
-        name: playbook.name,
-        price: playbook.price,
-      },
+      type,
+      playbook:
+        type === "playbook"
+          ? { id: order.playbookId, slug: itemSlug, name: itemName, price: order.amount }
+          : undefined,
     });
   }
 }

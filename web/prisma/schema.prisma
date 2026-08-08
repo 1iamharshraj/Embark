@@ -22,6 +22,8 @@ model User {
   progress          PlaybookProgress[]
   orders            Order[]
   bookingRequests   BookingRequest[]
+  speakerApplications SpeakerApplication[]
+  lectureRequests   LectureRequest[]
 }
 
 model Competition {
@@ -162,7 +164,9 @@ model PlaybookProgress {
 model Order {
   id               String   @id @default(cuid())
   userId           String
-  playbookId       String
+  type             String   @default("playbook")
+  playbookId       String?
+  bookingRequestId String?
   amount           Int
   status           String   @default("pending")
   paymentId        String?
@@ -170,8 +174,9 @@ model Order {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  playbook Playbook @relation(fields: [playbookId], references: [id], onDelete: Cascade)
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  playbook         Playbook?       @relation(fields: [playbookId], references: [id], onDelete: Cascade)
+  bookingRequest   BookingRequest? @relation(fields: [bookingRequestId], references: [id], onDelete: SetNull)
 }
 
 model Mentor {
@@ -209,11 +214,13 @@ model BookingRequest {
   status    String   @default("pending")
   amount    Int?
   paymentId String?
+  note      String   @default("")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  mentor Mentor @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mentor Mentor  @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+  orders Order[]
 }
 
 model SpeakerApplication {
@@ -229,8 +236,12 @@ model SpeakerApplication {
   format      String
   topics      String
   status      String   @default("pending")
+  userId      String?
+  note        String   @default("")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
 
 model PasswordResetToken {
@@ -257,7 +268,11 @@ model LectureRequest {
   budget        String
   message       String?
   status        String   @default("pending")
+  userId        String?
+  note          String   @default("")
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
 

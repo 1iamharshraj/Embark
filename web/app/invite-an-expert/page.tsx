@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useSession } from "next-auth/react";
 import Container from "@/components/Container";
 import Eyebrow from "@/components/Eyebrow";
 import Button from "@/components/Button";
@@ -73,9 +74,11 @@ const budgetOptions = [
 
 export default function InviteAnExpertPage() {
   const [submitted, setSubmitted] = useState(false);
+  const { data: session } = useSession();
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -87,7 +90,22 @@ export default function InviteAnExpertPage() {
     },
   });
 
-  const onSubmit = () => {
+  useEffect(() => {
+    if (session?.user?.name) setValue("name", session.user.name);
+    if (session?.user?.email) setValue("email", session.user.email);
+  }, [session, setValue]);
+
+  const onSubmit = async (values: FormValues) => {
+    const res = await fetch("/api/lecture-requests", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(values),
+    });
+    const data = (await res.json()) as { ok?: boolean; error?: string };
+    if (!res.ok || !data.ok) {
+      alert(data.error || "Could not submit request. Please try again.");
+      return;
+    }
     setSubmitted(true);
   };
 

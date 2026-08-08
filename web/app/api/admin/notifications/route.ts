@@ -13,14 +13,13 @@ export async function GET() {
   const session = await requireAdmin();
   if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const orders = await prisma.order.findMany({
-    include: {
-      user: { select: { email: true, name: true } },
-      playbook: true,
-      bookingRequest: { include: { mentor: true } },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const [mentorship, speakers, lectures] = await Promise.all([
+    prisma.bookingRequest.count({ where: { status: "pending" } }),
+    prisma.speakerApplication.count({ where: { status: "pending" } }),
+    prisma.lectureRequest.count({ where: { status: "pending" } }),
+  ]);
 
-  return NextResponse.json({ orders });
+  return NextResponse.json({
+    counts: { mentorship, speakers, lectures, total: mentorship + speakers + lectures },
+  });
 }

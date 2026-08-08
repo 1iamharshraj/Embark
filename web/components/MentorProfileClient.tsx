@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
 import Container from "@/components/Container";
@@ -37,8 +38,39 @@ const phaseNames: Record<number, string> = {
   5: "Land your final placement",
 };
 
-function BookingForm() {
+interface BookingFormProps {
+  mentorSlug: string;
+  mentorName: string;
+}
+
+function BookingForm({ mentorSlug, mentorName }: BookingFormProps) {
+  const { data: session, status } = useSession();
+  const [name, setName] = useState(session?.user?.name ?? "");
+  const [email, setEmail] = useState(session?.user?.email ?? "");
+  const [topic, setTopic] = useState("");
+  const [message, setMessage] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  if (status === "loading") {
+    return <div className="text-sm text-inkSoft">Loading…</div>;
+  }
+
+  if (!session?.user) {
+    return (
+      <div className="text-center py-4">
+        <p className="text-sm text-inkSoft mb-4">Sign in to book a session with {mentorName.split(" ")[0]}.</p>
+        <Link
+          href={`/login?callbackUrl=${encodeURIComponent(`/mentor/${mentorSlug}`)}`}
+          className="inline-flex items-center justify-center rounded-full bg-orangeDeep text-white px-7 py-3.5 font-semibold transition hover:bg-[#1740A8]"
+        >
+          Sign in to book
+        </Link>
+      </div>
+    );
+  }
+
   if (submitted) {
     return (
       <div className="text-center py-6">
@@ -46,31 +78,80 @@ function BookingForm() {
           <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
         </div>
         <h3 className="font-display font-bold text-xl text-charcoal mb-2">Request sent</h3>
-        <p className="text-sm text-inkSoft">You&apos;ll get slot options on email and WhatsApp within a day. Payment happens only after you confirm a slot.</p>
+        <p className="text-sm text-inkSoft">We’ll confirm slots on email/WhatsApp within a day.</p>
       </div>
     );
   }
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError(null);
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/mentorship/book", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mentorSlug, name, email, topic, message }),
+      });
+      const data = (await res.json()) as { ok?: boolean; error?: string };
+      if (!res.ok || !data.ok) {
+        setError(data.error || "Could not send request. Please try again.");
+        return;
+      }
+      setSubmitted(true);
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        setSubmitted(true);
-      }}
-      className="grid gap-4"
-    >
+    <form onSubmit={handleSubmit} className="grid gap-4">
       <div className="flex flex-col gap-1.5">
         <label className="text-sm font-semibold text-charcoal">Your name</label>
-        <input required type="text" className="rounded-xl bg-cream border border-transparent px-4 py-3 text-charcoal focus:bg-white focus:border-orange outline-none transition" />
+        <input
+          required
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="rounded-xl bg-cream border border-transparent px-4 py-3 text-charcoal focus:bg-white focus:border-orange outline-none transition"
+        />
       </div>
       <div className="flex flex-col gap-1.5">
         <label className="text-sm font-semibold text-charcoal">Email</label>
-        <input required type="email" className="rounded-xl bg-cream border border-transparent px-4 py-3 text-charcoal focus:bg-white focus:border-orange outline-none transition" />
+        <input
+          required
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="rounded-xl bg-cream border border-transparent px-4 py-3 text-charcoal focus:bg-white focus:border-orange outline-none transition"
+        />
       </div>
       <div className="flex flex-col gap-1.5">
         <label className="text-sm font-semibold text-charcoal">What&apos;s the session about?</label>
-        <textarea required minLength={10} className="rounded-xl bg-cream border border-transparent px-4 py-3 text-charcoal focus:bg-white focus:border-orange outline-none transition min-h-[100px]" placeholder="The more specific, the better the session" />
+        <textarea
+          required
+          minLength={10}
+          value={topic}
+          onChange={(e) => setTopic(e.target.value)}
+          className="rounded-xl bg-cream border border-transparent px-4 py-3 text-charcoal focus:bg-white focus:border-orange outline-none transition min-h-[100px]"
+          placeholder="The more specific, the better the session"
+        />
       </div>
-      <Button type="submit" className="w-full">Request a session</Button>
+      <div className="flex flex-col gap-1.5">
+        <label className="text-sm font-semibold text-charcoal">Anything else? (optional)</label>
+        <textarea
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          className="rounded-xl bg-cream border border-transparent px-4 py-3 text-charcoal focus:bg-white focus:border-orange outline-none transition min-h-[80px]"
+          placeholder="Preferred timing, background, or questions"
+        />
+      </div>
+      {error && <p className="text-sm text-red-600">{error}</p>}
+      <Button type="submit" disabled={submitting} className="w-full">
+        {submitting ? "Sending…" : "Request a session"}
+      </Button>
     </form>
   );
 }
@@ -252,7 +333,7 @@ export default function MentorProfileClient({ mentor }: MentorProfileClientProps
                 <p className="text-sm text-inkSoft mb-5">
                   Indicative per-session price. Inside the Journey, sessions are bundled — <Link href="/mentorship#pricing" className="text-orangeDeep">see packaging</Link>.
                 </p>
-                <BookingForm />
+                <BookingForm mentorSlug={mentor.slug} mentorName={mentor.name} />
               </div>
               {mentor.guestLectures && (
                 <div className="bg-navy text-cream rounded-3xl p-6">

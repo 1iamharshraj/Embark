@@ -63,13 +63,22 @@ export async function POST(request: Request) {
   const signatureMatches = expectedSignature && expectedSignature === razorpay_signature;
 
   if (signatureMatches || isTestMode) {
-    await prisma.order.update({
-      where: { id: dbOrderId },
-      data: {
-        status: "paid",
-        paymentId: razorpay_payment_id,
-        paymentSignature: razorpay_signature,
-      },
+    await prisma.$transaction(async (tx) => {
+      await tx.order.update({
+        where: { id: dbOrderId },
+        data: {
+          status: "paid",
+          paymentId: razorpay_payment_id,
+          paymentSignature: razorpay_signature,
+        },
+      });
+
+      if (order.type === "mentorship" && order.bookingRequestId) {
+        await tx.bookingRequest.update({
+          where: { id: order.bookingRequestId },
+          data: { status: "paid" },
+        });
+      }
     });
 
     return NextResponse.json({ ok: true, status: "paid" });

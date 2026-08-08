@@ -8,9 +8,9 @@ import Eyebrow from "@/components/Eyebrow";
 const adminLinks = [
   { href: "/admin/competitions", label: "Manage competitions", desc: "Create, edit and publish case competitions." },
   { href: "/admin/playbooks", label: "Manage playbooks", desc: "Update stream playbooks and pricing." },
-  { href: "/admin/mentors", label: "Manage mentors", desc: "Add or edit mentor profiles and availability." },
-  { href: "/admin/speakers", label: "Speaker applications", desc: "Review and approve guest speaker applications." },
-  { href: "/admin/lectures", label: "Lecture requests", desc: "Review guest lecture requests from institutes." },
+  { href: "/admin/mentorship", label: "Mentorship bookings", desc: "Manage mentorship requests and confirmations." },
+  { href: "/admin/speaker-applications", label: "Speaker applications", desc: "Review and approve guest speaker applications." },
+  { href: "/admin/lecture-requests", label: "Lecture requests", desc: "Review guest lecture requests from institutes." },
   { href: "/admin/orders", label: "Orders", desc: "View playbook and mentorship orders." },
 ];
 
