@@ -15,6 +15,8 @@
     "verify:phase4": "tsx scripts/verify-phase-4.ts",
     "verify:phase5": "tsx scripts/verify-phase-5.ts",
     "verify:phase6": "tsx scripts/verify-phase-6.ts",
+    "verify:all": "tsx scripts/verify-all.ts",
+    "verify:security": "tsx scripts/security-checks.ts",
     "migrate:supabase": "tsx scripts/migrate-supabase.ts",
     "db:seed": "tsx prisma/seed.ts"
   },

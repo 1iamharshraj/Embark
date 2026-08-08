@@ -24,3 +24,19 @@ Newest first. Append a short dated entry at the end of each conversation: what w
 - Bumped `css/gl.css?v=5` → `v=6` across all pages (edited gl.css). Verified in browser: zero blog traces, no console errors, spot-pill + college chips styled correctly. Committed (7e651ff) and pushed to `main`.
 - **Note:** CLAUDE.md §4 still lists Blog as service #8 — update it if the founder wants the docs to match. Left as-is for now (not asked).
 - **Next:** unchanged — Hostinger deploy confirmation + Playbooks polish.
+
+---
+
+## 2026-08-08
+- **Completed Phase 7 (final QA verification and launch preparation)** of the 8-phase Embark India rebuild.
+- The new Next.js 14 app lives in `web/` and is built with Next.js 14 + Prisma + PostgreSQL + NextAuth + Razorpay (test mode) + next-pwa.
+- All user flows implemented and verified locally: auth, competitions, playbooks, mentorship, guest lectures, PWA redirects, and admin guards.
+- Created `web/scripts/verify-lib.ts` (shared utilities) and refactored `verify-phase-2.ts` through `verify-phase-5.ts` to use it.
+- Created `web/scripts/verify-all.ts` (40 end-to-end checks) and `web/scripts/security-checks.ts` (11 admin/security checks).
+- Added `verify:all` and `verify:security` npm scripts to `web/package.json`.
+- Ran `npx tsc --noEmit` (passed), `npm run build` (passed), and all phase scripts plus `verify:all` and `verify:security` (all passed).
+- Documented `npm audit` results (10 high-severity, build-time/framework dependencies) in `web/QA-NOTES.md`.
+- Updated `web/README.md` with a local run guide and default logins.
+- Updated `Agentic config/00-current-state.md` to reflect the new app state and created `Agentic config/13-launch-checklist.md`.
+- **Per user request, no deployment or GitHub push was performed.** All changes are committed locally only.
+- **Next:** launch checklist execution (Vercel deploy, Neon DB, env secrets, DNS cutover) when the user gives the go-ahead.

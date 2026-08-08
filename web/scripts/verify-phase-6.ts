@@ -87,10 +87,10 @@ async function checkOffline() {
 async function runBuild() {
   console.log("\nRunning npm run build (this is the main deploy readiness check)...");
   return new Promise<void>((resolve, reject) => {
-    const proc = spawn("npm", ["run", "build"], {
+    const proc = spawn("npm run build", {
       cwd: process.cwd(),
       stdio: "inherit",
-      shell: process.platform === "win32",
+      shell: true,
       env: { ...process.env, NODE_ENV: "production" },
     });
 
