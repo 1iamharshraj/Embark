@@ -15,7 +15,7 @@ export async function generateMetadata({
   });
   return {
     title: playbook ? `${playbook.name} Playbook — Embark India` : "Playbook — Embark India",
-    description: playbook?.oneLiner || "An MBA stream playbook from Embark India.",
+    description: playbook?.oneLiner || "An MBA playbook from Embark India.",
   };
 }
 
@@ -37,6 +37,7 @@ export default async function PlaybookDetailPage({
   return (
     <PlaybookDetailClient
       playbook={{
+        id: playbook.id,
         slug: playbook.slug,
         name: playbook.name,
         category: playbook.category,

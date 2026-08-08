@@ -12,6 +12,7 @@
     "verify:phase1": "tsx scripts/verify-phase-1.ts",
     "verify:phase2": "tsx scripts/verify-phase-2.ts",
     "verify:phase3": "tsx scripts/verify-phase-3.ts",
+    "verify:phase4": "tsx scripts/verify-phase-4.ts",
     "db:seed": "tsx prisma/seed.ts"
   },
   "prisma": {
@@ -27,6 +28,7 @@
     "next-auth": "^4.24.15",
     "next-pwa": "^5.6.0",
     "prisma": "^5.22.0",
+    "razorpay": "^2.9.8",
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.84.0",

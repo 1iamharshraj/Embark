@@ -145,6 +145,16 @@ export default async function AccountPage() {
               </div>
             )}
           </div>
+
+          <div className="bg-white rounded-2xl shadow-[0_2px_8px_rgba(22,22,22,0.06),0_12px_32px_rgba(22,22,22,0.07)] p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 className="font-display font-bold text-xl text-charcoal mb-1">My orders</h2>
+              <p className="text-inkSoft text-sm">View playbooks you have purchased and their payment status.</p>
+            </div>
+            <Button href="/account/orders" size="sm">
+              View orders
+            </Button>
+          </div>
         </div>
       </Container>
     </section>
