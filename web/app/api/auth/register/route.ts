@@ -1,0 +1,68 @@
+import { NextResponse } from "next/server";
+import { z } from "zod";
+import { hash } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+
+const registerSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Please enter a valid email"),
+  college: z.string().min(1, "College is required"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  confirmPassword: z.string().min(1, "Please confirm your password"),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+});
+
+const ADMIN_EMAILS = new Set([
+  "ajay.san36@gmail.com",
+  "admin@embark.local",
+]);
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    const parsed = registerSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { message: parsed.error.errors[0]?.message || "Invalid input" },
+        { status: 400 }
+      );
+    }
+
+    const { name, email, college, password } = parsed.data;
+    const normalizedEmail = email.toLowerCase().trim();
+
+    const existing = await prisma.user.findUnique({
+      where: { email: normalizedEmail },
+    });
+
+    if (existing) {
+      return NextResponse.json(
+        { error: "Email already registered" },
+        { status: 409 }
+      );
+    }
+
+    const hashedPassword = await hash(password, 10);
+
+    await prisma.user.create({
+      data: {
+        name: name.trim(),
+        email: normalizedEmail,
+        college: college.trim(),
+        password: hashedPassword,
+        isAdmin: ADMIN_EMAILS.has(normalizedEmail),
+      },
+    });
+
+    return NextResponse.json({ ok: true }, { status: 200 });
+  } catch (error) {
+    console.error("Registration error:", error);
+    return NextResponse.json(
+      { message: "Something went wrong. Please try again." },
+      { status: 500 }
+    );
+  }
+}

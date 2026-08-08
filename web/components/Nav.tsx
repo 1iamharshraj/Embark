@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { useState } from "react";
 
 const links = [
@@ -52,12 +52,29 @@ export default function Nav() {
           ))}
         </ul>
 
-        <Link
-          href={session ? "/account" : "/auth/signin"}
-          className="hidden lg:inline-flex items-center justify-center rounded-full border-[1.5px] border-charcoal/25 text-charcoal font-semibold text-sm px-5 py-2.5 hover:border-charcoal transition"
-        >
-          {session ? "My account" : "Sign in"}
-        </Link>
+        {session ? (
+          <div className="hidden lg:flex items-center gap-3">
+            <Link
+              href="/account"
+              className="inline-flex items-center justify-center rounded-full border-[1.5px] border-charcoal/25 text-charcoal font-semibold text-sm px-5 py-2.5 hover:border-charcoal transition"
+            >
+              My account
+            </Link>
+            <button
+              onClick={() => signOut({ callbackUrl: "/" })}
+              className="inline-flex items-center justify-center rounded-full font-semibold text-sm px-5 py-2.5 text-red-700 hover:bg-red-50 transition"
+            >
+              Sign out
+            </button>
+          </div>
+        ) : (
+          <Link
+            href="/login"
+            className="hidden lg:inline-flex items-center justify-center rounded-full border-[1.5px] border-charcoal/25 text-charcoal font-semibold text-sm px-5 py-2.5 hover:border-charcoal transition"
+          >
+            Sign in
+          </Link>
+        )}
 
         <button
           className="lg:hidden p-2 text-charcoal"
@@ -103,13 +120,34 @@ export default function Nav() {
               {l.label}
             </Link>
           ))}
-          <Link
-            href={session ? "/account" : "/auth/signin"}
-            onClick={() => setOpen(false)}
-            className="block text-charcoal font-semibold text-base px-4 py-3 rounded-xl hover:bg-orange/8 hover:text-orangeDeep"
-          >
-            {session ? "My account" : "Sign in"}
-          </Link>
+          {session ? (
+            <>
+              <Link
+                href="/account"
+                onClick={() => setOpen(false)}
+                className="block text-charcoal font-semibold text-base px-4 py-3 rounded-xl hover:bg-orange/8 hover:text-orangeDeep"
+              >
+                My account
+              </Link>
+              <button
+                onClick={() => {
+                  setOpen(false);
+                  signOut({ callbackUrl: "/" });
+                }}
+                className="block w-full text-left text-red-700 font-semibold text-base px-4 py-3 rounded-xl hover:bg-red-50 transition"
+              >
+                Sign out
+              </button>
+            </>
+          ) : (
+            <Link
+              href="/login"
+              onClick={() => setOpen(false)}
+              className="block text-charcoal font-semibold text-base px-4 py-3 rounded-xl hover:bg-orange/8 hover:text-orangeDeep"
+            >
+              Sign in
+            </Link>
+          )}
         </div>
       )}
     </nav>

@@ -233,6 +233,16 @@ model SpeakerApplication {
   updatedAt   DateTime @updatedAt
 }
 
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
+
 model LectureRequest {
   id            String   @id @default(cuid())
   institute     String
@@ -250,3 +260,4 @@ model LectureRequest {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
+
