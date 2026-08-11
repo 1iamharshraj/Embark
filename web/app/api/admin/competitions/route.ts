@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/authOptions";
+import { requireAuth, requirePermission } from "@/lib/rbac";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { competitionStatus } from "@/lib/competition";
@@ -48,101 +47,115 @@ const createSchema = z.object({
   seedRegs: z.number().int().default(0),
 });
 
-async function requireAdmin() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.isAdmin) return null;
-  return session;
-}
-
 export async function GET() {
-  const session = await requireAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  try {
+    const user = await requireAuth();
+    requirePermission(user, "competition.view");
 
-  const raw = await prisma.competition.findMany({
-    orderBy: { startAt: "desc" },
-    include: {
-      _count: { select: { registrations: true } },
-    },
-  });
+    const raw = await prisma.competition.findMany({
+      orderBy: { startAt: "desc" },
+      include: {
+        _count: { select: { registrations: true } },
+      },
+    });
 
-  const competitions = raw.map((c) => ({
-    id: c.id,
-    title: c.title,
-    host: c.host,
-    category: c.category,
-    banner: c.banner,
-    fee: c.fee,
-    draft: c.draft,
-    regOpen: c.regOpen.toISOString(),
-    regClose: c.regClose.toISOString(),
-    startAt: c.startAt.toISOString(),
-    endAt: c.endAt.toISOString(),
-    resultAt: c.resultAt?.toISOString() ?? null,
-    status: competitionStatus(c),
-    registrationCount: (c._count?.registrations ?? 0) + c.seedRegs,
-  }));
+    const competitions = raw.map((c) => ({
+      id: c.id,
+      title: c.title,
+      host: c.host,
+      category: c.category,
+      banner: c.banner,
+      fee: c.fee,
+      draft: c.draft,
+      regOpen: c.regOpen.toISOString(),
+      regClose: c.regClose.toISOString(),
+      startAt: c.startAt.toISOString(),
+      endAt: c.endAt.toISOString(),
+      resultAt: c.resultAt?.toISOString() ?? null,
+      status: competitionStatus(c),
+      registrationCount: (c._count?.registrations ?? 0) + c.seedRegs,
+    }));
 
-  return NextResponse.json({ competitions });
+    return NextResponse.json({ competitions });
+  } catch (error) {
+    if (error instanceof Error && error.message === "UNAUTHORIZED") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (error instanceof Error && error.message === "FORBIDDEN") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    return NextResponse.json({ error: "Failed to fetch competitions" }, { status: 500 });
+  }
 }
 
 export async function POST(request: Request) {
-  const session = await requireAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-
-  let body: unknown;
   try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+    const user = await requireAuth();
+    requirePermission(user, "competition.create");
+
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+    }
+
+    const parsed = createSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.errors[0]?.message || "Invalid input" }, { status: 400 });
+    }
+
+    const data = parsed.data;
+
+    const existing = await prisma.competition.findUnique({ where: { id: data.id } });
+    if (existing) {
+      return NextResponse.json({ error: "Competition ID already exists" }, { status: 409 });
+    }
+
+    const competition = await prisma.competition.create({
+      data: {
+        id: data.id,
+        title: data.title,
+        host: data.host ?? "Embark India",
+        category: data.category ?? "General Management",
+        banner: data.banner ?? "orange",
+        fee: data.fee,
+        teamMin: data.teamMin,
+        teamMax: data.teamMax,
+        eligibility: data.eligibility ?? "",
+        about: data.about ?? "",
+        rules: data.rules,
+        prizes: data.prizes ?? [],
+        ppo: data.ppo,
+        beginner: data.beginner,
+        draft: !data.published,
+        regOpen: new Date(data.regOpen),
+        regClose: new Date(data.regClose),
+        startAt: new Date(data.startAt),
+        endAt: new Date(data.endAt),
+        resultAt: data.resultAt ? new Date(data.resultAt) : null,
+        rounds: data.rounds as unknown as object,
+        eligibilityCriteria: data.eligibilityCriteria,
+        teamStructure: data.teamStructure,
+        institutes: data.institutes,
+        compStructure: data.compStructure,
+        submissionGuidelines: data.submissionGuidelines,
+        contacts: data.contacts ?? [],
+        aboutHost: data.aboutHost ?? "",
+        faqs: data.faqs ?? [],
+        viewBoost: data.viewBoost,
+        seedRegs: data.seedRegs,
+      },
+    });
+
+    return NextResponse.json({ competition }, { status: 201 });
+  } catch (error) {
+    if (error instanceof Error && error.message === "UNAUTHORIZED") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (error instanceof Error && error.message === "FORBIDDEN") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    return NextResponse.json({ error: "Failed to create competition" }, { status: 500 });
   }
-
-  const parsed = createSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.errors[0]?.message || "Invalid input" }, { status: 400 });
-  }
-
-  const data = parsed.data;
-
-  const existing = await prisma.competition.findUnique({ where: { id: data.id } });
-  if (existing) {
-    return NextResponse.json({ error: "Competition ID already exists" }, { status: 409 });
-  }
-
-  const competition = await prisma.competition.create({
-    data: {
-      id: data.id,
-      title: data.title,
-      host: data.host ?? "Embark India",
-      category: data.category ?? "General Management",
-      banner: data.banner ?? "orange",
-      fee: data.fee,
-      teamMin: data.teamMin,
-      teamMax: data.teamMax,
-      eligibility: data.eligibility ?? "",
-      about: data.about ?? "",
-      rules: data.rules,
-      prizes: data.prizes ?? [],
-      ppo: data.ppo,
-      beginner: data.beginner,
-      draft: !data.published,
-      regOpen: new Date(data.regOpen),
-      regClose: new Date(data.regClose),
-      startAt: new Date(data.startAt),
-      endAt: new Date(data.endAt),
-      resultAt: data.resultAt ? new Date(data.resultAt) : null,
-      rounds: data.rounds as unknown as object,
-      eligibilityCriteria: data.eligibilityCriteria,
-      teamStructure: data.teamStructure,
-      institutes: data.institutes,
-      compStructure: data.compStructure,
-      submissionGuidelines: data.submissionGuidelines,
-      contacts: data.contacts ?? [],
-      aboutHost: data.aboutHost ?? "",
-      faqs: data.faqs ?? [],
-      viewBoost: data.viewBoost,
-      seedRegs: data.seedRegs,
-    },
-  });
-
-  return NextResponse.json({ competition }, { status: 201 });
 }

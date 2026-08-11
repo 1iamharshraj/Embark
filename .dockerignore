@@ -1,0 +1,31 @@
+# Git
+.git
+.gitignore
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Documentation / planning
+Agentic config
+docs
+memory
+design-source
+
+# New app source (served separately via web/ compose)
+web/
+web
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log

@@ -54,7 +54,7 @@ EmbarkIndia/
   design-source/                ← Word docs (gitignored)
 ```
 
-The old static site can stay at the repo root as an archive until the new app is ready to replace it.
+The old static site is archived in `prototype/` and served by the `static` Docker Compose service until the new app replaces it.
 
 ## 3. Development environment
 

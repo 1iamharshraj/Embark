@@ -1,7 +1,7 @@
 # Embark India — Website Context
 
 > Living reference for the Embark India website: what it is, how it's built, what's done, and what's left to do.
-> Last updated: 2026-08-02. Keep this file current when things change.
+> Last updated: 2026-08-09. Keep this file current when things change.
 
 ---
 
@@ -18,22 +18,39 @@
 
 ## 2. How it's built (architecture)
 
-**Plain static website. No framework, no build step, no npm.** Hand-written HTML + CSS + vanilla JS. Edit a file → it's live once uploaded.
+**Two implementations run side by side:**
+
+1. **Legacy static site** — plain HTML + CSS + vanilla JS in `prototype/`. Live on Hostinger.
+2. **New Next.js 14 app** — full-stack PWA in `web/`, with Prisma + PostgreSQL, NextAuth, Razorpay, and Docker Compose support. This is the target replacement for the static site.
+
+**Current local Docker stack (verified live):**
+
+| URL | Service |
+|-----|---------|
+| http://localhost:3000 | Next.js 14 PWA |
+| http://localhost:8080 | Legacy static site |
+| http://localhost:9001 | MinIO console |
+
+See `docs/go-live.md` for full deployment options.
 
 ```
-/                    → all .html pages (they ARE the live URLs — keep at root)
+/prototype/          → legacy static site (.html, css/, js/, assets/)
   .htaccess          → Hostinger cache rule for HTML; blocks .md from public view
-  CLAUDE.md          → AI/developer orientation
-  context.md         → THIS file
-/css/  gl.css        → the ONE shared stylesheet (all design tokens live here)
-/js/                 → db.js, mentors.js, nav.js, playbooks.js
-/assets/             → images + vendored libs (categories/ logos/ people/ posters/ vendor/)
+  Dockerfile.static  → nginx container for the static site
+  nginx-static.conf  → nginx config for the static site
+/web/                → Next.js 14 PWA (target replacement)
+  app/               → App Router routes
+  components/        → shared UI components
+  prisma/            → schema + migrations + seed
+  public/            → PWA manifest, icons, static assets
 /supabase/           → schema.sql + update-0*.sql (run in Supabase, not deployed)
 /memory/             → persistent AI memory
+/Agentic config/     → phase plans and architecture docs
+/docs/               → go-live, components, API reference
 ```
 
-- **Styling:** one shared stylesheet `css/gl.css`. All design tokens (colors, fonts) live here.
-- **Shared nav:** `js/nav.js` (sticky nav + mobile burger).
+- **Styling:** one shared stylesheet `prototype/css/gl.css`. All design tokens (colors, fonts) live here.
+- **Shared nav:** `prototype/js/nav.js` (sticky nav + mobile burger).
 - **Fonts:** Google Fonts — Bricolage Grotesque (display) + Inter (body).
 - **Static content data:** hardcoded JS arrays — `js/mentors.js` (MENTORS), `js/playbooks.js` (PLAYBOOKS).
 - **Backend:** **Supabase** (database, auth, file uploads, row-level security). Wiring in `js/db.js`; schema in `supabase/`. Public URL + anon key are public by design.

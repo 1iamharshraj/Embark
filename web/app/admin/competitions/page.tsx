@@ -1,7 +1,5 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/authOptions";
+import { checkPagePermission } from "@/lib/rbac";
 import { prisma } from "@/lib/prisma";
 import Container from "@/components/Container";
 import Eyebrow from "@/components/Eyebrow";
@@ -9,8 +7,7 @@ import Button from "@/components/Button";
 import { competitionStatus, statusBadgeClass } from "@/lib/competition";
 
 export default async function AdminCompetitionsPage() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.isAdmin) redirect("/account");
+  await checkPagePermission("competition.view");
 
   const raw = await prisma.competition.findMany({
     orderBy: { startAt: "desc" },

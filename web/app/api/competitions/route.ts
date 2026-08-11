@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { competitionStatus } from "@/lib/competition";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   const raw = await prisma.competition.findMany({
     where: { draft: false },

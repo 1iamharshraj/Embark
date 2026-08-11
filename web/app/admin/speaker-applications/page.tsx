@@ -1,7 +1,5 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/authOptions";
+import { checkPagePermission } from "@/lib/rbac";
 import { prisma } from "@/lib/prisma";
 import Container from "@/components/Container";
 import Eyebrow from "@/components/Eyebrow";
@@ -25,8 +23,7 @@ function statusBadge(status: string) {
 }
 
 export default async function AdminSpeakerApplicationsPage() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.isAdmin) redirect("/account");
+  await checkPagePermission("speaker.view");
 
   const applications = await prisma.speakerApplication.findMany({
     orderBy: { createdAt: "desc" },

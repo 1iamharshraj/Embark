@@ -1,14 +1,11 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/authOptions";
+import { checkPagePermission } from "@/lib/rbac";
 import Container from "@/components/Container";
 import Eyebrow from "@/components/Eyebrow";
 import CompetitionForm from "../_components/CompetitionForm";
 
 export default async function NewCompetitionPage() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.isAdmin) redirect("/account");
+  await checkPagePermission("competition.create");
 
   return (
     <section className="bg-cream py-16 sm:py-24">

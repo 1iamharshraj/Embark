@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import MentorshipPageClient from "@/components/MentorshipPageClient";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Mentorship — Embark India",
   description: "Book 1:1 mentorship sessions with verified MBA alumni and industry professionals.",

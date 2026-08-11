@@ -1,109 +1,42 @@
 import { prisma } from "@/lib/prisma";
 import Container from "@/components/Container";
 import Button from "@/components/Button";
-import Eyebrow from "@/components/Eyebrow";
-import PosterStrip from "@/components/PosterStrip";
+import HeroCarousel from "@/components/HeroCarousel";
+import PosterMarquee from "@/components/PosterMarquee";
+import LiveCompetitions from "@/components/LiveCompetitions";
+import PartnersMarquee from "@/components/PartnersMarquee";
+import CollegesMarquee from "@/components/CollegesMarquee";
+import ServiceStrip from "@/components/ServiceStrip";
 import Link from "next/link";
 
-function RoadmapIllustration() {
-  return (
-    <div className="relative w-full max-w-lg mx-auto lg:mx-0 h-80 lg:h-96">
-      <svg
-        viewBox="0 0 540 410"
-        preserveAspectRatio="xMidYMid meet"
-        className="absolute inset-0 w-full h-full"
-        aria-hidden="true"
-      >
-        <path
-          d="M30 355 C 140 330, 90 240, 190 225 C 290 210, 260 300, 360 285 C 460 270, 420 130, 510 85"
-          fill="none"
-          stroke="#0B1F3A"
-          strokeWidth="3"
-          strokeLinecap="round"
-          strokeDasharray="9 11"
-          opacity="0.85"
-        />
-      </svg>
-      <span className="absolute left-[2px] top-[82%] inline-flex items-center gap-2 bg-white rounded-full shadow-[0_2px_8px_rgba(22,22,22,0.08)] px-4 py-2 text-xs font-semibold">
-        <span className="w-2.5 h-2.5 rounded-full bg-orange" />
-        College selection
-      </span>
-      <span className="absolute left-[22%] top-[60%] inline-flex items-center gap-2 bg-white rounded-full shadow-[0_2px_8px_rgba(22,22,22,0.08)] px-4 py-2 text-xs font-semibold">
-        <span className="w-2.5 h-2.5 rounded-full bg-orange" />
-        Start strong
-      </span>
-      <span className="absolute left-[40%] top-[40%] inline-flex items-center gap-2 bg-white rounded-full shadow-[0_2px_8px_rgba(22,22,22,0.08)] px-4 py-2 text-xs font-semibold">
-        <span className="w-2.5 h-2.5 rounded-full bg-navy" />
-        Resume
-      </span>
-      <span className="absolute left-[54%] top-[74%] inline-flex items-center gap-2 bg-white rounded-full shadow-[0_2px_8px_rgba(22,22,22,0.08)] px-4 py-2 text-xs font-semibold">
-        <span className="w-2.5 h-2.5 rounded-full bg-navy" />
-        Case competition
-      </span>
-      <span className="absolute left-[62%] top-[46%] inline-flex items-center gap-2 bg-white rounded-full shadow-[0_2px_8px_rgba(22,22,22,0.08)] px-4 py-2 text-xs font-semibold">
-        <span className="w-2.5 h-2.5 rounded-full bg-orange" />
-        Summer internship
-      </span>
-      <span className="absolute left-[70%] top-[16%] inline-flex items-center gap-2 bg-green text-white rounded-full shadow-[0_2px_8px_rgba(22,22,22,0.08)] px-4 py-2 text-xs font-semibold">
-        <span className="w-2.5 h-2.5 rounded-full bg-orange" />
-        Final placement
-      </span>
-    </div>
-  );
-}
+export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const competitions = await prisma.competition.findMany({
     where: { draft: false },
     orderBy: { regClose: "asc" },
-    take: 6,
-    select: { id: true, title: true, category: true, banner: true },
+    take: 12,
+    select: {
+      id: true,
+      title: true,
+      category: true,
+      banner: true,
+      fee: true,
+      regClose: true,
+      startAt: true,
+      endAt: true,
+      banners: true,
+    },
   });
 
   return (
     <>
-      <section className="relative overflow-hidden bg-cream py-16 sm:py-24 lg:py-32">
-        <svg
-          className="absolute -top-24 -right-24 w-80 opacity-90 pointer-events-none"
-          viewBox="0 0 330 300"
-          aria-hidden="true"
-        >
-          <path
-            fill="#2E6BFF"
-            d="M236 20c46 25 86 70 82 114-4 44-52 88-106 102-53 14-110-4-142-42C38 156 32 98 58 60 84 21 142 3 182 6c20 2 38 7 54 14Z"
-          />
-        </svg>
-        <Container>
-          <div className="relative z-10 grid lg:grid-cols-2 gap-12 items-center">
-            <div className="max-w-2xl">
-              <Eyebrow>The platform</Eyebrow>
-              <h1 className="font-display font-extrabold text-4xl sm:text-5xl lg:text-6xl leading-tight tracking-tight text-charcoal">
-                Your MBA journey needs more than advice.
-                <br />
-                <span className="text-orange">It needs a roadmap.</span>
-              </h1>
-              <p className="mt-6 text-lg text-inkSoft max-w-lg">
-                Embark India helps tier-2 MBA students move from confusion to clarity
-                — from college selection to case competitions, internships, and final
-                placements.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Button href="/mentorship">Start your MBA journey</Button>
-                <Button href="/competitions" variant="ghost">
-                  Explore services
-                </Button>
-              </div>
-            </div>
-            <div className="hidden sm:block">
-              <RoadmapIllustration />
-            </div>
-          </div>
-        </Container>
-      </section>
+      <HeroCarousel />
+      <PosterMarquee />
+      <LiveCompetitions competitions={competitions} />
+      <PartnersMarquee />
 
-      <PosterStrip competitions={competitions} />
-
-      <section className="bg-white py-16 sm:py-20 lg:py-24">
+      <section className="bg-white py-16 sm:py-20 lg:py-24" aria-label="The MBA reality">
         <Container>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-px bg-charcoal/14 rounded-3xl overflow-hidden border border-charcoal/14">
             <div className="bg-[#EEF3FA] p-6 min-h-[132px] flex flex-col justify-center hover:bg-[#FBFCFE] transition">
@@ -122,7 +55,10 @@ export default async function HomePage() {
               <span className="font-display font-bold text-lg text-charcoal mb-2">Multiple exams</span>
               <div className="flex flex-wrap gap-1">
                 {["CAT", "XAT", "SNAP", "NMAT", "CMAT", "MAT", "CET"].map((t) => (
-                  <span key={t} className="text-[0.64rem] font-semibold bg-white border border-charcoal/18 rounded-full px-2 py-0.5">
+                  <span
+                    key={t}
+                    className="text-[0.64rem] font-semibold bg-white border border-charcoal/18 rounded-full px-2 py-0.5"
+                  >
                     {t}
                   </span>
                 ))}
@@ -205,6 +141,8 @@ export default async function HomePage() {
         </Container>
       </section>
 
+      <CollegesMarquee />
+
       <section className="bg-navy py-16 sm:py-20 lg:py-24 relative overflow-hidden text-cream">
         <Container>
           <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-16 items-center mb-16">
@@ -237,7 +175,7 @@ export default async function HomePage() {
                 key={s.l}
                 className="bg-white rounded-lg p-7 sm:p-8 shadow-[0_10px_30px_rgba(0,0,0,0.25)] hover:-translate-y-1 transition"
               >
-                <span className={`font-display font-extrabold text-3xl sm:text-4xl block ${s.accent ? "text-orange" : "text-orange"}`}>
+                <span className="font-display font-extrabold text-3xl sm:text-4xl block text-orange">
                   {s.n}
                 </span>
                 <p className="text-sm text-charcoal mt-3">{s.l}</p>
@@ -246,6 +184,8 @@ export default async function HomePage() {
           </div>
         </Container>
       </section>
+
+      <ServiceStrip />
 
       <section className="bg-cream py-16 sm:py-20 lg:py-24">
         <Container>

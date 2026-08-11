@@ -1,0 +1,143 @@
+# Embark India — full-stack Docker orchestration
+# Runs the legacy static site (nginx) + the new Next.js app + Postgres + Redis + MinIO.
+#
+# Quick start:
+#   cp web/.env.example .env
+#   docker compose up -d --build
+#   docker compose --profile seed run --rm seed
+#
+# URLs:
+#   - Next.js app: http://localhost:3000
+#   - Legacy static site: http://localhost:8080
+#   - MinIO console: http://localhost:9001 (embark / embark12345)
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: embark-postgres
+    environment:
+      POSTGRES_USER: embark
+      POSTGRES_PASSWORD: embark
+      POSTGRES_DB: embark
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U embark -d embark"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: minio/minio:latest
+    container_name: embark-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: embark
+      MINIO_ROOT_PASSWORD: embark12345
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - miniodata:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: embark-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: embark-web
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://embark:embark@postgres:5432/embark?schema=public}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-local-docker-secret-change-me}
+      RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID:-}
+      RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET:-}
+      R2_ENDPOINT: ${R2_ENDPOINT:-http://minio:9000}
+      S3_BUCKET_NAME: ${S3_BUCKET_NAME:-embark-india}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-embark}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-embark12345}
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+      EMAIL_FROM: ${EMAIL_FROM:-Embark India <hello@embarkindia.in>}
+      EMAIL_SERVER: ${EMAIL_SERVER:-}
+    volumes:
+      - uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  static:
+    build:
+      context: ./prototype
+      dockerfile: Dockerfile.static
+    container_name: embark-static
+    ports:
+      - "8080:80"
+
+  migrate:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+      target: builder
+    container_name: embark-migrate
+    command: npx prisma migrate deploy
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://embark:embark@postgres:5432/embark?schema=public}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    profiles:
+      - migrate
+
+  seed:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+      target: builder
+    container_name: embark-seed
+    command: npm run db:seed
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://embark:embark@postgres:5432/embark?schema=public}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-local-docker-secret-change-me}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    profiles:
+      - seed
+
+volumes:
+  pgdata:
+  miniodata:
+  redisdata:
+  uploads:

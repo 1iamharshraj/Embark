@@ -1,25 +1,28 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/authOptions";
+import { requireAuth, requirePermission } from "@/lib/rbac";
 import { prisma } from "@/lib/prisma";
 
-async function requireAdmin() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.isAdmin) return null;
-  return session;
-}
+export async function POST(_request: Request, { params }: { params: { id: string } }) {
+  try {
+    const user = await requireAuth();
+    requirePermission(user, "competition.update");
 
-export async function POST(request: Request, { params }: { params: { id: string } }) {
-  const session = await requireAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    const competition = await prisma.competition.findUnique({ where: { id: params.id } });
+    if (!competition) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const competition = await prisma.competition.findUnique({ where: { id: params.id } });
-  if (!competition) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    const updated = await prisma.competition.update({
+      where: { id: params.id },
+      data: { draft: false },
+    });
 
-  const updated = await prisma.competition.update({
-    where: { id: params.id },
-    data: { draft: false },
-  });
-
-  return NextResponse.json({ competition: updated });
+    return NextResponse.json({ competition: updated });
+  } catch (error) {
+    if (error instanceof Error && error.message === "UNAUTHORIZED") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (error instanceof Error && error.message === "FORBIDDEN") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    return NextResponse.json({ error: "Failed to publish competition" }, { status: 500 });
+  }
 }

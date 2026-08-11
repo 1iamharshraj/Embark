@@ -78,11 +78,11 @@ In the Vercel project settings, set:
 - [ ] Add the domain in Vercel project settings and verify it.
 - [ ] Enable HTTPS / auto-renewal in Vercel.
 - [ ] Wait for DNS propagation and confirm `https://embarkindia.in` loads the new Next.js app.
-- [ ] Keep the old static site files at the repo root until this cutover is verified.
+- [ ] Verify the old static site files in `prototype/` remain accessible on the temporary subdomain until the cutover is verified.
 
 ## 11. Post-cutover cleanup
 
-- [ ] Once production traffic is verified on Vercel for 24–48 hours, move the old static HTML files from the repo root to `archive/`.
+- [ ] Once production traffic is verified on Vercel for 24–48 hours, move the old static HTML files from `prototype/` to `archive/` if they no longer need to be served.
 - [ ] Update `README.md` to remove references to the legacy static site.
 - [ ] Archive the old Supabase project after a final backup if it is no longer needed.
 

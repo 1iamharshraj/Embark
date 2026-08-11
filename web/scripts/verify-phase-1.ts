@@ -17,63 +17,63 @@ function checkFile(rel: string) {
 }
 
 const expectedFiles = [
-  "app/page.tsx",
-  "app/mentorship/page.tsx",
-  "app/mentor/[slug]/page.tsx",
-  "app/guest-lectures/page.tsx",
-  "app/become-a-speaker/page.tsx",
-  "app/invite-an-expert/page.tsx",
-  "app/playbooks/page.tsx",
-  "app/playbook/[slug]/page.tsx",
-  "app/competitions/page.tsx",
-  "app/competition/[id]/page.tsx",
-  "components/Section.tsx",
-  "components/FAQ.tsx",
-  "components/MentorCard.tsx",
-  "components/CompetitionCard.tsx",
-  "components/PlaybookCard.tsx",
-  "components/MentorshipPageClient.tsx",
-  "components/MentorProfileClient.tsx",
-  "components/PlaybookDetailClient.tsx",
-  "public/manifest.json",
-  "public/offline.html",
-  "public/icon-192.svg",
-  "public/icon-512.svg",
+  // Auth & RBAC
+  "prisma/schema.prisma",
+  "lib/authOptions.ts",
+  "types/next-auth.d.ts",
+  "lib/rbac.ts",
+  "middleware.ts",
+  "app/api/v1/auth/refresh/route.ts",
+  // RBAC admin API
+  "app/api/admin/roles/route.ts",
+  "app/api/admin/roles/[id]/route.ts",
+  "app/api/admin/permissions/route.ts",
+  "app/api/admin/users/route.ts",
+  "app/api/admin/users/[id]/roles/route.ts",
+  // RBAC admin UI
+  "app/admin/roles/page.tsx",
+  "app/admin/roles/new/page.tsx",
+  "app/admin/roles/[id]/edit/page.tsx",
+  "app/admin/roles/_components/RoleForm.tsx",
+  "app/admin/permissions/page.tsx",
+  "app/admin/users/page.tsx",
+  "app/admin/users/_components/UserRoleAssign.tsx",
+  // Migrated admin API routes
+  "app/api/admin/competitions/route.ts",
+  "app/api/admin/competitions/[id]/route.ts",
+  "app/api/admin/orders/route.ts",
+  "app/api/admin/orders/[id]/route.ts",
+  "app/api/admin/mentorship/[id]/route.ts",
+  "app/api/admin/lecture-requests/[id]/route.ts",
+  "app/api/admin/speaker-applications/[id]/route.ts",
+  "app/api/admin/notifications/route.ts",
 ];
 
-const expectedRoutes = [
-  "/",
-  "/mentorship",
-  "/mentor/[slug]",
-  "/guest-lectures",
-  "/become-a-speaker",
-  "/invite-an-expert",
-  "/playbooks",
-  "/playbook/[slug]",
-  "/competitions",
-  "/competition/[id]",
-];
+function checkContent(rel: string, needle: string) {
+  checkFile(rel);
+  const content = fs.readFileSync(path.join(webRoot, rel), "utf8");
+  if (!content.includes(needle)) fail(`${rel} missing expected content: ${needle}`);
+}
 
 function main() {
   for (const file of expectedFiles) {
     checkFile(file);
   }
 
-  const manifest = JSON.parse(fs.readFileSync(path.join(webRoot, "public/manifest.json"), "utf8")) as {
-    icons?: { src: string }[];
-  };
-  if (!manifest.icons || manifest.icons.length < 2) {
-    fail("Manifest should reference at least two icons.");
-  }
-  for (const icon of manifest.icons) {
-    checkFile(`public${icon.src}`);
-  }
+  // Sanity checks for RBAC wiring
+  checkContent("lib/rbac.ts", "requireAuth");
+  checkContent("lib/rbac.ts", "requirePermission");
+  checkContent("lib/rbac.ts", "checkPagePermission");
+  checkContent("lib/authOptions.ts", "PrismaAdapter");
+  checkContent("lib/authOptions.ts", "GoogleProvider");
+  checkContent("lib/authOptions.ts", "roles");
+  checkContent("lib/authOptions.ts", "permissions");
+  checkContent("middleware.ts", "/admin/:path*");
+  checkContent("middleware.ts", "/expert/:path*");
+  checkContent("middleware.ts", "/judge/:path*");
 
   console.log("✅ Phase 1 verification passed.");
-  console.log("Expected routes present:");
-  for (const route of expectedRoutes) {
-    console.log(`  • ${route}`);
-  }
+  console.log("   Files present for Identity, RBAC, refresh tokens, middleware and admin role UI.");
 }
 
 main();

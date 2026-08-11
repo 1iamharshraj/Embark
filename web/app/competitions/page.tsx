@@ -8,6 +8,8 @@ import FAQ from "@/components/FAQ";
 import CompetitionCard from "@/components/CompetitionCard";
 import Section from "@/components/Section";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Case Competitions — Embark India",
   description:

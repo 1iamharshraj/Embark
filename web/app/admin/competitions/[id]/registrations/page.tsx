@@ -1,15 +1,13 @@
-import { redirect, notFound } from "next/navigation";
+import { notFound } from "next/navigation";
+import { checkPagePermission } from "@/lib/rbac";
 import Link from "next/link";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
 import Container from "@/components/Container";
 import Eyebrow from "@/components/Eyebrow";
 import { parseMembers } from "@/lib/competition";
 
 export default async function RegistrationsPage({ params }: { params: { id: string } }) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.isAdmin) redirect("/account");
+  await checkPagePermission("competition.view");
 
   const competition = await prisma.competition.findUnique({
     where: { id: params.id },

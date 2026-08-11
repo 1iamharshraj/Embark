@@ -1,26 +1,29 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/authOptions";
+import { requireAuth, requirePermission } from "@/lib/rbac";
 import { prisma } from "@/lib/prisma";
 
-async function requireAdmin() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.isAdmin) return null;
-  return session;
-}
-
 export async function GET() {
-  const session = await requireAdmin();
-  if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  try {
+    const user = await requireAuth();
+    requirePermission(user, "order.view");
 
-  const orders = await prisma.order.findMany({
-    include: {
-      user: { select: { email: true, name: true } },
-      playbook: true,
-      bookingRequest: { include: { mentor: true } },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+    const orders = await prisma.order.findMany({
+      include: {
+        user: { select: { email: true, name: true } },
+        playbook: true,
+        bookingRequest: { include: { mentor: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    });
 
-  return NextResponse.json({ orders });
+    return NextResponse.json({ orders });
+  } catch (error) {
+    if (error instanceof Error && error.message === "UNAUTHORIZED") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (error instanceof Error && error.message === "FORBIDDEN") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    return NextResponse.json({ error: "Failed to fetch orders" }, { status: 500 });
+  }
 }

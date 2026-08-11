@@ -13,6 +13,259 @@ function iso(date: Date): string {
   return date.toISOString();
 }
 
+// 2.0.0 RBAC seed data
+const systemRoles = [
+  { name: "Super Admin", description: "Full platform access" },
+  { name: "Admin", description: "General platform management" },
+  { name: "Operations Admin", description: "User, mentor, booking and transaction operations" },
+  { name: "Hackathon Admin", description: "Hackathon management" },
+  { name: "Evaluator", description: "Hackathon evaluation only" },
+  { name: "Expert", description: "Expert marketplace access" },
+  { name: "Student", description: "Student functionality" },
+  { name: "Support Agent", description: "Customer support functionality" },
+];
+
+const systemPermissions = [
+  // Users
+  { resource: "user", action: "view" },
+  { resource: "user", action: "create" },
+  { resource: "user", action: "update" },
+  { resource: "user", action: "delete" },
+  // Roles & permissions
+  { resource: "role", action: "view" },
+  { resource: "role", action: "create" },
+  { resource: "role", action: "update" },
+  { resource: "role", action: "delete" },
+  { resource: "permission", action: "view" },
+  { resource: "permission", action: "assign" },
+  // Experts
+  { resource: "expert", action: "view" },
+  { resource: "expert", action: "create" },
+  { resource: "expert", action: "update" },
+  { resource: "expert", action: "verify" },
+  { resource: "expert", action: "suspend" },
+  // Services
+  { resource: "service", action: "view" },
+  { resource: "service", action: "create" },
+  { resource: "service", action: "update" },
+  { resource: "service", action: "delete" },
+  { resource: "service", action: "suspend" },
+  // Bookings
+  { resource: "booking", action: "view" },
+  { resource: "booking", action: "create" },
+  { resource: "booking", action: "update" },
+  { resource: "booking", action: "cancel" },
+  // Priority DMs
+  { resource: "priority-dm", action: "view" },
+  { resource: "priority-dm", action: "create" },
+  { resource: "priority-dm", action: "respond" },
+  { resource: "priority-dm", action: "cancel" },
+  // Packages
+  { resource: "package", action: "view" },
+  { resource: "package", action: "create" },
+  { resource: "package", action: "update" },
+  { resource: "package", action: "delete" },
+  // Payments
+  { resource: "payment", action: "view" },
+  { resource: "payment", action: "refund" },
+  { resource: "payment", action: "reconcile" },
+  // Payouts
+  { resource: "payout", action: "view" },
+  { resource: "payout", action: "approve" },
+  { resource: "payout", action: "reject" },
+  // Reviews
+  { resource: "review", action: "view" },
+  { resource: "review", action: "create" },
+  { resource: "review", action: "moderate" },
+  // Hackathons
+  { resource: "hackathon", action: "view" },
+  { resource: "hackathon", action: "create" },
+  { resource: "hackathon", action: "update" },
+  { resource: "hackathon", action: "publish" },
+  { resource: "hackathon", action: "delete" },
+  // Registrations
+  { resource: "hackathon.registration", action: "view" },
+  { resource: "hackathon.registration", action: "update" },
+  // Submissions
+  { resource: "hackathon.submission", action: "view" },
+  { resource: "hackathon.submission", action: "manage" },
+  { resource: "hackathon.submission", action: "lock" },
+  // Evaluations
+  { resource: "hackathon.evaluation", action: "view" },
+  { resource: "hackathon.evaluation", action: "create" },
+  { resource: "hackathon.evaluation", action: "update" },
+  { resource: "hackathon.evaluation", action: "finalize" },
+  // Results
+  { resource: "hackathon.result", action: "view" },
+  { resource: "hackathon.result", action: "publish" },
+  { resource: "hackathon.result", action: "update" },
+  // Certificates
+  { resource: "certificate", action: "create" },
+  { resource: "certificate", action: "issue" },
+  { resource: "certificate", action: "revoke" },
+  { resource: "certificate", action: "view" },
+  // Notifications
+  { resource: "notification", action: "view" },
+  { resource: "notification", action: "send" },
+  { resource: "notification.template", action: "manage" },
+  // Audit logs
+  { resource: "audit-log", action: "view" },
+  // Platform settings
+  { resource: "platform-setting", action: "view" },
+  { resource: "platform-setting", action: "update" },
+  // Legacy admin modules (kept during 2.0.0 migration)
+  { resource: "dashboard", action: "view" },
+  { resource: "competition", action: "view" },
+  { resource: "competition", action: "create" },
+  { resource: "competition", action: "update" },
+  { resource: "competition", action: "delete" },
+  { resource: "order", action: "view" },
+  { resource: "order", action: "update" },
+  { resource: "mentorship", action: "view" },
+  { resource: "mentorship", action: "update" },
+  { resource: "lecture", action: "view" },
+  { resource: "lecture", action: "update" },
+  { resource: "speaker", action: "view" },
+  { resource: "speaker", action: "update" },
+];
+
+const rolePermissionMap: Record<string, string[]> = {
+  "Super Admin": systemPermissions.map((p) => `${p.resource}.${p.action}`),
+  Admin: [
+    "user.view", "user.create", "user.update",
+    "role.view", "role.create", "role.update", "role.delete",
+    "permission.view", "permission.assign",
+    "expert.view", "expert.verify", "expert.suspend",
+    "service.view", "service.suspend",
+    "booking.view", "booking.update", "booking.cancel",
+    "priority-dm.view", "priority-dm.cancel",
+    "package.view", "package.update",
+    "payment.view", "payment.refund", "payment.reconcile",
+    "payout.view", "payout.approve", "payout.reject",
+    "review.view", "review.moderate",
+    "hackathon.view", "hackathon.create", "hackathon.update", "hackathon.publish", "hackathon.delete",
+    "hackathon.registration.view", "hackathon.registration.update",
+    "hackathon.submission.view", "hackathon.submission.manage", "hackathon.submission.lock",
+    "hackathon.evaluation.view", "hackathon.evaluation.finalize",
+    "hackathon.result.view", "hackathon.result.publish", "hackathon.result.update",
+    "certificate.create", "certificate.issue", "certificate.revoke", "certificate.view",
+    "notification.view", "notification.send", "notification.template.manage",
+    "audit-log.view",
+    "platform-setting.view", "platform-setting.update",
+    "dashboard.view",
+    "competition.view", "competition.create", "competition.update", "competition.delete",
+    "order.view", "order.update",
+    "mentorship.view", "mentorship.update",
+    "lecture.view", "lecture.update",
+    "speaker.view", "speaker.update",
+  ],
+  "Operations Admin": [
+    "user.view", "user.update",
+    "expert.view", "expert.verify",
+    "service.view",
+    "booking.view", "booking.update", "booking.cancel",
+    "priority-dm.view", "priority-dm.cancel",
+    "package.view",
+    "payment.view", "payment.refund",
+    "payout.view", "payout.approve", "payout.reject",
+    "review.view", "review.moderate",
+  ],
+  "Hackathon Admin": [
+    "hackathon.view", "hackathon.create", "hackathon.update", "hackathon.publish",
+    "hackathon.registration.view", "hackathon.registration.update",
+    "hackathon.submission.view", "hackathon.submission.manage", "hackathon.submission.lock",
+    "hackathon.result.view", "hackathon.result.publish",
+    "certificate.create", "certificate.issue", "certificate.view",
+  ],
+  Evaluator: [
+    "hackathon.view",
+    "hackathon.submission.view",
+    "hackathon.evaluation.view", "hackathon.evaluation.create", "hackathon.evaluation.update",
+  ],
+  Expert: [
+    "service.view", "service.create", "service.update", "service.delete",
+    "booking.view", "booking.update",
+    "priority-dm.view", "priority-dm.respond",
+    "package.view", "package.create", "package.update", "package.delete",
+    "payout.view",
+  ],
+  Student: [
+    "service.view",
+    "booking.view", "booking.create",
+    "priority-dm.view", "priority-dm.create",
+    "package.view",
+    "hackathon.view", "hackathon.registration.view",
+    "hackathon.submission.view",
+    "certificate.view",
+    "review.create",
+  ],
+  "Support Agent": [
+    "user.view",
+    "booking.view",
+    "priority-dm.view",
+    "payment.view",
+    "notification.view", "notification.send",
+  ],
+};
+
+async function seedRolesAndPermissions() {
+  await prisma.permission.createMany({
+    data: systemPermissions,
+    skipDuplicates: true,
+  });
+
+  await prisma.role.createMany({
+    data: systemRoles,
+    skipDuplicates: true,
+  });
+
+  const roles = await prisma.role.findMany();
+  const permissions = await prisma.permission.findMany();
+
+  for (const role of roles) {
+    const perms = rolePermissionMap[role.name] || [];
+    for (const permKey of perms) {
+      const [resource, action] = permKey.split(".");
+      const permission = permissions.find((p) => p.resource === resource && p.action === action);
+      if (permission) {
+        await prisma.rolePermission.upsert({
+          where: {
+            roleId_permissionId: {
+              roleId: role.id,
+              permissionId: permission.id,
+            },
+          },
+          update: {},
+          create: {
+            roleId: role.id,
+            permissionId: permission.id,
+          },
+        });
+      }
+    }
+  }
+
+  return { roles, permissions };
+}
+
+async function assignRole(userId: string, roleName: string) {
+  const role = await prisma.role.findUnique({ where: { name: roleName } });
+  if (!role) return;
+  await prisma.userRole.upsert({
+    where: {
+      userId_roleId: {
+        userId,
+        roleId: role.id,
+      },
+    },
+    update: {},
+    create: {
+      userId,
+      roleId: role.id,
+    },
+  });
+}
+
 const streamPlaybooks = [
   {
     slug: "general-management",
@@ -1348,7 +1601,47 @@ function makeCompetitions(now: Date) {
 async function main() {
   const now = new Date();
 
-  // Clear existing data in dependency order (Cascades handle most).
+  // Clear 2.0.0 tables first (children before parents).
+  await prisma.$transaction([
+    prisma.review.deleteMany(),
+    prisma.booking.deleteMany(),
+    prisma.priorityDM.deleteMany(),
+    prisma.packageUsage.deleteMany(),
+    prisma.packagePurchase.deleteMany(),
+    prisma.packageItem.deleteMany(),
+    prisma.package.deleteMany(),
+    prisma.serviceAvailability.deleteMany(),
+    prisma.service.deleteMany(),
+    prisma.expertVerification.deleteMany(),
+    prisma.studentProfile.deleteMany(),
+    prisma.expertProfile.deleteMany(),
+    prisma.userRole.deleteMany(),
+    prisma.rolePermission.deleteMany(),
+    prisma.account.deleteMany(),
+    prisma.session.deleteMany(),
+    prisma.refreshToken.deleteMany(),
+    prisma.notification.deleteMany(),
+    prisma.auditLog.deleteMany(),
+    prisma.walletTransaction.deleteMany(),
+    prisma.payout.deleteMany(),
+    prisma.certificate.deleteMany(),
+    prisma.hackathonResult.deleteMany(),
+    prisma.evaluationScore.deleteMany(),
+    prisma.evaluation.deleteMany(),
+    prisma.judgeAssignment.deleteMany(),
+    prisma.judge.deleteMany(),
+    prisma.submissionFile.deleteMany(),
+    prisma.hackathonSubmission.deleteMany(),
+    prisma.hackathonTeamMember.deleteMany(),
+    prisma.hackathonTeam.deleteMany(),
+    prisma.hackathonRegistration.deleteMany(),
+    prisma.hackathonTimeline.deleteMany(),
+    prisma.hackathon.deleteMany(),
+    prisma.role.deleteMany(),
+    prisma.permission.deleteMany(),
+  ]);
+
+  // Clear legacy tables.
   await prisma.$transaction([
     prisma.winner.deleteMany(),
     prisma.advancement.deleteMany(),
@@ -1364,6 +1657,9 @@ async function main() {
     prisma.playbook.deleteMany(),
     prisma.competition.deleteMany(),
   ]);
+
+  // Seed 2.0.0 RBAC foundation.
+  await seedRolesAndPermissions();
 
   // Users
   const [admin, student, riya] = await Promise.all([
@@ -1395,6 +1691,11 @@ async function main() {
       },
     }),
   ]);
+
+  // Assign 2.0.0 roles
+  await assignRole(admin.id, "Super Admin");
+  await assignRole(student.id, "Student");
+  await assignRole(riya.id, "Student");
 
   // Stream playbooks
   await prisma.playbook.createMany({

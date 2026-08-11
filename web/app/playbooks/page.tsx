@@ -2,10 +2,12 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import PlaybooksPageClient from "@/components/PlaybooksPageClient";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Playbooks — Embark India",
   description:
-    "Stream playbooks and interview/case prep shop. Pick your MBA stream map or buy focused prep playbooks.",
+    "One playbook per MBA stream — roles, recruiters, term-by-term gameplans and skill checklists. Pick your book off the shelf.",
 };
 
 export default async function PlaybooksPage() {

@@ -19,6 +19,8 @@ function isPublic(path: string) {
   return PUBLIC_PATHS.some((p) => path === p || path.startsWith(`${p}/`));
 }
 
+const ADMIN_ROLES = new Set(["Super Admin", "Admin", "Operations Admin", "Hackathon Admin"]);
+
 export async function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
@@ -37,13 +39,43 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  if (pathname.startsWith("/admin") && !token.isAdmin) {
-    return NextResponse.redirect(new URL("/account", request.url));
+  const roles = (token.roles as string[]) || [];
+
+  // Admin routes
+  if (pathname.startsWith("/admin")) {
+    const isAdmin = token.isAdmin || roles.some((r) => ADMIN_ROLES.has(r));
+    if (!isAdmin) {
+      return NextResponse.redirect(new URL("/account", request.url));
+    }
   }
+
+  // Expert dashboard routes
+  if (pathname.startsWith("/expert")) {
+    const isExpert = roles.includes("Expert") || token.isAdmin;
+    if (!isExpert) {
+      return NextResponse.redirect(new URL("/account", request.url));
+    }
+  }
+
+  // Judge portal routes
+  if (pathname.startsWith("/judge")) {
+    const isJudge = roles.includes("Evaluator") || roles.includes("Super Admin") || token.isAdmin;
+    if (!isJudge) {
+      return NextResponse.redirect(new URL("/account", request.url));
+    }
+  }
+
+  // Student routes just require auth (handled above).
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/account/:path*", "/admin/:path*"],
+  matcher: [
+    "/account/:path*",
+    "/admin/:path*",
+    "/expert/:path*",
+    "/judge/:path*",
+    "/student/:path*",
+  ],
 };

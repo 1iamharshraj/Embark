@@ -1,12 +1,9 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/authOptions";
+import { checkPagePermission } from "@/lib/rbac";
 import Container from "@/components/Container";
 
 export default async function AdminSpeakersPage() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.isAdmin) redirect("/account");
+  await checkPagePermission("speaker.view");
 
   return (
     <section className="bg-cream py-16 sm:py-24">

@@ -1,0 +1,19 @@
+# Embark India — local development overrides
+# Use with:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+# This enables live reload for Next.js development.
+
+services:
+  web:
+    build:
+      target: builder
+    command: npm run dev
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+      - /app/.next
+      - uploads:/app/uploads
+    environment:
+      NODE_ENV: development
+    ports:
+      - "3000:3000"

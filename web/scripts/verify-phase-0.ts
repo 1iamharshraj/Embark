@@ -10,9 +10,14 @@ async function main() {
 
   const counts = {
     users: await prisma.user.count(),
+    roles: await prisma.role.count(),
+    permissions: await prisma.permission.count(),
+    rolePermissions: await prisma.rolePermission.count(),
+    userRoles: await prisma.userRole.count(),
     playbooks: await prisma.playbook.count(),
     mentors: await prisma.mentor.count(),
     competitions: await prisma.competition.count(),
+    hackathons: await prisma.hackathon.count(),
     registrations: await prisma.registration.count(),
     submissions: await prisma.submission.count(),
     advancements: await prisma.advancement.count(),
@@ -24,15 +29,23 @@ async function main() {
 
   const admin = await prisma.user.findFirst({
     where: { email: "ajay.san36@gmail.com" },
+    include: { roles: { include: { role: true } } },
   });
   if (!admin) fail("Admin user ajay.san36@gmail.com not found.");
   if (!admin.isAdmin) fail("Admin user does not have isAdmin=true.");
+  const adminRoleNames = admin.roles.map((r) => r.role.name);
+  if (!adminRoleNames.includes("Super Admin"))
+    fail(`Admin user should have Super Admin role, found: ${adminRoleNames.join(", ")}`);
 
   const student = await prisma.user.findFirst({
     where: { email: "student@embark.local" },
+    include: { roles: { include: { role: true } } },
   });
   if (!student) fail("Student user student@embark.local not found.");
   if (student.isAdmin) fail("Student user should not be an admin.");
+  const studentRoleNames = student.roles.map((r) => r.role.name);
+  if (!studentRoleNames.includes("Student"))
+    fail(`Student user should have Student role, found: ${studentRoleNames.join(", ")}`);
 
   const live = await prisma.competition.count({
     where: {

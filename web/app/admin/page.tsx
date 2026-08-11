@@ -1,7 +1,5 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/authOptions";
+import { checkPagePermission } from "@/lib/rbac";
 import Container from "@/components/Container";
 import Eyebrow from "@/components/Eyebrow";
 
@@ -12,13 +10,13 @@ const adminLinks = [
   { href: "/admin/speaker-applications", label: "Speaker applications", desc: "Review and approve guest speaker applications." },
   { href: "/admin/lecture-requests", label: "Lecture requests", desc: "Review guest lecture requests from institutes." },
   { href: "/admin/orders", label: "Orders", desc: "View playbook and mentorship orders." },
+  { href: "/admin/users", label: "Users & roles", desc: "Assign roles and manage platform access." },
+  { href: "/admin/roles", label: "Roles", desc: "Create and edit RBAC roles." },
+  { href: "/admin/permissions", label: "Permissions", desc: "View the permission catalogue." },
 ];
 
 export default async function AdminPage() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.isAdmin) {
-    redirect("/account");
-  }
+  await checkPagePermission("dashboard.view");
 
   return (
     <section className="bg-cream py-16 sm:py-24">

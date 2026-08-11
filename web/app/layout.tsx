@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, Inter } from "next/font/google";
+import {
+  Anton,
+  Bricolage_Grotesque,
+  Gloock,
+  Inter,
+  PT_Serif,
+} from "next/font/google";
 import "./globals.css";
 import Providers from "./Providers";
 import TopBar from "@/components/TopBar";
@@ -17,6 +23,28 @@ const bricolage = Bricolage_Grotesque({
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+  display: "swap",
+});
+
+const gloock = Gloock({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-gloock",
+  display: "swap",
+});
+
+const anton = Anton({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-anton",
+  display: "swap",
+});
+
+const ptSerif = PT_Serif({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-pt-serif",
   display: "swap",
 });
 
@@ -58,7 +86,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${bricolage.variable} ${inter.variable}`}>
+    <html lang="en" className={`${bricolage.variable} ${inter.variable} ${gloock.variable} ${anton.variable} ${ptSerif.variable}`}>
       <body className="font-body antialiased bg-cream text-charcoal">
         <Providers>
           <TopBar />

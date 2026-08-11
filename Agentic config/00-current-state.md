@@ -19,7 +19,7 @@ The new application is in `web/`:
 - **PWA:** `next-pwa` with `manifest.json`, service worker, icons, and offline page.
 - **Admin:** Protected `/admin` routes and `/api/admin/*` API namespace.
 - **Storage:** Local upload handler (`app/api/uploads/[...path]`) — production should switch to S3/R2 or Supabase Storage.
-- **Old static site:** HTML/CSS/JS files remain at the repo root as the live archive until DNS is cut over to Vercel.
+- **Old static site:** HTML/CSS/JS files are archived in `prototype/`; the Docker Compose `static` service serves them from there.
 
 ## 3. Pages and status
 
@@ -64,7 +64,7 @@ All verification scripts pass locally:
 3. **File storage:** Local uploads. Move to S3/R2/Supabase Storage for production.
 4. **Database hosting:** Move from local Docker to Neon (or equivalent managed PostgreSQL).
 5. **Hosting / DNS:** Deploy to Vercel and cut over DNS from Hostinger.
-6. **Old static site:** Keep at repo root until production DNS switch is verified; then move to `archive/`.
+6. **Old static site:** Archived in `prototype/`; keep it there until production DNS switch is verified, then move to `archive/`.
 7. **Dependencies:** `npm audit` reports 10 high-severity issues in build-time/framework packages (Next.js 14, eslint-config-next, next-pwa/workbox). Schedule a post-launch dependency upgrade sweep.
 
 ## 7. Launch checklist
