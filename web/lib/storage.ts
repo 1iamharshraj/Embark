@@ -59,6 +59,17 @@ export async function uploadFile(
   return key;
 }
 
+export function getPublicUrl(key: string): string {
+  if (isProductionStorage()) {
+    if (R2_ENDPOINT) {
+      const base = R2_ENDPOINT.replace(/\/$/, "");
+      return `${base}/${BUCKET}/${key}`;
+    }
+    return `https://${BUCKET}.s3.${AWS_REGION}.amazonaws.com/${key}`;
+  }
+  return `/api/uploads/${key}`;
+}
+
 export async function getSignedDownloadUrl(key: string): Promise<string> {
   if (isProductionStorage()) {
     const client = s3Client();

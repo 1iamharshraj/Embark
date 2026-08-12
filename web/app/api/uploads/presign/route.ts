@@ -6,7 +6,7 @@ import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { S3Client } from "@aws-sdk/client-s3";
 
-const allowedFolders = ["profiles", "resumes", "verifications"] as const;
+const allowedFolders = ["profiles", "resumes", "verifications", "hackathons", "submissions"] as const;
 
 type Folder = (typeof allowedFolders)[number];
 
