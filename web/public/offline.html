@@ -5,10 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Offline — Embark India</title>
     <style>
+      :root {
+        --cream: #f4f7fc;
+        --charcoal: #161616;
+        --ink-soft: #6b7280;
+        --orange-deep: #2e6bff;
+      }
+      * { box-sizing: border-box; }
       body {
         margin: 0;
-        background: #f4f7fc;
-        color: #161616;
+        background: var(--cream);
+        color: var(--charcoal);
         font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         display: flex;
         align-items: center;
@@ -25,17 +32,26 @@
         font-weight: 800;
         margin-bottom: 1rem;
       }
-      .logo span { color: #2e6bff; }
-      h1 { font-size: 1.4rem; margin: 0 0 0.5rem; }
-      p { font-size: 1rem; line-height: 1.5; color: #6b7280; margin: 0 0 1.5rem; }
-      a {
+      .logo span { color: var(--orange-deep); }
+      h1 { font-size: 1.5rem; margin: 0 0 0.5rem; }
+      p { font-size: 1rem; line-height: 1.5; color: var(--ink-soft); margin: 0 0 1.5rem; }
+      .actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+      a, button {
         display: inline-block;
-        background: #2e6bff;
+        background: var(--orange-deep);
         color: #fff;
         text-decoration: none;
         padding: 0.75rem 1.25rem;
         border-radius: 999px;
         font-weight: 600;
+        border: none;
+        font-size: 1rem;
+        cursor: pointer;
+      }
+      button {
+        background: #fff;
+        color: var(--charcoal);
+        border: 1px solid rgba(22, 22, 22, 0.12);
       }
     </style>
   </head>
@@ -44,7 +60,10 @@
       <div class="logo">e<span>MBA</span>rk</div>
       <h1>You're offline</h1>
       <p>We can't reach Embark India right now. Check your connection and try again.</p>
-      <a href="/">Try again</a>
+      <div class="actions">
+        <a href="/">Go home</a>
+        <button onclick="window.location.reload()">Retry</button>
+      </div>
     </div>
   </body>
 </html>
