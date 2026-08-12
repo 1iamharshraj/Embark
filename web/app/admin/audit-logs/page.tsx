@@ -6,6 +6,7 @@ import { checkPagePermission } from "@/lib/rbac";
 import { prisma } from "@/lib/prisma";
 import Container from "@/components/Container";
 import Eyebrow from "@/components/Eyebrow";
+import { StaggerContainer, StaggerItem } from "@/components/motion";
 
 const PER_PAGE = 25;
 
@@ -148,9 +149,9 @@ export default async function AdminAuditLogsPage({
                   <th className="text-left font-semibold text-charcoal px-5 py-3">Details</th>
                 </tr>
               </thead>
-              <tbody>
+              <StaggerContainer as="tbody" staggerDelay={0.03}>
                 {logs.map((log) => (
-                  <tr key={log.id} className="border-b border-charcoal/8 last:border-0 align-top">
+                  <StaggerItem key={log.id} as="tr" className="border-b border-charcoal/8 last:border-0 align-top">
                     <td className="px-5 py-4 text-inkSoft whitespace-nowrap">
                       {new Date(log.createdAt).toLocaleString()}
                     </td>
@@ -183,7 +184,7 @@ export default async function AdminAuditLogsPage({
                         </pre>
                       </details>
                     </td>
-                  </tr>
+                  </StaggerItem>
                 ))}
                 {logs.length === 0 && (
                   <tr>
@@ -192,7 +193,7 @@ export default async function AdminAuditLogsPage({
                     </td>
                   </tr>
                 )}
-              </tbody>
+              </StaggerContainer>
             </table>
           </div>
 

@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import Container from "@/components/Container";
 import Eyebrow from "@/components/Eyebrow";
 import Button from "@/components/Button";
+import { StaggerContainer, StaggerItem } from "@/components/motion";
 import UserRoleAssign from "./_components/UserRoleAssign";
 import UserStatusToggle from "./_components/UserStatusToggle";
 
@@ -160,9 +161,9 @@ export default async function AdminUsersPage({
                   <th className="text-left font-semibold text-charcoal px-5 py-3">Assign roles</th>
                 </tr>
               </thead>
-              <tbody>
+              <StaggerContainer as="tbody" staggerDelay={0.04}>
                 {users.map((u) => (
-                  <tr key={u.id} className="border-b border-charcoal/8 last:border-0 align-top">
+                  <StaggerItem key={u.id} as="tr" className="border-b border-charcoal/8 last:border-0 align-top">
                     <td className="px-5 py-4">
                       <div className="font-semibold text-charcoal">{u.name}</div>
                       <div className="text-xs text-inkSoft">{u.email}</div>
@@ -195,7 +196,7 @@ export default async function AdminUsersPage({
                         allRoles={roles}
                       />
                     </td>
-                  </tr>
+                  </StaggerItem>
                 ))}
                 {users.length === 0 && (
                   <tr>
@@ -204,7 +205,7 @@ export default async function AdminUsersPage({
                     </td>
                   </tr>
                 )}
-              </tbody>
+              </StaggerContainer>
             </table>
           </div>
 
