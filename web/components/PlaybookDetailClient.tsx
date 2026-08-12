@@ -101,8 +101,12 @@ export default function PlaybookDetailClient({ playbook }: PlaybookDetailClientP
                     </Button>
                   ) : (
                     <RazorpayButton
-                      playbook={{ slug: playbook.slug, name: playbook.name, price: playbook.price }}
-                      label={`Buy for ₹${playbook.price}`}
+                      order={{
+                        orderType: "PLAYBOOK",
+                        relatedId: playbook.id,
+                        name: playbook.name,
+                        label: `Buy for ₹${playbook.price}`,
+                      }}
                       onSuccess={() => {
                         setHasAccess(true);
                         setBought(true);

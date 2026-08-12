@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Container from "@/components/Container";
 import Eyebrow from "@/components/Eyebrow";
+import RazorpayButton from "@/components/RazorpayButton";
 
 interface Booking {
   id: string;
@@ -188,14 +189,28 @@ export default function BookingDetailPage({ params }: { params: { id: string } }
 
             <div className="flex flex-wrap gap-3 pt-4 border-t border-charcoal/8">
               {booking.status === "PENDING_PAYMENT" && (
-                <button
-                  type="button"
-                  disabled={actionLoading}
-                  onClick={() => updateStatus("CANCELLED")}
-                  className="inline-flex items-center justify-center rounded-full font-semibold bg-red-100 text-red-700 px-5 py-2.5 hover:bg-red-200 transition disabled:opacity-60"
-                >
-                  Cancel booking
-                </button>
+                <>
+                  <RazorpayButton
+                    order={{
+                      orderType: "BOOKING",
+                      relatedId: booking.id,
+                      name: booking.service.name,
+                      label: `Pay ₹${(booking.amount / 100).toFixed(2)}`,
+                    }}
+                    onSuccess={() => {
+                      toast.success("Payment successful");
+                      router.refresh();
+                    }}
+                  />
+                  <button
+                    type="button"
+                    disabled={actionLoading}
+                    onClick={() => updateStatus("CANCELLED")}
+                    className="inline-flex items-center justify-center rounded-full font-semibold bg-red-100 text-red-700 px-5 py-2.5 hover:bg-red-200 transition disabled:opacity-60"
+                  >
+                    Cancel booking
+                  </button>
+                </>
               )}
               {booking.status === "CONFIRMED" && (
                 <button

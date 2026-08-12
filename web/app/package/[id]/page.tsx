@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
 import Container from "@/components/Container";
 import Eyebrow from "@/components/Eyebrow";
-import PurchaseButton from "./_components/PurchaseButton";
+import RazorpayButton from "@/components/RazorpayButton";
 
 interface PackagePageProps {
   params: { id: string };
@@ -68,7 +68,14 @@ export default async function PackagePage({ params }: PackagePageProps) {
                 </p>
               </div>
               {session?.user?.id ? (
-                <PurchaseButton packageId={pkg.id} />
+                <RazorpayButton
+                  order={{
+                    orderType: "PACKAGE",
+                    relatedId: pkg.id,
+                    name: pkg.name,
+                    label: `Buy for ₹${(pkg.price / 100).toFixed(2)}`,
+                  }}
+                />
               ) : (
                 <Link
                   href="/login"

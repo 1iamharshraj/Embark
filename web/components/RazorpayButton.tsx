@@ -38,13 +38,22 @@ interface CreateOrderResponse {
   amount: number;
   currency: string;
   dbOrderId: string;
+  name?: string;
   playbook?: { slug: string; name: string; price: number };
+}
+
+interface GenericOrderItem {
+  orderType: "PLAYBOOK" | "MENTORSHIP" | "BOOKING" | "PRIORITY_DM" | "PACKAGE" | "HACKATHON_FEE";
+  relatedId: string;
+  name?: string;
+  label?: string;
 }
 
 interface RazorpayButtonProps {
   type?: "playbook" | "mentorship";
   playbook?: { slug: string; name: string; price: number };
   bookingRequestId?: string;
+  order?: GenericOrderItem;
   label?: string;
   onSuccess?: () => void;
   className?: string;
@@ -56,6 +65,7 @@ export default function RazorpayButton({
   type: typeProp,
   playbook,
   bookingRequestId,
+  order,
   label,
   onSuccess,
   className = "",
@@ -64,29 +74,47 @@ export default function RazorpayButton({
 }: RazorpayButtonProps) {
   const [loading, setLoading] = useState(false);
 
-  const type = typeProp ?? (bookingRequestId ? "mentorship" : "playbook");
-  const itemName = type === "mentorship" ? playbook?.name ?? "Mentorship" : playbook?.name ?? "";
-  const displayLabel =
-    label ?? (type === "mentorship" ? `Pay now for ${itemName}` : `Buy now for ₹${playbook?.price ?? 0}`);
+  const legacyType = typeProp ?? (bookingRequestId ? "mentorship" : playbook ? "playbook" : undefined);
+  const itemName = order?.name ?? (legacyType === "mentorship" ? playbook?.name ?? "Mentorship" : playbook?.name ?? "");
+  const displayLabel = label ?? order?.label ?? (legacyType === "mentorship" ? `Pay now for ${itemName}` : `Buy now for ₹${playbook?.price ?? 0}`);
 
   async function handleClick() {
-    if (type === "playbook" && !playbook?.slug) {
-      alert("Playbook details missing.");
-      return;
-    }
-    if (type === "mentorship" && !bookingRequestId) {
-      alert("Booking details missing.");
-      return;
+    if (order) {
+      if (!order.orderType || !order.relatedId) {
+        alert("Order details missing.");
+        return;
+      }
+    } else {
+      if (legacyType === "playbook" && !playbook?.slug) {
+        alert("Playbook details missing.");
+        return;
+      }
+      if (legacyType === "mentorship" && !bookingRequestId) {
+        alert("Booking details missing.");
+        return;
+      }
     }
 
     setLoading(true);
     try {
-      const body =
-        type === "mentorship"
-          ? JSON.stringify({ type: "mentorship", bookingRequestId })
-          : JSON.stringify({ type: "playbook", playbookSlug: playbook!.slug });
+      let body: string;
+      let createUrl: string;
+      let verifyUrl: string;
 
-      const res = await fetch("/api/orders/create", {
+      if (order) {
+        createUrl = "/api/v1/orders";
+        verifyUrl = "/api/v1/payments/verify";
+        body = JSON.stringify({ orderType: order.orderType, relatedId: order.relatedId });
+      } else {
+        createUrl = "/api/orders/create";
+        verifyUrl = "/api/orders/verify";
+        body =
+          legacyType === "mentorship"
+            ? JSON.stringify({ type: "mentorship", bookingRequestId })
+            : JSON.stringify({ type: "playbook", playbookSlug: playbook!.slug });
+      }
+
+      const res = await fetch(createUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body,
@@ -108,10 +136,10 @@ export default function RazorpayButton({
         amount: data.amount,
         currency: data.currency,
         name: "Embark India",
-        description: type === "mentorship" ? `Mentorship with ${itemName}` : itemName,
+        description: data.name || itemName,
         order_id: data.orderId,
         handler: async (response: RazorpayResponse) => {
-          const verifyRes = await fetch("/api/orders/verify", {
+          const verifyRes = await fetch(verifyUrl, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

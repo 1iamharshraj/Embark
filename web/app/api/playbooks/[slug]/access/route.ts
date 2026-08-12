@@ -24,7 +24,11 @@ export async function GET(_request: Request, { params }: { params: { slug: strin
   }
 
   const order = await prisma.order.findFirst({
-    where: { userId, playbookId: playbook.id, status: "paid" },
+    where: {
+      userId,
+      status: "paid",
+      OR: [{ playbookId: playbook.id }, { orderType: "PLAYBOOK", relatedId: playbook.id }],
+    },
     orderBy: { createdAt: "desc" },
   });
 
@@ -33,7 +37,11 @@ export async function GET(_request: Request, { params }: { params: { slug: strin
   }
 
   const pendingOrder = await prisma.order.findFirst({
-    where: { userId, playbookId: playbook.id, status: "pending" },
+    where: {
+      userId,
+      status: "pending",
+      OR: [{ playbookId: playbook.id }, { orderType: "PLAYBOOK", relatedId: playbook.id }],
+    },
     orderBy: { createdAt: "desc" },
   });
 

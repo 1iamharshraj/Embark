@@ -16,13 +16,17 @@ export async function GET() {
     select: { slug: true, category: true, price: true, id: true },
   });
 
-  const paidOrderPlaybookIds = new Set(
-    (
-      await prisma.order.findMany({
-        where: { userId, status: "paid" },
-        select: { playbookId: true },
-      })
-    ).map((o) => o.playbookId)
+  const paidOrders = await prisma.order.findMany({
+    where: {
+      userId,
+      status: "paid",
+      OR: [{ playbookId: { not: null } }, { orderType: "PLAYBOOK", relatedId: { not: null } }],
+    },
+    select: { playbookId: true, relatedId: true, orderType: true },
+  });
+
+  const paidOrderIds = new Set(
+    paidOrders.flatMap((o) => [o.playbookId, o.orderType === "PLAYBOOK" ? o.relatedId : null].filter(Boolean))
   );
 
   const access: Record<string, boolean> = {};
@@ -31,7 +35,7 @@ export async function GET() {
       isAdmin ||
       pb.price === 0 ||
       pb.category === "stream" ||
-      paidOrderPlaybookIds.has(pb.id);
+      paidOrderIds.has(pb.id);
   }
 
   return NextResponse.json({ access });

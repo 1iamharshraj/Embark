@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Container from "@/components/Container";
 import Eyebrow from "@/components/Eyebrow";
+import RazorpayButton from "@/components/RazorpayButton";
 
 interface PriorityDM {
   id: string;
@@ -212,7 +213,21 @@ export default function PriorityDmDetailPage({ params }: { params: { id: string 
             )}
 
             <div className="flex flex-wrap gap-3 pt-4 border-t border-charcoal/8">
-              {!dm.response && (
+              {dm.status === "PENDING_PAYMENT" && (
+                <RazorpayButton
+                  order={{
+                    orderType: "PRIORITY_DM",
+                    relatedId: dm.id,
+                    name: dm.title,
+                    label: `Pay ₹${(dm.amount / 100).toFixed(2)}`,
+                  }}
+                  onSuccess={() => {
+                    toast.success("Payment successful");
+                    router.refresh();
+                  }}
+                />
+              )}
+              {dm.status !== "PENDING_PAYMENT" && !dm.response && (
                 <>
                   <textarea
                     rows={4}

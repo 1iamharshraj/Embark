@@ -465,6 +465,18 @@ model PackageUsage {
 // Payments & Wallet
 // -------------------------
 
+model PlatformConfig {
+  id                  String   @id @default(cuid())
+  key                 String   @unique
+  value               String?
+  defaultCommissionRate Float @default(0.20)
+  currency            String   @default("INR")
+  updatedAt           DateTime @updatedAt
+  createdAt           DateTime @default(now())
+
+  @@index([key])
+}
+
 model Payment {
   id                String   @id @default(cuid())
   orderId           String   @unique
@@ -1031,10 +1043,13 @@ model Order {
   id               String   @id @default(cuid())
   userId           String
   type             String   @default("playbook")
+  orderType        String   @default("PLAYBOOK") // PLAYBOOK | MENTORSHIP | BOOKING | PRIORITY_DM | PACKAGE | HACKATHON_FEE
+  relatedId        String?
   playbookId       String?
   bookingRequestId String?
   amount           Int
   status           String   @default("pending")
+  razorpayOrderId  String?  @unique
   paymentId        String?
   paymentSignature String?
   createdAt        DateTime @default(now())
@@ -1051,6 +1066,12 @@ model Order {
   booking    Booking?
   dm         PriorityDM?
   purchase   PackagePurchase?
+
+  @@index([userId])
+  @@index([orderType])
+  @@index([relatedId])
+  @@index([status])
+  @@index([orderType, relatedId, status])
 }
 
 model Mentor {

@@ -120,6 +120,8 @@ export async function POST(request: Request) {
   const order = await prisma.order.create({
     data: {
       ...orderData,
+      orderType: type === "playbook" ? "PLAYBOOK" : "MENTORSHIP",
+      relatedId: type === "playbook" ? orderData.playbookId : orderData.bookingRequestId,
       status: "pending",
     },
   });

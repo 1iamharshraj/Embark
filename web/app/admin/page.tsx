@@ -11,6 +11,7 @@ const adminLinks = [
   { href: "/admin/lecture-requests", label: "Lecture requests", desc: "Review guest lecture requests from institutes." },
   { href: "/admin/experts", label: "Experts", desc: "Review expert applications and verifications." },
   { href: "/admin/orders", label: "Orders", desc: "View playbook and mentorship orders." },
+  { href: "/admin/payments/transactions", label: "Payments", desc: "Transactions, refunds, payouts and commission rules." },
   { href: "/admin/marketplace", label: "Marketplace", desc: "View and suspend marketplace services, packages and bookings." },
   { href: "/admin/users", label: "Users & roles", desc: "Assign roles and manage platform access." },
   { href: "/admin/roles", label: "Roles", desc: "Create and edit RBAC roles." },
@@ -30,19 +31,17 @@ export default async function AdminPage() {
               Admin centre
             </h1>
             <p className="text-inkSoft">
-              Manage competitions, content, mentors, and inbound requests.
+              Manage competitions, content, mentors, payments and inbound requests.
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {adminLinks.map((link) => (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">            {adminLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 className="group block bg-white rounded-2xl border border-charcoal/8 p-6 hover:border-orange/40 hover:shadow-[0_8px_24px_rgba(22,22,22,0.08)] transition"
               >
-                <h2 className="font-display font-bold text-lg text-charcoal group-hover:text-orangeDeep transition mb-1">
-                  {link.label}
+                <h2 className="font-display font-bold text-lg text-charcoal group-hover:text-orangeDeep transition mb-1">                  {link.label}
                 </h2>
                 <p className="text-sm text-inkSoft">{link.desc}</p>
               </Link>
