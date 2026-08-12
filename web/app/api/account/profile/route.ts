@@ -6,7 +6,13 @@ import { prisma } from "@/lib/prisma";
 
 const profileSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  college: z.string().min(1, "College is required"),
+  phone: z.string().optional(),
+  image: z.string().optional(),
+  bio: z.string().optional(),
+  location: z.string().optional(),
+  linkedIn: z.string().optional(),
+  website: z.string().optional(),
+  isPublic: z.boolean().optional(),
 });
 
 export async function PATCH(request: Request) {
@@ -26,14 +32,38 @@ export async function PATCH(request: Request) {
       );
     }
 
-    const { name, college } = parsed.data;
+    const { name, phone, image, bio, location, linkedIn, website, isPublic } = parsed.data;
 
-    const updated = await prisma.user.update({
-      where: { id: session.user.id },
-      data: {
-        name: name.trim(),
-        college: college.trim(),
-      },
+    const updated = await prisma.$transaction(async (tx) => {
+      const user = await tx.user.update({
+        where: { id: session.user.id },
+        data: {
+          name: name.trim(),
+          phone: phone?.trim() || null,
+          image: image?.trim() || null,
+        },
+      });
+
+      await tx.studentProfile.upsert({
+        where: { userId: user.id },
+        create: {
+          userId: user.id,
+          bio: bio?.trim() || null,
+          location: location?.trim() || null,
+          linkedIn: linkedIn?.trim() || null,
+          website: website?.trim() || null,
+          isPublic: isPublic ?? true,
+        },
+        update: {
+          bio: bio?.trim() || null,
+          location: location?.trim() || null,
+          linkedIn: linkedIn?.trim() || null,
+          website: website?.trim() || null,
+          isPublic: isPublic ?? true,
+        },
+      });
+
+      return user;
     });
 
     return NextResponse.json(
@@ -42,7 +72,8 @@ export async function PATCH(request: Request) {
           id: updated.id,
           email: updated.email,
           name: updated.name,
-          college: updated.college,
+          phone: updated.phone,
+          image: updated.image,
           isAdmin: updated.isAdmin,
         },
       },

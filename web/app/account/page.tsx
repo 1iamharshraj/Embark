@@ -24,6 +24,7 @@ export default async function AccountPage() {
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
+    include: { studentProfile: true, expertProfile: true },
   });
 
   if (!user) {
@@ -69,6 +70,7 @@ export default async function AccountPage() {
           <div className="flex flex-wrap gap-2 mb-8">
             {[
               { href: "/account", label: "Profile" },
+              { href: "/account/profile", label: "Student profile" },
               { href: "/account/orders", label: "Orders" },
               { href: "/account/mentorship", label: "Mentorship" },
               { href: "/account/requests", label: "Requests" },
@@ -90,8 +92,16 @@ export default async function AccountPage() {
               </h2>
               <p className="text-inkSoft text-sm mb-5">Update your name and college.</p>
               <ProfileForm
-                initialName={user.name}
-                initialCollege={user.college}
+                initial={{
+                  name: user.name,
+                  phone: user.phone || "",
+                  image: user.image || "",
+                  bio: user.studentProfile?.bio || "",
+                  location: user.studentProfile?.location || "",
+                  linkedIn: user.studentProfile?.linkedIn || "",
+                  website: user.studentProfile?.website || "",
+                  isPublic: user.studentProfile?.isPublic ?? true,
+                }}
                 email={user.email}
               />
             </div>
@@ -172,6 +182,18 @@ export default async function AccountPage() {
               View orders
             </Button>
           </div>
+
+          {!user.expertProfile && (
+            <div className="bg-white rounded-2xl shadow-[0_2px_8px_rgba(22,22,22,0.06),0_12px_32px_rgba(22,22,22,0.07)] p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="font-display font-bold text-xl text-charcoal mb-1">Become an expert</h2>
+                <p className="text-inkSoft text-sm">Share your experience and mentor MBA students on Embark.</p>
+              </div>
+              <Button href="/expert/onboarding" size="sm">
+                Apply
+              </Button>
+            </div>
+          )}
         </div>
       </Container>
     </section>

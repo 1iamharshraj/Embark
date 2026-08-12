@@ -8,13 +8,17 @@ Every user has a base profile. Students can add academic and career details. Exp
 
 ## Output
 
-- `/account/profile` extended with student profile fields.
-- `/expert/onboarding` — new expert profile creation flow.
-- `/expert/verification` — verification document submission.
-- `/expert/[id]` — public expert profile page.
-- `/admin/experts` — list of experts with verification status.
-- `/admin/experts/[id]/verification` — review and approve/reject verification.
-- API routes under `/api/v1/students`, `/api/v1/experts`, `/api/v1/expert-verifications`.
+- `/account` base profile extended with phone, image, bio, location, LinkedIn, website, and visibility.
+- `/account/profile` dedicated student profile page with degree, specialization, graduation year, skills, etc.
+- `/expert/onboarding` — multi-step expert profile creation flow.
+- `/expert/verification` — verification document submission with file uploads.
+- `/expert/[id]` — public expert profile page with verified badge.
+- `/admin/experts` — list of experts with status filters.
+- `/admin/experts/[id]` — expert detail view.
+- `/admin/experts/[id]/verification` — review uploaded docs and approve/reject with note.
+- API routes under `/api/v1/students`, `/api/v1/experts`, `/api/v1/expert-verifications`, `/api/v1/admin/experts`, `/api/v1/admin/expert-verifications`.
+- Presigned S3 upload helper at `/api/uploads/presign` and local fallback at `/api/uploads`.
+- In-app notification created when admin approves/rejects verification.
 
 ## Steps
 
@@ -61,16 +65,19 @@ Every user has a base profile. Students can add academic and career details. Exp
    - Actual email/WhatsApp delivery implemented in Phase 5.
 
 9. **Verification checklist**
-   - [ ] A student can complete and save their student profile.
-   - [ ] A student can apply to become an expert.
-   - [ ] Applying creates an expert profile and assigns the Expert role.
-   - [ ] An expert can submit verification documents.
-   - [ ] Admin sees pending verifications in `/admin/experts`.
-   - [ ] Admin can approve verification; expert profile shows "Embark Verified" badge.
-   - [ ] Admin can reject verification with a note; expert can resubmit.
-   - [ ] Public expert profile displays services, packages, and reviews sections.
-   - [ ] Profile photo uploads work via presigned URL.
-   - [ ] Privacy settings are respected in public APIs.
+   - [x] `npm run build` passes.
+   - [x] A student can complete and save their student profile at `/account/profile`.
+   - [x] Base profile on `/account` supports phone, photo, bio, location, LinkedIn, website and visibility toggle.
+   - [x] A student can apply to become an expert at `/expert/onboarding`.
+   - [x] Applying creates an expert profile and assigns the `Expert` role.
+   - [x] An expert can submit verification documents at `/expert/verification`.
+   - [x] Admin sees pending verifications in `/admin/experts` and can review at `/admin/experts/[id]/verification`.
+   - [x] Admin can approve verification; expert profile shows "Embark Verified" badge and becomes public.
+   - [x] Admin can reject verification with a note; expert can resubmit a new verification request.
+   - [x] Public expert profile displays headline, bio, credentials, expertise and stats; services/packages/reviews are placeholders until Phase 3.
+   - [x] Profile photo and verification document uploads work via presigned S3 URL with local dev fallback.
+   - [x] Privacy settings (`isPublic`) stored on `StudentProfile`; public expert profile visibility tied to verification status.
+   - [x] In-app notification queued when verification status changes.
 
 ## Risks / notes
 

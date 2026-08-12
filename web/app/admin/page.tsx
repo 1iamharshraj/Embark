@@ -9,6 +9,7 @@ const adminLinks = [
   { href: "/admin/mentorship", label: "Mentorship bookings", desc: "Manage mentorship requests and confirmations." },
   { href: "/admin/speaker-applications", label: "Speaker applications", desc: "Review and approve guest speaker applications." },
   { href: "/admin/lecture-requests", label: "Lecture requests", desc: "Review guest lecture requests from institutes." },
+  { href: "/admin/experts", label: "Experts", desc: "Review expert applications and verifications." },
   { href: "/admin/orders", label: "Orders", desc: "View playbook and mentorship orders." },
   { href: "/admin/users", label: "Users & roles", desc: "Assign roles and manage platform access." },
   { href: "/admin/roles", label: "Roles", desc: "Create and edit RBAC roles." },

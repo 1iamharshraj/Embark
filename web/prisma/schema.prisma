@@ -202,6 +202,7 @@ model StudentProfile {
   bio              String?
   linkedIn         String?
   portfolio        String?
+  website          String?
   resumeUrl        String?
   location         String?
   isPublic         Boolean  @default(true)

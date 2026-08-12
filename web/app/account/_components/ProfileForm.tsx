@@ -1,41 +1,45 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { ImageUpload } from "./ImageUpload";
 
 const profileSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  college: z.string().min(1, "College is required"),
+  phone: z.string().optional(),
+  image: z.string().optional(),
+  bio: z.string().optional(),
+  location: z.string().optional(),
+  linkedIn: z.string().optional(),
+  website: z.string().optional(),
+  isPublic: z.boolean().optional(),
 });
 
-type ProfileForm = z.infer<typeof profileSchema>;
+type ProfileFormData = z.infer<typeof profileSchema>;
 
 interface ProfileFormProps {
-  initialName: string;
-  initialCollege: string;
+  initial: ProfileFormData;
   email: string;
 }
 
-export function ProfileForm({ initialName, initialCollege, email }: ProfileFormProps) {
+export function ProfileForm({ initial, email }: ProfileFormProps) {
   const router = useRouter();
   const [serverError, setServerError] = useState("");
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
-  } = useForm<ProfileForm>({
+  } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
-    defaultValues: {
-      name: initialName,
-      college: initialCollege,
-    },
+    defaultValues: initial,
   });
 
-  async function onSubmit(data: ProfileForm) {
+  async function onSubmit(data: ProfileFormData) {
     setServerError("");
     try {
       const res = await fetch("/api/account/profile", {
@@ -56,7 +60,7 @@ export function ProfileForm({ initialName, initialCollege, email }: ProfileFormP
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       {serverError && (
         <div className="rounded-xl bg-red-50 text-red-700 text-sm px-4 py-3">
           {serverError}
@@ -76,6 +80,12 @@ export function ProfileForm({ initialName, initialCollege, email }: ProfileFormP
         />
       </div>
 
+      <Controller
+        name="image"
+        control={control}
+        render={({ field }) => <ImageUpload value={field.value || ""} onChange={field.onChange} />}
+      />
+
       <div className="flex flex-col gap-1.5">
         <label htmlFor="profile-name" className="text-sm font-semibold text-charcoal">
           Full name
@@ -86,25 +96,73 @@ export function ProfileForm({ initialName, initialCollege, email }: ProfileFormP
           {...register("name")}
           className="w-full rounded-xl bg-cream border border-transparent px-4 py-3 text-charcoal placeholder-inkSoft/50 focus:bg-white focus:border-orange outline-none transition"
         />
-        {errors.name && (
-          <span className="text-xs text-red-600">{errors.name.message}</span>
-        )}
+        {errors.name && <span className="text-xs text-red-600">{errors.name.message}</span>}
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="profile-college" className="text-sm font-semibold text-charcoal">
-          College / Institute
+        <label htmlFor="profile-phone" className="text-sm font-semibold text-charcoal">
+          Phone
         </label>
         <input
-          id="profile-college"
-          type="text"
-          {...register("college")}
+          id="profile-phone"
+          type="tel"
+          {...register("phone")}
           className="w-full rounded-xl bg-cream border border-transparent px-4 py-3 text-charcoal placeholder-inkSoft/50 focus:bg-white focus:border-orange outline-none transition"
         />
-        {errors.college && (
-          <span className="text-xs text-red-600">{errors.college.message}</span>
-        )}
       </div>
+
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="profile-bio" className="text-sm font-semibold text-charcoal">
+          Bio
+        </label>
+        <textarea
+          id="profile-bio"
+          rows={3}
+          {...register("bio")}
+          className="w-full rounded-xl bg-cream border border-transparent px-4 py-3 text-charcoal placeholder-inkSoft/50 focus:bg-white focus:border-orange outline-none transition"
+        />
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="profile-location" className="text-sm font-semibold text-charcoal">
+          Location
+        </label>
+        <input
+          id="profile-location"
+          type="text"
+          {...register("location")}
+          className="w-full rounded-xl bg-cream border border-transparent px-4 py-3 text-charcoal placeholder-inkSoft/50 focus:bg-white focus:border-orange outline-none transition"
+        />
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="profile-linkedin" className="text-sm font-semibold text-charcoal">
+          LinkedIn URL
+        </label>
+        <input
+          id="profile-linkedin"
+          type="url"
+          {...register("linkedIn")}
+          className="w-full rounded-xl bg-cream border border-transparent px-4 py-3 text-charcoal placeholder-inkSoft/50 focus:bg-white focus:border-orange outline-none transition"
+        />
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="profile-website" className="text-sm font-semibold text-charcoal">
+          Website
+        </label>
+        <input
+          id="profile-website"
+          type="url"
+          {...register("website")}
+          className="w-full rounded-xl bg-cream border border-transparent px-4 py-3 text-charcoal placeholder-inkSoft/50 focus:bg-white focus:border-orange outline-none transition"
+        />
+      </div>
+
+      <label className="flex items-center gap-3 rounded-xl bg-cream border border-transparent px-4 py-3 cursor-pointer">
+        <input type="checkbox" {...register("isPublic")} className="rounded" />
+        <span className="text-sm text-charcoal">Make my profile visible to other users</span>
+      </label>
 
       <button
         type="submit"
