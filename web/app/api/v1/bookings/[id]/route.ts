@@ -4,6 +4,7 @@ import { z } from "zod";
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
 import { AuthorizedUser } from "@/lib/rbac";
+import { notifyBookingCompleted } from "@/lib/notifications";
 
 const updateSchema = z.object({
   status: z.enum(["CANCELLED", "RESCHEDULE_REQUESTED", "CONFIRMED", "COMPLETED"]),
@@ -76,6 +77,19 @@ export async function PATCH(request: Request, { params }: { params: { id: string
         expert: { select: { id: true, name: true } },
       },
     });
+
+    if (status === "COMPLETED") {
+      try {
+        await notifyBookingCompleted(
+          updated.clientId,
+          updated.expertId,
+          updated.id,
+          updated.service.name
+        );
+      } catch (notifyErr) {
+        console.error("Booking completion notification failed:", notifyErr);
+      }
+    }
 
     return NextResponse.json({ booking: updated });
   } catch (error) {

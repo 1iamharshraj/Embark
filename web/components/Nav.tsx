@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { useState } from "react";
+import NotificationBell from "./NotificationBell";
 
 const links = [
   { href: "/mentorship", label: "Mentorship" },
@@ -54,6 +55,7 @@ export default function Nav() {
 
         {session ? (
           <div className="hidden lg:flex items-center gap-3">
+            <NotificationBell />
             <Link
               href="/account"
               className="inline-flex items-center justify-center rounded-full border-[1.5px] border-charcoal/25 text-charcoal font-semibold text-sm px-5 py-2.5 hover:border-charcoal transition"
@@ -122,6 +124,10 @@ export default function Nav() {
           ))}
           {session ? (
             <>
+              <div className="px-4 py-2 flex items-center justify-between">
+                <span className="text-charcoal font-semibold text-base">Notifications</span>
+                <NotificationBell />
+              </div>
               <Link
                 href="/account"
                 onClick={() => setOpen(false)}

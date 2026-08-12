@@ -3,6 +3,7 @@ import { createHmac } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { getDefaultCommissionRate, calculateCommission } from "@/lib/commission";
 import { unlockAfterPayment } from "@/lib/paymentUnlock";
+import { notifyPaymentConfirmation, notifyBookingConfirmed, notifyNewDM } from "@/lib/notifications";
 
 export const dynamic = "force-dynamic";
 
@@ -137,6 +138,38 @@ async function capturePayment(razorpayOrderId: string, razorpayPaymentId: string
 
     await unlockAfterPayment(tx, order.orderType, order.relatedId, order, platformAmount, expertAmount);
   });
+
+  try {
+    await notifyPaymentConfirmation(order.userId, order.id, order.amount, order.orderType);
+
+    if (order.orderType === "BOOKING" && order.relatedId) {
+      const booking = await prisma.booking.findUnique({
+        where: { id: order.relatedId },
+        include: { service: { select: { name: true } } },
+      });
+      if (booking) {
+        await notifyBookingConfirmed(
+          booking.clientId,
+          booking.expertId,
+          booking.id,
+          booking.service.name,
+          booking.scheduledAt
+        );
+      }
+    }
+
+    if (order.orderType === "PRIORITY_DM" && order.relatedId && order.dm) {
+      const dm = await prisma.priorityDM.findUnique({
+        where: { id: order.relatedId },
+        select: { id: true, title: true, expertId: true },
+      });
+      if (dm) {
+        await notifyNewDM(dm.expertId, dm.id, dm.title);
+      }
+    }
+  } catch (notifyErr) {
+    console.error("Webhook notification failed:", notifyErr);
+  }
 }
 
 async function failPayment(razorpayOrderId: string) {

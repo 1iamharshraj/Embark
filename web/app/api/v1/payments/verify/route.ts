@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { isTestRazorpaySecret } from "@/lib/razorpay";
 import { getDefaultCommissionRate, calculateCommission } from "@/lib/commission";
 import { unlockAfterPayment } from "@/lib/paymentUnlock";
+import { notifyPaymentConfirmation, notifyBookingConfirmed, notifyNewDM } from "@/lib/notifications";
 
 const verifySchema = z.object({
   razorpay_payment_id: z.string().min(1),
@@ -132,6 +133,38 @@ export async function POST(request: Request) {
 
       await unlockAfterPayment(tx, order.orderType, order.relatedId, order, platformAmount, expertAmount);
     });
+
+    try {
+      await notifyPaymentConfirmation(order.userId, dbOrderId, order.amount, order.orderType);
+
+      if (order.orderType === "BOOKING" && order.relatedId) {
+        const booking = await prisma.booking.findUnique({
+          where: { id: order.relatedId },
+          include: { service: { select: { name: true } } },
+        });
+        if (booking) {
+          await notifyBookingConfirmed(
+            booking.clientId,
+            booking.expertId,
+            booking.id,
+            booking.service.name,
+            booking.scheduledAt
+          );
+        }
+      }
+
+      if (order.orderType === "PRIORITY_DM" && order.relatedId && order.dm) {
+        const dm = await prisma.priorityDM.findUnique({
+          where: { id: order.relatedId },
+          select: { id: true, title: true, expertId: true },
+        });
+        if (dm) {
+          await notifyNewDM(dm.expertId, dm.id, dm.title);
+        }
+      }
+    } catch (notifyErr) {
+      console.error("Payment notification failed:", notifyErr);
+    }
 
     return NextResponse.json({ ok: true, status: "paid" });
   } catch (error) {

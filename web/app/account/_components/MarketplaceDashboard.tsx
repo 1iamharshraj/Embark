@@ -75,9 +75,20 @@ export default function MarketplaceDashboard({ bookings, dms, purchases }: Marke
                       {new Date(booking.scheduledAt).toLocaleString()} · {booking.expert.name}
                     </p>
                   </div>
-                  <span className={`text-xs font-semibold uppercase tracking-wider rounded-full px-2.5 py-1 ${statusClass(booking.status)}`}>
-                    {booking.status}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {booking.status === "COMPLETED" && (
+                      <Link
+                        href={`/account/reviews/write?bookingId=${booking.id}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-xs font-semibold text-orangeDeep hover:underline"
+                      >
+                        Review
+                      </Link>
+                    )}
+                    <span className={`text-xs font-semibold uppercase tracking-wider rounded-full px-2.5 py-1 ${statusClass(booking.status)}`}>
+                      {booking.status}
+                    </span>
+                  </div>
                 </div>
               </Link>
             ))}
@@ -102,9 +113,20 @@ export default function MarketplaceDashboard({ bookings, dms, purchases }: Marke
                     <p className="font-semibold text-charcoal">{dm.title}</p>
                     <p className="text-sm text-inkSoft">{dm.expert.name}</p>
                   </div>
-                  <span className={`text-xs font-semibold uppercase tracking-wider rounded-full px-2.5 py-1 ${statusClass(dm.status)}`}>
-                    {dm.status}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {(dm.status === "COMPLETED" || dm.status === "RESPONDED") && (
+                      <Link
+                        href={`/account/reviews/write?dmId=${dm.id}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-xs font-semibold text-orangeDeep hover:underline"
+                      >
+                        Review
+                      </Link>
+                    )}
+                    <span className={`text-xs font-semibold uppercase tracking-wider rounded-full px-2.5 py-1 ${statusClass(dm.status)}`}>
+                      {dm.status}
+                    </span>
+                  </div>
                 </div>
               </Link>
             ))}

@@ -4,6 +4,7 @@ import { z } from "zod";
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
 import { AuthorizedUser } from "@/lib/rbac";
+import { notifyDMResponded } from "@/lib/notifications";
 
 const updateSchema = z.object({
   status: z.enum(["PAID", "ASSIGNED", "IN_PROGRESS", "RESPONDED", "COMPLETED", "CANCELLED", "EXPIRED"]).optional(),
@@ -105,6 +106,19 @@ export async function PATCH(request: Request, { params }: { params: { id: string
         student: { select: { id: true, name: true, email: true } },
       },
     });
+
+    if (response !== undefined) {
+      try {
+        await notifyDMResponded(
+          updated.studentId,
+          updated.id,
+          updated.title,
+          updated.expert.name
+        );
+      } catch (notifyErr) {
+        console.error("DM response notification failed:", notifyErr);
+      }
+    }
 
     return NextResponse.json({ dm: updated });
   } catch (error) {

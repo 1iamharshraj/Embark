@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { hash } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { notifyWelcome } from "@/lib/notifications";
 
 const registerSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -47,7 +48,7 @@ export async function POST(request: Request) {
 
     const hashedPassword = await hash(password, 10);
 
-    await prisma.user.create({
+    const user = await prisma.user.create({
       data: {
         name: name.trim(),
         email: normalizedEmail,
@@ -56,6 +57,12 @@ export async function POST(request: Request) {
         isAdmin: ADMIN_EMAILS.has(normalizedEmail),
       },
     });
+
+    try {
+      await notifyWelcome(user.id);
+    } catch (err) {
+      console.error("Welcome notification failed:", err);
+    }
 
     return NextResponse.json({ ok: true }, { status: 200 });
   } catch (error) {

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import Container from "@/components/Container";
 import Eyebrow from "@/components/Eyebrow";
+import ReviewList from "@/components/ReviewList";
 
 export const dynamic = "force-dynamic";
 
@@ -143,7 +144,7 @@ export default async function ExpertPublicPage({ params }: { params: { id: strin
                 </div>
                 <div className="rounded-xl bg-cream p-4">
                   <div className="font-display font-bold text-2xl text-charcoal">{expert.rating.toFixed(1)}</div>
-                  <div className="text-xs text-inkSoft uppercase tracking-wider">Rating</div>
+                  <div className="text-xs text-inkSoft uppercase tracking-wider">Rating ({expert.reviewCount})</div>
                 </div>
               </div>
 
@@ -219,8 +220,8 @@ export default async function ExpertPublicPage({ params }: { params: { id: strin
               </div>
 
               <div className="rounded-xl bg-cream p-5">
-                <h2 className="font-display font-bold text-lg text-charcoal mb-2">Reviews</h2>
-                <p className="text-inkSoft text-sm">Reviews will appear here once the marketplace goes live.</p>
+                <h2 className="font-display font-bold text-lg text-charcoal mb-4">Reviews</h2>
+                <ReviewList expertUserId={expert.user.id} />
               </div>
             </div>
           </div>
