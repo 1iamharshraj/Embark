@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface Role {
   id: string;
@@ -20,6 +21,7 @@ interface UserRoleAssignProps {
 }
 
 export default function UserRoleAssign({ user, allRoles }: UserRoleAssignProps) {
+  const router = useRouter();
   const [selected, setSelected] = useState<Set<string>>(new Set(user.roles.map((r) => r.id)));
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -36,6 +38,7 @@ export default function UserRoleAssign({ user, allRoles }: UserRoleAssignProps) 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to update roles");
       setMessage("Saved");
+      router.refresh();
     } catch (e) {
       setMessage(e instanceof Error ? e.message : "Failed to save");
     } finally {

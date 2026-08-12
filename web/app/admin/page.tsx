@@ -4,7 +4,9 @@ import Container from "@/components/Container";
 import Eyebrow from "@/components/Eyebrow";
 
 const adminLinks = [
+  { href: "/admin/dashboard", label: "Dashboard", desc: "Metrics, charts and platform overview." },
   { href: "/admin/competitions", label: "Manage competitions", desc: "Create, edit and publish case competitions." },
+  { href: "/admin/hackathons", label: "Hackathons", desc: "Create hackathons, judges and publish results." },
   { href: "/admin/playbooks", label: "Manage playbooks", desc: "Update stream playbooks and pricing." },
   { href: "/admin/mentorship", label: "Mentorship bookings", desc: "Manage mentorship requests and confirmations." },
   { href: "/admin/speaker-applications", label: "Speaker applications", desc: "Review and approve guest speaker applications." },
@@ -16,6 +18,8 @@ const adminLinks = [
   { href: "/admin/users", label: "Users & roles", desc: "Assign roles and manage platform access." },
   { href: "/admin/roles", label: "Roles", desc: "Create and edit RBAC roles." },
   { href: "/admin/permissions", label: "Permissions", desc: "View the permission catalogue." },
+  { href: "/admin/audit-logs", label: "Audit logs", desc: "Track sensitive admin actions." },
+  { href: "/admin/settings", label: "Settings", desc: "Platform configuration and defaults." },
 ];
 
 export default async function AdminPage() {

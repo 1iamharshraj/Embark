@@ -4,6 +4,7 @@ import { z } from "zod";
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
 import { requirePermission, AuthorizedUser } from "@/lib/rbac";
+import { createAuditLog } from "@/lib/audit";
 
 export const dynamic = "force-dynamic";
 
@@ -67,6 +68,7 @@ export async function PUT(request: Request) {
     }
 
     let config = await prisma.platformConfig.findFirst({ orderBy: { createdAt: "asc" } });
+    const previousRate = config?.defaultCommissionRate ?? 0.2;
     if (!config) {
       config = await prisma.platformConfig.create({ data: { key: "default", defaultCommissionRate: parsed.data.defaultCommissionRate } });
     } else {
@@ -75,6 +77,15 @@ export async function PUT(request: Request) {
         data: { defaultCommissionRate: parsed.data.defaultCommissionRate },
       });
     }
+
+    await createAuditLog({
+      userId: sessionUser.id,
+      action: "COMMISSION_RATE_UPDATED",
+      resource: "PlatformConfig",
+      resourceId: config.id,
+      oldValue: { defaultCommissionRate: previousRate },
+      newValue: { defaultCommissionRate: config.defaultCommissionRate },
+    });
 
     return NextResponse.json({ config });
   } catch (error) {

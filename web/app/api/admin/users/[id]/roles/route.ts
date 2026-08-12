@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAuth, requirePermission } from "@/lib/rbac";
 import { prisma } from "@/lib/prisma";
+import { createAuditLog } from "@/lib/audit";
 import { z } from "zod";
 
 const updateSchema = z.object({
@@ -66,17 +67,38 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 
     const { roleIds } = parsed.data;
 
-    await prisma.$transaction(async (tx) => {
-      await tx.userRole.deleteMany({ where: { userId: params.id } });
-      await tx.userRole.createMany({
-        data: roleIds.map((roleId) => ({
-          userId: params.id,
-          roleId,
-        })),
-      });
+    const previousRoles = await prisma.userRole.findMany({
+      where: { userId: params.id },
+      include: { role: { select: { id: true, name: true } } },
     });
 
-    return NextResponse.json({ success: true });
+    await prisma.$transaction(async (tx) => {
+      await tx.userRole.deleteMany({ where: { userId: params.id } });
+      if (roleIds.length > 0) {
+        await tx.userRole.createMany({
+          data: roleIds.map((roleId) => ({
+            userId: params.id,
+            roleId,
+          })),
+        });
+      }
+    });
+
+    const updatedRoles = await prisma.userRole.findMany({
+      where: { userId: params.id },
+      include: { role: { select: { id: true, name: true } } },
+    });
+
+    await createAuditLog({
+      userId: user.id,
+      action: "USER_ROLES_UPDATED",
+      resource: "User",
+      resourceId: params.id,
+      oldValue: { roles: previousRoles.map((r) => r.role) },
+      newValue: { roles: updatedRoles.map((r) => r.role) },
+    });
+
+    return NextResponse.json({ success: true, roles: updatedRoles.map((r) => r.role) });
   } catch (error) {
     if (error instanceof Error && error.message === "UNAUTHORIZED") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

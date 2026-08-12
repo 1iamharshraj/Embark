@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
 import { getRazorpayInstance } from "@/lib/razorpay";
 import { requirePermission, AuthorizedUser } from "@/lib/rbac";
+import { createAuditLog } from "@/lib/audit";
 
 export const dynamic = "force-dynamic";
 
@@ -142,6 +143,14 @@ export async function POST(request: Request) {
       if (order.purchase) {
         await tx.packagePurchase.update({ where: { id: order.purchase.id }, data: { status: "CANCELLED" } });
       }
+    });
+
+    await createAuditLog({
+      userId: sessionUser.id,
+      action: "REFUND_CREATED",
+      resource: "Order",
+      resourceId: orderId,
+      newValue: { amount: refundAmount, reason, status: razorpayRefundId ? "PENDING" : "PROCESSED" },
     });
 
     return NextResponse.json({ success: true }, { status: 201 });

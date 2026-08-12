@@ -4,6 +4,7 @@ import { z } from "zod";
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
 import { requirePermission, AuthorizedUser } from "@/lib/rbac";
+import { createAuditLog } from "@/lib/audit";
 
 const updateSchema = z.object({
   status: z.enum(["APPROVED", "REJECTED", "PROCESSED"]),
@@ -69,6 +70,15 @@ export async function PATCH(request: Request, { params }: { params: { id: string
           },
         });
       }
+    });
+
+    await createAuditLog({
+      userId: sessionUser.id,
+      action: "payout.update",
+      resource: "payout",
+      resourceId: payout.id,
+      oldValue: { status: payout.status },
+      newValue: { status, adminNote },
     });
 
     return NextResponse.json({ success: true });

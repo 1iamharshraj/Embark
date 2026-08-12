@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, requirePermission } from "@/lib/rbac";
 import { certificateQueue } from "@/lib/queue";
+import { createAuditLog } from "@/lib/audit";
 
 function normalizeError(error: unknown) {
   if (error instanceof Error && error.message === "UNAUTHORIZED") {
@@ -80,6 +81,15 @@ export async function POST(request: Request, { params }: { params: { id: string 
       });
 
       return created;
+    });
+
+    await createAuditLog({
+      userId: user.id,
+      action: "hackathon.results.publish",
+      resource: "hackathon",
+      resourceId: hackathon.id,
+      oldValue: { status: hackathon.status },
+      newValue: { status: "RESULTS_PUBLISHED", results: results.count },
     });
 
     const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
