@@ -8,6 +8,7 @@ import Eyebrow from "@/components/Eyebrow";
 import Button from "@/components/Button";
 import { ProfileForm } from "./_components/ProfileForm";
 import { PasswordForm } from "./_components/PasswordForm";
+import MarketplaceDashboard from "./_components/MarketplaceDashboard";
 
 function compStatus(now: Date, regOpen: Date, regClose: Date, endAt: Date) {
   if (now < regOpen) return "Upcoming";
@@ -36,6 +37,27 @@ export default async function AccountPage() {
     include: { competition: true },
     orderBy: { createdAt: "desc" },
   });
+
+  const [bookings, dms, purchases] = await Promise.all([
+    prisma.booking.findMany({
+      where: { clientId: user.id },
+      include: { service: { select: { name: true, durationMinutes: true } }, expert: { select: { name: true } } },
+      orderBy: { scheduledAt: "desc" },
+      take: 10,
+    }),
+    prisma.priorityDM.findMany({
+      where: { studentId: user.id },
+      include: { expert: { select: { name: true } } },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+    }),
+    prisma.packagePurchase.findMany({
+      where: { studentId: user.id },
+      include: { package: { select: { name: true } } },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+    }),
+  ]);
 
   const now = new Date();
 
@@ -66,6 +88,10 @@ export default async function AccountPage() {
               </Button>
             </div>
           )}
+
+          <div className="mb-10">
+            <MarketplaceDashboard bookings={bookings} dms={dms} purchases={purchases} />
+          </div>
 
           <div className="flex flex-wrap gap-2 mb-8">
             {[

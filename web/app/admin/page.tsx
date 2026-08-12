@@ -11,6 +11,7 @@ const adminLinks = [
   { href: "/admin/lecture-requests", label: "Lecture requests", desc: "Review guest lecture requests from institutes." },
   { href: "/admin/experts", label: "Experts", desc: "Review expert applications and verifications." },
   { href: "/admin/orders", label: "Orders", desc: "View playbook and mentorship orders." },
+  { href: "/admin/marketplace", label: "Marketplace", desc: "View and suspend marketplace services, packages and bookings." },
   { href: "/admin/users", label: "Users & roles", desc: "Assign roles and manage platform access." },
   { href: "/admin/roles", label: "Roles", desc: "Create and edit RBAC roles." },
   { href: "/admin/permissions", label: "Permissions", desc: "View the permission catalogue." },

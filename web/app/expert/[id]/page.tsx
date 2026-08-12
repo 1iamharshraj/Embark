@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import Container from "@/components/Container";
 import Eyebrow from "@/components/Eyebrow";
@@ -17,6 +18,15 @@ async function getExpert(id: string) {
           image: true,
         },
       },
+      services: {
+        where: { isActive: true },
+        orderBy: { price: "asc" },
+      },
+      packages: {
+        where: { isActive: true },
+        include: { items: { include: { service: { select: { name: true } } } } },
+        orderBy: { price: "asc" },
+      },
     },
   });
 
@@ -27,6 +37,8 @@ async function getExpert(id: string) {
 export default async function ExpertPublicPage({ params }: { params: { id: string } }) {
   const expert = await getExpert(params.id);
   if (!expert) notFound();
+
+  const dmService = expert.services.find((s) => s.type === "PRIORITY_DM");
 
   return (
     <section className="bg-cream py-16 sm:py-24">
@@ -54,10 +66,28 @@ export default async function ExpertPublicPage({ params }: { params: { id: strin
                 </div>
                 <p className="text-inkSoft text-lg">{expert.headline}</p>
                 {expert.location && <p className="text-sm text-inkSoft mt-1">{expert.location}</p>}
+                <div className="flex flex-wrap gap-2 mt-4">
+                  {dmService && (
+                    <Link
+                      href={`/priority-dm/${expert.user.id}`}
+                      className="inline-flex items-center justify-center rounded-full font-semibold bg-orangeDeep text-white px-5 py-2.5 hover:bg-[#1740A8] transition"
+                    >
+                      Priority DM
+                    </Link>
+                  )}
+                  {expert.services.some((s) => s.type === "ONE_ON_ONE") && (
+                    <Link
+                      href="#services"
+                      className="inline-flex items-center justify-center rounded-full font-semibold bg-cream text-charcoal px-5 py-2.5 hover:bg-orange/10 transition"
+                    >
+                      Book a session
+                    </Link>
+                  )}
+                </div>
               </div>
             </div>
 
-            <div className="mt-8 space-y-6">
+            <div className="mt-8 space-y-8">
               {expert.bio && (
                 <div>
                   <h2 className="font-display font-bold text-lg text-charcoal mb-2">About</h2>
@@ -117,9 +147,75 @@ export default async function ExpertPublicPage({ params }: { params: { id: strin
                 </div>
               </div>
 
-              <div className="rounded-xl bg-cream p-5">
-                <h2 className="font-display font-bold text-lg text-charcoal mb-2">Services & packages</h2>
-                <p className="text-inkSoft text-sm">Services and packages will appear here once the marketplace goes live.</p>
+              <div id="services">
+                <h2 className="font-display font-bold text-lg text-charcoal mb-4">Services</h2>
+                {expert.services.filter((s) => s.type === "ONE_ON_ONE").length === 0 ? (
+                  <p className="text-inkSoft text-sm">No 1:1 sessions available right now.</p>
+                ) : (
+                  <div className="grid gap-4">
+                    {expert.services
+                      .filter((s) => s.type === "ONE_ON_ONE")
+                      .map((service) => (
+                        <div
+                          key={service.id}
+                          className="rounded-xl bg-cream p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+                        >
+                          <div>
+                            <h3 className="font-semibold text-charcoal">{service.name}</h3>
+                            <p className="text-sm text-inkSoft mt-1">
+                              {service.durationMinutes} min · {service.category || "General"}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="font-display font-bold text-charcoal">
+                              ₹{(service.price / 100).toFixed(2)}
+                            </span>
+                            <Link
+                              href={`/booking/${service.id}`}
+                              className="inline-flex items-center justify-center rounded-full font-semibold bg-orangeDeep text-white px-5 py-2.5 hover:bg-[#1740A8] transition"
+                            >
+                              Book
+                            </Link>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <h2 className="font-display font-bold text-lg text-charcoal mb-4">Packages</h2>
+                {expert.packages.length === 0 ? (
+                  <p className="text-inkSoft text-sm">No packages available right now.</p>
+                ) : (
+                  <div className="grid gap-4">
+                    {expert.packages.map((pkg) => (
+                      <div
+                        key={pkg.id}
+                        className="rounded-xl bg-cream p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+                      >
+                        <div>
+                          <h3 className="font-semibold text-charcoal">{pkg.name}</h3>
+                          <p className="text-sm text-inkSoft mt-1">
+                            {pkg.items.map((i) => `${i.quantity}× ${i.service.name}`).join(" · ")} · {pkg.validityDays}{" "}
+                            days
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="font-display font-bold text-charcoal">
+                            ₹{(pkg.price / 100).toFixed(2)}
+                          </span>
+                          <Link
+                            href={`/package/${pkg.id}`}
+                            className="inline-flex items-center justify-center rounded-full font-semibold bg-orangeDeep text-white px-5 py-2.5 hover:bg-[#1740A8] transition"
+                          >
+                            View
+                          </Link>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="rounded-xl bg-cream p-5">

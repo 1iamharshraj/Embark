@@ -5,24 +5,18 @@ import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, requirePermission, requireResourceOwner, AuthorizedUser } from "@/lib/rbac";
 
-const itemSchema = z.object({
-  serviceId: z.string().min(1),
-  quantity: z.coerce.number().min(1),
-});
-
-const packageSchema = z.object({
+const availabilitySchema = z.object({
   expertProfileId: z.string().min(1),
-  name: z.string().min(1, "Name is required"),
-  description: z.string().optional(),
-  price: z.coerce.number().min(0),
-  validityDays: z.coerce.number().min(1),
-  items: z.array(itemSchema).min(1, "Add at least one service"),
+  dayOfWeek: z.coerce.number().min(0).max(6),
+  startTime: z.string().regex(/^\d{2}:\d{2}$/, "Use HH:mm format"),
+  endTime: z.string().regex(/^\d{2}:\d{2}$/, "Use HH:mm format"),
+  timeZone: z.string().default("Asia/Kolkata"),
 });
 
 export async function GET(request: Request) {
   try {
     const user = await requireAuth();
-    requirePermission(user, "package.view");
+    requirePermission(user, "service.view");
 
     const { searchParams } = new URL(request.url);
     const expertProfileId = searchParams.get("expertProfileId");
@@ -44,17 +38,12 @@ export async function GET(request: Request) {
       requireResourceOwner(user, expertProfile.userId);
     }
 
-    const packages = await prisma.package.findMany({
+    const availabilities = await prisma.serviceAvailability.findMany({
       where: { expertProfileId },
-      include: {
-        items: {
-          include: { service: { select: { id: true, name: true, durationMinutes: true, price: true } } },
-        },
-      },
-      orderBy: { createdAt: "desc" },
+      orderBy: [{ dayOfWeek: "asc" }, { startTime: "asc" }],
     });
 
-    return NextResponse.json({ packages });
+    return NextResponse.json({ availabilities });
   } catch (error) {
     if (error instanceof Error && error.message === "UNAUTHORIZED") {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -62,7 +51,7 @@ export async function GET(request: Request) {
     if (error instanceof Error && error.message === "FORBIDDEN") {
       return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }
-    return NextResponse.json({ message: "Failed to fetch packages" }, { status: 500 });
+    return NextResponse.json({ message: "Failed to fetch availability" }, { status: 500 });
   }
 }
 
@@ -74,7 +63,8 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const parsed = packageSchema.safeParse(body);
+    const parsed = availabilitySchema.safeParse(body);
+
     if (!parsed.success) {
       return NextResponse.json(
         { message: parsed.error.errors[0]?.message || "Invalid input" },
@@ -83,7 +73,6 @@ export async function POST(request: Request) {
     }
 
     const data = parsed.data;
-    const sessionUser = session.user as AuthorizedUser;
 
     const expertProfile = await prisma.expertProfile.findUnique({
       where: { id: data.expertProfileId },
@@ -94,35 +83,28 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: "Expert profile not found" }, { status: 404 });
     }
 
+    const sessionUser = session.user as AuthorizedUser;
     if (!sessionUser.isAdmin) {
       requireResourceOwner(sessionUser, expertProfile.userId);
-      requirePermission(sessionUser, "package.create");
+      requirePermission(sessionUser, "service.create");
     }
 
-    const pkg = await prisma.package.create({
+    const availability = await prisma.serviceAvailability.create({
       data: {
         expertProfileId: data.expertProfileId,
         createdById: sessionUser.id,
-        name: data.name.trim(),
-        description: data.description?.trim(),
-        price: data.price,
-        validityDays: data.validityDays,
-        items: {
-          create: data.items,
-        },
-      },
-      include: {
-        items: {
-          include: { service: { select: { id: true, name: true } } },
-        },
+        dayOfWeek: data.dayOfWeek,
+        startTime: data.startTime,
+        endTime: data.endTime,
+        timeZone: data.timeZone,
       },
     });
 
-    return NextResponse.json({ package: pkg }, { status: 201 });
+    return NextResponse.json({ availability }, { status: 201 });
   } catch (error) {
     if (error instanceof Error && error.message === "FORBIDDEN") {
       return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }
-    return NextResponse.json({ message: "Failed to create package" }, { status: 500 });
+    return NextResponse.json({ message: "Failed to create availability" }, { status: 500 });
   }
 }

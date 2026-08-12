@@ -347,6 +347,7 @@ model Booking {
   order   Order?        @relation(fields: [orderId], references: [id], onDelete: SetNull)
   review  Review?
 
+  @@unique([expertId, scheduledAt])
   @@index([clientId])
   @@index([expertId])
   @@index([serviceId])
