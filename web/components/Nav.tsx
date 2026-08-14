@@ -57,6 +57,14 @@ export default function Nav() {
         {session ? (
           <div className="hidden lg:flex items-center gap-3">
             <NotificationBell />
+            {session.user.roles?.includes("Expert") && (
+              <Link
+                href="/expert/dashboard"
+                className="inline-flex items-center justify-center rounded-full bg-orangeDeep/10 text-orangeDeep font-semibold text-sm px-5 py-2.5 hover:bg-orangeDeep/20 transition"
+              >
+                Expert dashboard
+              </Link>
+            )}
             <Link
               href="/account"
               className="inline-flex items-center justify-center rounded-full border-[1.5px] border-charcoal/25 text-charcoal font-semibold text-sm px-5 py-2.5 hover:border-charcoal transition"
@@ -129,6 +137,15 @@ export default function Nav() {
                 <span className="text-charcoal font-semibold text-base">Notifications</span>
                 <NotificationBell />
               </div>
+              {session.user.roles?.includes("Expert") && (
+                <Link
+                  href="/expert/dashboard"
+                  onClick={() => setOpen(false)}
+                  className="block text-orangeDeep font-semibold text-base px-4 py-3 rounded-xl hover:bg-orange/8"
+                >
+                  Expert dashboard
+                </Link>
+              )}
               <Link
                 href="/account"
                 onClick={() => setOpen(false)}

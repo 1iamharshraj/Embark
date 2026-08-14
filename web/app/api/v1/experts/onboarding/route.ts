@@ -174,7 +174,7 @@ export async function POST(request: Request) {
 
     const create = !existing;
 
-    const profile = await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx) => {
       const upserted = await tx.expertProfile.upsert({
         where: { userId },
         create: {

@@ -49,8 +49,9 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Expert dashboard routes
-  if (pathname.startsWith("/expert")) {
+  // Expert dashboard routes — onboarding is open to ALL logged-in users
+  // so any user can become an expert via the wizard.
+  if (pathname.startsWith("/expert") && !pathname.startsWith("/expert/onboarding")) {
     const isExpert = roles.includes("Expert") || token.isAdmin;
     if (!isExpert) {
       return NextResponse.redirect(new URL("/account", request.url));
@@ -67,7 +68,10 @@ export async function middleware(request: NextRequest) {
 
   // Student routes just require auth (handled above).
 
-  return NextResponse.next();
+  // Forward the pathname so server layouts can detect the current route
+  const response = NextResponse.next();
+  response.headers.set("x-pathname", pathname);
+  return response;
 }
 
 export const config = {

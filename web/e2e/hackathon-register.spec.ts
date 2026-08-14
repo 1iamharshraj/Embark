@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-async function login(page, email: string, password: string) {
+async function login(page: import("@playwright/test").Page, email: string, password: string) {
   await page.goto("/login");
   await page.waitForLoadState("networkidle");
   await page.getByLabel(/email/i).first().fill(email);
