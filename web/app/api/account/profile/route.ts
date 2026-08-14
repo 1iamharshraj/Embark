@@ -5,7 +5,7 @@ import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
 
 const profileSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  name: z.string().min(1, "Name is required").optional(),
   phone: z.string().optional(),
   image: z.string().optional(),
   bio: z.string().optional(),
@@ -35,14 +35,28 @@ export async function PATCH(request: Request) {
     const { name, phone, image, bio, location, linkedIn, website, isPublic } = parsed.data;
 
     const updated = await prisma.$transaction(async (tx) => {
+      const userData: { name?: string; phone?: string | null; image?: string | null } = {};
+      if (name !== undefined) userData.name = name.trim();
+      if (phone !== undefined) userData.phone = phone?.trim() || null;
+      if (image !== undefined) userData.image = image?.trim() || null;
+
       const user = await tx.user.update({
         where: { id: session.user.id },
-        data: {
-          name: name.trim(),
-          phone: phone?.trim() || null,
-          image: image?.trim() || null,
-        },
+        data: userData,
       });
+
+      const profileData: {
+        bio?: string | null;
+        location?: string | null;
+        linkedIn?: string | null;
+        website?: string | null;
+        isPublic?: boolean;
+      } = {};
+      if (bio !== undefined) profileData.bio = bio?.trim() || null;
+      if (location !== undefined) profileData.location = location?.trim() || null;
+      if (linkedIn !== undefined) profileData.linkedIn = linkedIn?.trim() || null;
+      if (website !== undefined) profileData.website = website?.trim() || null;
+      if (isPublic !== undefined) profileData.isPublic = isPublic;
 
       await tx.studentProfile.upsert({
         where: { userId: user.id },
@@ -54,13 +68,7 @@ export async function PATCH(request: Request) {
           website: website?.trim() || null,
           isPublic: isPublic ?? true,
         },
-        update: {
-          bio: bio?.trim() || null,
-          location: location?.trim() || null,
-          linkedIn: linkedIn?.trim() || null,
-          website: website?.trim() || null,
-          isPublic: isPublic ?? true,
-        },
+        update: profileData,
       });
 
       return user;

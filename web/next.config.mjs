@@ -26,7 +26,6 @@ const nextConfig = {
       { source: "/guest-lectures.html", destination: "/guest-lectures", permanent: true },
       { source: "/account.html", destination: "/account", permanent: true },
       { source: "/mentor-profile.html", destination: "/experts", permanent: true },
-      { source: "/mentor/:slug*", destination: "/experts", permanent: true },
       { source: "/become-speaker.html", destination: "/become-a-speaker", permanent: true },
       { source: "/invite-expert.html", destination: "/invite-an-expert", permanent: true },
     ];

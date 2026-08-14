@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { checkPagePermission } from "@/lib/rbac";
 import { prisma } from "@/lib/prisma";
-import Container from "@/components/Container";
 import ProgressPageClient from "./_components/ProgressPageClient";
 
 export default async function ProgressPage({ params }: { params: { id: string } }) {
@@ -22,10 +21,6 @@ export default async function ProgressPage({ params }: { params: { id: string } 
   if (!competition) notFound();
 
   return (
-    <section className="bg-cream py-16 sm:py-24">
-      <Container>
-        <ProgressPageClient competition={competition} registrations={competition.registrations} />
-      </Container>
-    </section>
+    <ProgressPageClient competition={competition} registrations={competition.registrations} />
   );
 }

@@ -44,19 +44,53 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Already paid" }, { status: 409 });
     }
 
-    const order = await prisma.order.create({
-      data: {
-        userId,
-        type: orderType.toLowerCase(),
-        orderType,
-        relatedId,
-        amount,
-        status: "pending",
-      },
-    });
+    const orderData: {
+      userId: string;
+      type: string;
+      orderType: string;
+      relatedId: string;
+      amount: number;
+      status: string;
+      playbookId?: string;
+      bookingRequestId?: string;
+    } = {
+      userId,
+      type: orderType.toLowerCase(),
+      orderType,
+      relatedId,
+      amount,
+      status: "pending",
+    };
+
+    if (orderType === "PLAYBOOK") orderData.playbookId = relatedId;
+    if (orderType === "MENTORSHIP") orderData.bookingRequestId = relatedId;
+
+    const order = await prisma.order.create({ data: orderData });
 
     const keyId = process.env.RAZORPAY_KEY_ID || "rzp_test_...";
+    const secret = process.env.RAZORPAY_KEY_SECRET || "";
+    const isMockMode = !keyId || !secret || secret === "..." || secret.startsWith("test_secret_") || secret.includes("placeholder");
     const amountPaise = order.amount;
+
+    if (isMockMode) {
+      const testOrderId = `test_order_${order.id}`;
+      await prisma.order.update({
+        where: { id: order.id },
+        data: { razorpayOrderId: testOrderId },
+      });
+
+      return NextResponse.json({
+        orderId: testOrderId,
+        keyId,
+        amount: amountPaise,
+        currency: "INR",
+        dbOrderId: order.id,
+        orderType,
+        relatedId,
+        name: itemName,
+        mock: true,
+      });
+    }
 
     try {
       const razorpay = getRazorpayInstance();
@@ -103,6 +137,7 @@ export async function POST(request: Request) {
         orderType,
         relatedId,
         name: itemName,
+        mock: true,
       });
     }
   } catch (error) {

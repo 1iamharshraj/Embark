@@ -27,6 +27,7 @@ type ShopFilter = "all" | "interview" | "case";
 type ShopSort = "popular" | "price-asc" | "price-desc" | "rating";
 
 interface DisplayPlaybook {
+  id?: string;
   slug: string;
   title: string;
   category: "interview" | "case";
@@ -53,7 +54,6 @@ export default function ShopGrid({ shopPlaybooks, access, onAccessChange }: Shop
   const [openMenu, setOpenMenu] = useState<"interview" | "case" | null>(null);
   const [selected, setSelected] = useState<DisplayPlaybook | null>(null);
   const [payMethod, setPayMethod] = useState<"card" | "upi">("card");
-  const [demoMsg, setDemoMsg] = useState("");
   const menuRef = useRef<HTMLDivElement>(null);
 
   // close dropdowns on outside click
@@ -100,6 +100,7 @@ export default function ShopGrid({ shopPlaybooks, access, onAccessChange }: Shop
     shopPlaybooks.forEach((p, i) => {
       const existing = map.get(p.slug);
       map.set(p.slug, {
+        id: p.id,
         slug: p.slug,
         title: p.name.replace(/\splaybook$/i, ""),
         category: (p.category === "interview" || p.category === "case" ? p.category : "interview") as DisplayPlaybook["category"],
@@ -398,26 +399,26 @@ export default function ShopGrid({ shopPlaybooks, access, onAccessChange }: Shop
                   </div>
                 </div>
               )}
-              <RazorpayButton
-                playbook={{ slug: selected.slug, name: `${selected.title} Playbook`, price: selected.price }}
-                label={`Pay ${formatPrice(selected.price)}`}
-                onSuccess={() => {
-                  setDemoMsg("Payment successful! Refreshing access…");
-                  onAccessChange?.();
-                }}
-                className="pbm-paybtn"
-                variant="primary"
-              />
-              <button
-                className="pbm-paybtn"
-                style={{ marginTop: 8 }}
-                onClick={() => setDemoMsg("Demo only — connect Razorpay to accept real payments.")}
-              >
-                Pay {formatPrice(selected.price)} (demo)
-              </button>
-              <p className="pbm-msg" role="status">
-                {demoMsg}
-              </p>
+              {selected.id ? (
+                <RazorpayButton
+                  order={{
+                    orderType: "PLAYBOOK",
+                    relatedId: selected.id,
+                    name: `${selected.title} Playbook`,
+                    label: `Pay ${formatPrice(selected.price)}`,
+                  }}
+                  onSuccess={() => {
+                    onAccessChange?.();
+                    setTimeout(() => setSelected(null), 800);
+                  }}
+                  className="pbm-paybtn"
+                  variant="primary"
+                />
+              ) : (
+                <button className="pbm-paybtn" disabled>
+                  Available soon
+                </button>
+              )}
               <p className="pbm-secure">🔒 Secure checkout — connect Razorpay to accept real payments.</p>
             </div>
           </div>

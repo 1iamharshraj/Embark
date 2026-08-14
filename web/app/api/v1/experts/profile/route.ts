@@ -15,6 +15,21 @@ const commaList = z
   })
   .default([]);
 
+function slugify(title: string): string {
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .substring(0, 80);
+}
+
+function generateSlug(name: string | null | undefined): string {
+  const base = slugify(name || "expert");
+  const suffix = Math.random().toString(36).slice(2, 8);
+  return `${base}-${suffix}`;
+}
+
 const expertProfileSchema = z.object({
   headline: z.string().min(1, "Headline is required"),
   bio: z.string().min(1, "Bio is required"),
@@ -66,6 +81,7 @@ export async function POST(request: Request) {
       const profile = await tx.expertProfile.create({
         data: {
           userId: session.user.id,
+          slug: generateSlug(session.user.name),
           headline: data.headline.trim(),
           bio: data.bio.trim(),
           location: data.location?.trim() || null,

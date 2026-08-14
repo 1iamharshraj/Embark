@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -33,31 +33,44 @@ export function ProfileForm({ initial, email }: ProfileFormProps) {
     register,
     handleSubmit,
     control,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: initial,
   });
 
-  async function onSubmit(data: ProfileFormData) {
-    setServerError("");
-    try {
-      const res = await fetch("/api/account/profile", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      const json = await res.json();
-      if (!res.ok) {
-        setServerError(json.message || "Failed to update profile.");
-        return;
+  const saveProfile = useCallback(
+    async (data: Partial<ProfileFormData>) => {
+      setServerError("");
+      try {
+        const res = await fetch("/api/account/profile", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        const json = await res.json();
+        if (!res.ok) {
+          setServerError(json.message || "Failed to update profile.");
+          return;
+        }
+        toast.success("Profile updated");
+        router.refresh();
+      } catch {
+        setServerError("Something went wrong. Please try again.");
       }
-      toast.success("Profile updated");
-      router.refresh();
-    } catch {
-      setServerError("Something went wrong. Please try again.");
-    }
-  }
+    },
+    [router]
+  );
+
+  const onSubmit = useCallback(
+    async (data: ProfileFormData) => {
+      await saveProfile(data);
+    },
+    [saveProfile]
+  );
+
+  const currentName = watch("name");
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -83,7 +96,17 @@ export function ProfileForm({ initial, email }: ProfileFormProps) {
       <Controller
         name="image"
         control={control}
-        render={({ field }) => <ImageUpload value={field.value || ""} onChange={field.onChange} />}
+        render={({ field }) => (
+          <ImageUpload
+            value={field.value || ""}
+            onChange={(url) => {
+              field.onChange(url);
+              // Auto-save so the uploaded photo persists without requiring the
+              // user to also click "Save profile".
+              saveProfile({ name: currentName, image: url });
+            }}
+          />
+        )}
       />
 
       <div className="flex flex-col gap-1.5">

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAuth, requirePermission } from "@/lib/rbac";
 import { certificateQueue } from "@/lib/queue";
 import { createAuditLog } from "@/lib/audit";
+import { calculateAverageScore, rankSubmissions } from "@/lib/evaluation";
 
 function normalizeError(error: unknown) {
   if (error instanceof Error && error.message === "UNAUTHORIZED") {
@@ -14,12 +15,6 @@ function normalizeError(error: unknown) {
   return null;
 }
 
-function getAward(rank: number): string | null {
-  if (rank === 1) return "WINNER";
-  if (rank === 2) return "RUNNER_UP";
-  if (rank <= 5) return "FINALIST";
-  return null;
-}
 
 export async function POST(request: Request, { params }: { params: { id: string } }) {
   try {
@@ -43,23 +38,20 @@ export async function POST(request: Request, { params }: { params: { id: string 
       return NextResponse.json({ message: "Hackathon not found" }, { status: 404 });
     }
 
-    const scoredSubmissions = hackathon.submissions
-      .map((sub) => {
-        const finalized = sub.evaluations.filter((e) => e.score !== null);
-        const average =
-          finalized.length > 0
-            ? finalized.reduce((sum, e) => sum + (e.score || 0), 0) / finalized.length
-            : 0;
-        return { ...sub, averageScore: Math.round(average * 100) / 100, hasFinalized: finalized.length > 0 };
-      })
-      .filter((sub) => sub.hasFinalized)
-      .sort((a, b) => b.averageScore - a.averageScore);
+    const scoredSubmissions = hackathon.submissions.map((sub) => {
+      const finalized = sub.evaluations.filter((e) => e.score !== null);
+      return {
+        ...sub,
+        averageScore: calculateAverageScore(finalized.map((e) => e.score)),
+        hasFinalized: finalized.length > 0,
+      };
+    });
 
-    if (scoredSubmissions.length === 0) {
+    const ranked = rankSubmissions(scoredSubmissions);
+
+    if (ranked.length === 0) {
       return NextResponse.json({ message: "No finalized evaluations to publish results" }, { status: 400 });
     }
-
-    const ranked = scoredSubmissions.map((sub, index) => ({ ...sub, rank: index + 1, award: getAward(index + 1) }));
 
     const results = await prisma.$transaction(async (tx) => {
       await tx.hackathonResult.deleteMany({ where: { hackathonId: hackathon.id } });

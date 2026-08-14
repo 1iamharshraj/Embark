@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
-import { getUploadKey, getSignedDownloadUrl, isProductionStorage } from "@/lib/storage";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { S3Client } from "@aws-sdk/client-s3";
+import {
+  getUploadKey,
+  getSignedDownloadUrl,
+  getSignedUploadUrl,
+  getPublicUrl,
+  isProductionStorage,
+} from "@/lib/storage";
 
 const allowedFolders = ["profiles", "resumes", "verifications", "hackathons", "submissions"] as const;
 
@@ -35,31 +38,22 @@ export async function POST(request: Request) {
     const key = getUploadKey(folder, `${session.user.id}-${safeName}`);
 
     if (isProductionStorage()) {
-      const client = new S3Client({
-        region: process.env.AWS_REGION || "auto",
-        endpoint: process.env.R2_ENDPOINT || undefined,
-        forcePathStyle: Boolean(process.env.R2_ENDPOINT),
-        credentials: {
-          accessKeyId: process.env.AWS_ACCESS_KEY_ID || "",
-          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "",
-        },
+      const putUrl = await getSignedUploadUrl(key, contentType, 300);
+      return NextResponse.json({
+        key,
+        putUrl,
+        getUrl: await getSignedDownloadUrl(key),
+        publicUrl: getPublicUrl(key),
       });
-
-      const putUrl = await getSignedUrl(
-        client,
-        new PutObjectCommand({
-          Bucket: process.env.S3_BUCKET_NAME || "",
-          Key: key,
-          ContentType: contentType || "application/octet-stream",
-        }),
-        { expiresIn: 300 }
-      );
-
-      return NextResponse.json({ key, putUrl, getUrl: await getSignedDownloadUrl(key) });
     }
 
     // Local dev fallback: return local upload endpoint so client can POST to /api/uploads directly.
-    return NextResponse.json({ key, putUrl: `/api/uploads?key=${encodeURIComponent(key)}`, getUrl: `/api/uploads/${key}` });
+    return NextResponse.json({
+      key,
+      putUrl: `/api/uploads?key=${encodeURIComponent(key)}`,
+      getUrl: `/api/uploads/${key}`,
+      publicUrl: `/api/uploads/${key}`,
+    });
   } catch (error) {
     console.error("Presign error:", error);
     return NextResponse.json({ message: "Failed to generate upload URL" }, { status: 500 });

@@ -1,9 +1,7 @@
 import { notFound } from "next/navigation";
 import { checkPagePermission } from "@/lib/rbac";
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import Container from "@/components/Container";
-import Eyebrow from "@/components/Eyebrow";
+import { AdminHeader } from "@/components/admin/AdminHeader";
 import CompetitionForm from "../../_components/CompetitionForm";
 import { parseRounds } from "@/lib/competition";
 
@@ -60,17 +58,14 @@ export default async function EditCompetitionPage({ params }: { params: { id: st
   };
 
   return (
-    <section className="bg-cream py-16 sm:py-24">
-      <Container>
-        <div className="max-w-4xl mx-auto">
-          <Link href="/admin/competitions" className="text-sm font-semibold text-orange hover:underline mb-4 inline-block">
-            ← Back to competitions
-          </Link>
-          <Eyebrow>Edit competition</Eyebrow>
-          <h1 className="font-display font-bold text-3xl text-charcoal mt-2 mb-8">{competition.title}</h1>
-          <CompetitionForm mode="edit" submitUrl={`/api/admin/competitions/${competition.id}`} initial={initial} />
-        </div>
-      </Container>
-    </section>
+    <div className="max-w-4xl mx-auto">
+      <AdminHeader
+        eyebrow="Edit competition"
+        title={competition.title}
+        description="Update details, rounds and publishing status."
+        backHref="/admin/competitions"
+      />
+      <CompetitionForm mode="edit" submitUrl={`/api/admin/competitions/${competition.id}`} initial={initial} />
+    </div>
   );
 }

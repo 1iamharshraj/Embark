@@ -8,10 +8,7 @@ import {
 } from "next/font/google";
 import "./globals.css";
 import Providers from "./Providers";
-import TopBar from "@/components/TopBar";
-import Nav from "@/components/Nav";
-import Footer from "@/components/Footer";
-import PwaInstallPrompt from "@/components/PwaInstallPrompt";
+import { LayoutShell } from "@/components/LayoutShell";
 
 
 const bricolage = Bricolage_Grotesque({
@@ -89,11 +86,7 @@ export default function RootLayout({
     <html lang="en" className={`${bricolage.variable} ${inter.variable} ${gloock.variable} ${anton.variable} ${ptSerif.variable}`}>
       <body className="font-body antialiased bg-cream text-charcoal">
         <Providers>
-          <TopBar />
-          <Nav />
-          <main>{children}</main>
-          <Footer />
-          <PwaInstallPrompt />
+          <LayoutShell>{children}</LayoutShell>
         </Providers>
       </body>
     </html>

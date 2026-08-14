@@ -14,8 +14,10 @@ export const dynamic = "force-dynamic";
 export default async function HackathonDetailPage({ params }: { params: { slug: string } }) {
   const session = await getServerSession(authOptions);
 
-  const hackathon = await prisma.hackathon.findUnique({
-    where: { slug: params.slug },
+  const hackathon = await prisma.hackathon.findFirst({
+    where: {
+      OR: [{ slug: params.slug }, { id: params.slug }],
+    },
     include: {
       timelines: { orderBy: { startsAt: "asc" } },
       _count: { select: { registrations: true, teams: true } },

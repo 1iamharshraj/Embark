@@ -10,31 +10,36 @@ export const metadata: Metadata = {
 };
 
 export default async function MentorshipPage() {
-  const mentors = await prisma.mentor.findMany({
+  const experts = await prisma.expertProfile.findMany({
+    where: {
+      verificationStatus: "VERIFIED",
+      isPublic: true,
+    },
+    include: { user: true },
     orderBy: { rating: "desc" },
   });
 
-  const serializable = mentors.map((m) => ({
-    id: m.id,
-    slug: m.slug,
-    name: m.name,
-    image: m.image,
-    role: m.role,
-    company: m.company,
-    college: m.college,
-    batch: m.batch,
-    tier: m.tier,
-    phases: m.phases,
-    streams: m.streams,
-    rating: m.rating,
-    sessions: m.sessions,
-    years: m.years,
-    price: m.price,
-    guestLectures: m.guestLectures,
-    expertise: m.expertise,
-    bio: m.bio,
-    reviewText: m.reviewText,
-    reviewWho: m.reviewWho,
+  const serializable = experts.map((e) => ({
+    id: e.id,
+    slug: e.slug,
+    name: e.user.name,
+    image: e.image ?? "",
+    role: e.currentRole ?? "",
+    company: e.currentCompany ?? "",
+    college: e.bSchool ?? "",
+    batch: e.batch ?? "",
+    tier: e.yearsExperience && e.yearsExperience <= 3 ? "alumni" : "industry",
+    phases: e.phases,
+    streams: e.streams,
+    rating: e.rating,
+    sessions: e.sessions,
+    years: e.yearsExperience ?? 0,
+    price: e.price,
+    guestLectures: e.guestLectures,
+    expertise: e.expertise,
+    bio: e.bio ?? "",
+    reviewText: e.reviewText ?? "",
+    reviewWho: e.reviewWho ?? "",
   }));
 
   return <MentorshipPageClient mentors={serializable} />;

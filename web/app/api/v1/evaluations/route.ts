@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/rbac";
+import { calculateWeightedScore, calculateAverageScore } from "@/lib/evaluation";
 
 const scoreSchema = z.object({
   criterionName: z.string().min(1),
@@ -24,12 +25,6 @@ function normalizeError(error: unknown) {
   return null;
 }
 
-function calculateWeightedScore(scores: { score: number; weight: number }[]): number {
-  const totalWeight = scores.reduce((sum, s) => sum + s.weight, 0);
-  if (totalWeight === 0) return 0;
-  const weightedSum = scores.reduce((sum, s) => sum + s.score * s.weight, 0);
-  return Math.round((weightedSum / totalWeight) * 100) / 100;
-}
 
 export async function POST(request: Request) {
   try {
@@ -118,13 +113,10 @@ export async function POST(request: Request) {
           where: { submissionId },
           select: { score: true },
         });
-        const averageScore =
-          allEvaluations.length > 0
-            ? allEvaluations.reduce((sum, e) => sum + (e.score || 0), 0) / allEvaluations.length
-            : 0;
+        const averageScore = calculateAverageScore(allEvaluations.map((e) => e.score));
         await tx.hackathonSubmission.update({
           where: { id: submissionId },
-          data: { score: Math.round(averageScore * 100) / 100 },
+          data: { score: averageScore },
         });
       }
 

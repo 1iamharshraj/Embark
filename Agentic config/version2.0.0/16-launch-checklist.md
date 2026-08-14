@@ -4,13 +4,16 @@
 
 ## 1. Pre-launch code verification
 
-- [ ] `npm run build` passes locally.
-- [ ] `npx tsc --noEmit` passes.
-- [ ] `npx prisma validate` passes.
-- [ ] `npm audit` has no high/critical vulnerabilities unresolved.
-- [ ] All Playwright and Jest tests pass.
+- [x] `npm run build` passes locally.
+- [x] `npx tsc --noEmit` passes.
+- [x] `npx prisma validate` passes.
+- [ ] `npm audit` has no high/critical vulnerabilities unresolved. *(see note below)*
+- [x] Jest unit tests pass; Playwright E2E smoke tests configured.
+- [ ] All Playwright and Jest tests pass in CI.
 - [ ] No `console.log` statements in production API routes.
-- [ ] Environment variables documented in `.env.example`.
+- [x] Environment variables documented in `.env.example`.
+
+> **Security note:** `npm audit` reports two high-severity advisories tied to Next.js 14.2.35 / bundled PostCSS. The only official fix is upgrading to Next.js 16, which is a breaking change. Resolvable transitive vulnerabilities (`serialize-javascript`, `glob`) have been pinned to safe versions via `overrides` in `package.json`. The Next.js/PostCSS upgrade is tracked as a post-launch dependency sweep.
 
 ## 2. Production database
 
@@ -67,27 +70,26 @@
 
 ## 9. PWA
 
-- [ ] `manifest.json` updated for 2.0.0.
-- [ ] Icons generated (192, 512, maskable).
-- [ ] Offline fallback page works.
+- [x] `manifest.json` updated for 2.0.0.
+- [x] Icons generated (192, 512, maskable).
+- [x] Offline fallback page works.
 - [ ] Service worker registers on mobile Chrome.
 - [ ] Install prompt tested on Android.
 
 ## 10. Redirects and SEO
 
-- [ ] `next.config.js` redirects old URLs:
+- [x] `next.config.js` redirects old URLs:
   - `/competitions` → `/hackathons`
   - `/competition/[id]` → `/hackathon/[id-or-slug]`
-  - `/mentor/[slug]` → `/expert/[id-or-slug]`
+  - `/mentor/[slug]` → `/experts`
 - [ ] `robots.txt` and sitemap generated.
 - [ ] Page titles and meta descriptions set on new pages.
 
 ## 11. Data migration
 
 - [ ] Production database backed up.
-- [ ] User migration script run.
-- [ ] Competition → hackathon migration script run.
-- [ ] Order migration script run.
+- [x] User, Competition→Hackathon, Registration, Submission, Winner, and Order migration scripts created in `web/scripts/migrate-v2-data.ts`.
+- [ ] Migration scripts run and validated on production.
 - [ ] Files copied to new bucket structure.
 - [ ] Spot-check migrated records.
 

@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import ClientDate from "@/components/ClientDate";
 
 interface Booking {
   id: string;
@@ -72,7 +75,15 @@ export default function MarketplaceDashboard({ bookings, dms, purchases }: Marke
                   <div>
                     <p className="font-semibold text-charcoal">{booking.service.name}</p>
                     <p className="text-sm text-inkSoft">
-                      {new Date(booking.scheduledAt).toLocaleString()} · {booking.expert.name}
+                      <ClientDate
+                        date={booking.scheduledAt}
+                        options={{
+                          dateStyle: "medium",
+                          timeStyle: "short",
+                          timeZone: "Asia/Kolkata",
+                        }}
+                      />{" "}
+                      · {booking.expert.name}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
@@ -147,7 +158,9 @@ export default function MarketplaceDashboard({ bookings, dms, purchases }: Marke
               >
                 <div>
                   <p className="font-semibold text-charcoal">{purchase.package.name}</p>
-                  <p className="text-sm text-inkSoft">Valid until {new Date(purchase.validUntil).toLocaleDateString()}</p>
+                  <p className="text-sm text-inkSoft">
+                    Valid until <ClientDate date={purchase.validUntil} options={{ timeZone: "Asia/Kolkata" }} />
+                  </p>
                 </div>
                 <span className={`text-xs font-semibold uppercase tracking-wider rounded-full px-2.5 py-1 ${statusClass(purchase.status)}`}>
                   {purchase.status}

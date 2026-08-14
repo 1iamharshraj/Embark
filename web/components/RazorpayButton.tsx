@@ -39,6 +39,7 @@ interface CreateOrderResponse {
   currency: string;
   dbOrderId: string;
   name?: string;
+  mock?: boolean;
   playbook?: { slug: string; name: string; price: number };
 }
 
@@ -122,6 +123,27 @@ export default function RazorpayButton({
       const data = (await res.json()) as CreateOrderResponse | { error: string };
       if (!res.ok || !("orderId" in data)) {
         alert("orderId" in data ? "Unexpected response" : data.error || "Could not create order");
+        return;
+      }
+
+      // Mock mode: skip Razorpay checkout and mark paid immediately.
+      if (data.mock) {
+        const verifyRes = await fetch(verifyUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            razorpay_payment_id: `mock_payment_${data.dbOrderId}`,
+            razorpay_order_id: data.orderId,
+            razorpay_signature: "mock_signature",
+            dbOrderId: data.dbOrderId,
+          }),
+        });
+        const verifyData = (await verifyRes.json()) as { ok?: boolean; error?: string };
+        if (verifyRes.ok && verifyData.ok) {
+          onSuccess?.();
+        } else {
+          alert(verifyData.error || "Mock payment verification failed.");
+        }
         return;
       }
 

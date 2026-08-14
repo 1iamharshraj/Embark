@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Button from "@/components/Button";
+import { AdminCard } from "@/components/admin/AdminCard";
 
 interface Round {
   name: string;
@@ -246,7 +247,8 @@ export default function CompetitionForm({ initial, mode, submitUrl }: Competitio
   const checkboxClass = "h-4 w-4 rounded border-charcoal/20 text-orange focus:ring-orange";
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <AdminCard className="p-6">
+      <form onSubmit={handleSubmit} className="space-y-8">
       {message && (
         <div className={`rounded-xl px-4 py-3 text-sm ${message.includes("failed") || message.includes("Failed") ? "bg-red-50 text-red-700" : "bg-green-50 text-green-700"}`}>
           {message}
@@ -464,6 +466,7 @@ export default function CompetitionForm({ initial, mode, submitUrl }: Competitio
           </>
         )}
       </div>
-    </form>
+      </form>
+    </AdminCard>
   );
 }

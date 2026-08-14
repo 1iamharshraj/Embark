@@ -45,7 +45,7 @@ export function ImageUpload({ value, onChange, folder = "profiles" }: ImageUploa
         if (!uploadRes.ok) throw new Error("Failed to upload file");
       }
 
-      onChange(data.getUrl);
+      onChange(data.publicUrl || data.getUrl);
       toast.success("Photo uploaded");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Upload failed");
@@ -56,15 +56,18 @@ export function ImageUpload({ value, onChange, folder = "profiles" }: ImageUploa
   }
 
   return (
-    <div className="flex items-center gap-4">
-      <div className="w-16 h-16 rounded-full bg-cream overflow-hidden flex items-center justify-center border border-charcoal/8">
+    <div className="flex items-center gap-5">
+      <div className="relative group w-24 h-24 rounded-full bg-cream overflow-hidden flex items-center justify-center border border-charcoal/8">
         {value ? (
           <img src={value} alt="Profile" className="w-full h-full object-cover" />
         ) : (
-          <span className="text-2xl text-inkSoft">?</span>
+          <span className="text-3xl text-inkSoft font-bold">{uploading ? "…" : "?"}</span>
         )}
+        <div className="absolute inset-0 bg-charcoal/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+          <span className="text-white text-xs font-semibold text-center px-2">Change</span>
+        </div>
       </div>
-      <div>
+      <div className="flex-1 min-w-0">
         <input
           ref={inputRef}
           type="file"
@@ -77,10 +80,11 @@ export function ImageUpload({ value, onChange, folder = "profiles" }: ImageUploa
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={uploading}
-          className="text-sm font-semibold text-orange hover:underline disabled:opacity-60"
+          className="inline-flex items-center justify-center rounded-full font-semibold bg-orangeDeep text-white px-5 py-2.5 text-sm hover:bg-[#1740A8] transition disabled:opacity-60"
         >
-          {uploading ? "Uploading..." : value ? "Change photo" : "Upload photo"}
+          {uploading ? "Uploading…" : value ? "Change photo" : "Upload photo"}
         </button>
+        <p className="text-xs text-inkSoft mt-2">JPG, PNG or WEBP. Recommended size 400×400px.</p>
       </div>
     </div>
   );

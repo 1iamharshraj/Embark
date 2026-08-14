@@ -1,9 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Button from "@/components/Button";
+import { AdminHeader } from "@/components/admin/AdminHeader";
+import { AdminCard } from "@/components/admin/AdminCard";
+import { AdminDataTable } from "@/components/admin/AdminDataTable";
+import { StatusBadge } from "@/components/admin/StatusBadge";
 import { parseMembers, parseRounds } from "@/lib/competition";
 
 interface Registration {
@@ -65,16 +68,15 @@ export default function ProgressPageClient({ competition, registrations }: Progr
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <Link href="/admin/competitions" className="text-sm font-semibold text-orange hover:underline mb-4 inline-block">
-        ← Back to competitions
-      </Link>
-      <div className="mb-6">
-        <div className="text-xs font-semibold uppercase tracking-wider text-orange mb-1">Progress</div>
-        <h1 className="font-display font-bold text-3xl text-charcoal">{competition.title}</h1>
-      </div>
+    <>
+      <AdminHeader
+        eyebrow="Progress"
+        title={competition.title}
+        description="Advance teams through rounds based on submissions."
+        backHref="/admin/competitions"
+      />
 
-      <div className="bg-white rounded-2xl border border-charcoal/8 p-5 mb-6">
+      <AdminCard className="p-5 mb-6">
         <label className="block text-sm font-semibold text-charcoal mb-2">Select round to advance teams into</label>
         <select
           className="w-full rounded-xl border border-charcoal/10 bg-cream px-4 py-2.5 text-sm text-charcoal"
@@ -93,7 +95,7 @@ export default function ProgressPageClient({ competition, registrations }: Progr
           Teams eligible here {selectedRound === 0 ? "are all registered teams" : `have a submission for Round ${selectedRound}`}.
           Checked teams will be allowed to submit for Round {selectedRound + 1}.
         </p>
-      </div>
+      </AdminCard>
 
       {message && (
         <div className={`rounded-xl px-4 py-3 text-sm mb-6 ${message.includes("failed") || message.includes("Failed") ? "bg-red-50 text-red-700" : "bg-green-50 text-green-700"}`}>
@@ -101,7 +103,16 @@ export default function ProgressPageClient({ competition, registrations }: Progr
         </div>
       )}
 
-      <div className="bg-white rounded-2xl border border-charcoal/8 overflow-hidden mb-6">
+      <AdminDataTable
+        title="Teams"
+        description="Eligible teams for the selected round."
+        count={eligibleRegistrations.length}
+        empty={
+          eligibleRegistrations.length === 0 && (
+            <div className="p-8 text-center text-inkSoft">No eligible teams for this round.</div>
+          )
+        }
+      >
         <table className="w-full text-sm">
           <thead className="bg-cream border-b border-charcoal/8">
             <tr>
@@ -143,18 +154,20 @@ export default function ProgressPageClient({ competition, registrations }: Progr
                     )}
                   </td>
                   <td className="px-5 py-4">
-                    {alreadyAdvanced ? <span className="text-xs text-green-700 font-semibold">Yes</span> : <span className="text-xs text-inkSoft">No</span>}
+                    <StatusBadge status={alreadyAdvanced ? "confirmed" : "pending"} />
                   </td>
                 </tr>
               );
             })}
           </tbody>
         </table>
-      </div>
+      </AdminDataTable>
 
-      <Button onClick={handleSave} disabled={saving}>
-        {saving ? "Saving…" : "Save advancements"}
-      </Button>
-    </div>
+      <div className="mt-6">
+        <Button onClick={handleSave} disabled={saving}>
+          {saving ? "Saving…" : "Save advancements"}
+        </Button>
+      </div>
+    </>
   );
 }

@@ -7,33 +7,34 @@ export default async function MentorProfilePage({
 }: {
   params: { slug: string };
 }) {
-  const mentor = await prisma.mentor.findUnique({
+  const expert = await prisma.expertProfile.findUnique({
     where: { slug: params.slug },
+    include: { user: true },
   });
 
-  if (!mentor) {
+  if (!expert) {
     notFound();
   }
 
   const serializable = {
-    slug: mentor.slug,
-    name: mentor.name,
-    image: mentor.image,
-    role: mentor.role,
-    company: mentor.company,
-    college: mentor.college,
-    batch: mentor.batch,
-    rating: mentor.rating,
-    sessions: mentor.sessions,
-    years: mentor.years,
-    price: mentor.price,
-    guestLectures: mentor.guestLectures,
-    expertise: mentor.expertise,
-    streams: mentor.streams,
-    phases: mentor.phases,
-    bio: mentor.bio,
-    reviewText: mentor.reviewText,
-    reviewWho: mentor.reviewWho,
+    slug: expert.slug,
+    name: expert.user.name,
+    image: expert.image ?? "",
+    role: expert.currentRole ?? "",
+    company: expert.currentCompany ?? "",
+    college: expert.bSchool ?? "",
+    batch: expert.batch ?? "",
+    rating: expert.rating,
+    sessions: expert.sessions,
+    years: expert.yearsExperience ?? 0,
+    price: expert.price,
+    guestLectures: expert.guestLectures,
+    expertise: expert.expertise,
+    streams: expert.streams,
+    phases: expert.phases,
+    bio: expert.bio ?? "",
+    reviewText: expert.reviewText ?? "",
+    reviewWho: expert.reviewWho ?? "",
   };
 
   return <MentorProfileClient mentor={serializable} />;

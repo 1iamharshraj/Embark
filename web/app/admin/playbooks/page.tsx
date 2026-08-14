@@ -1,21 +1,21 @@
-import Link from "next/link";
 import { checkPagePermission } from "@/lib/rbac";
-import Container from "@/components/Container";
+import { AdminHeader } from "@/components/admin/AdminHeader";
+import { AdminCard } from "@/components/admin/AdminCard";
 
 export default async function AdminPlaybooksPage() {
   await checkPagePermission("dashboard.view");
 
   return (
-    <section className="bg-cream py-16 sm:py-24">
-      <Container>
-        <div className="max-w-5xl mx-auto">
-          <Link href="/admin" className="text-sm font-semibold text-orange hover:underline mb-4 inline-block">
-            ← Back to admin
-          </Link>
-          <h1 className="font-display font-bold text-3xl text-charcoal mb-4">Manage playbooks</h1>
-          <p className="text-inkSoft">Playbook management tools coming in the next phase.</p>
-        </div>
-      </Container>
-    </section>
+    <>
+      <AdminHeader
+        eyebrow="Content & events"
+        title="Manage playbooks"
+        description="Playbook management tools coming in the next phase."
+        backHref="/admin"
+      />
+      <AdminCard className="p-6">
+        <p className="text-inkSoft">Playbook management tools coming in the next phase.</p>
+      </AdminCard>
+    </>
   );
 }

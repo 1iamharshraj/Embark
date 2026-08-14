@@ -10,6 +10,7 @@ const links = [
   { href: "/competitions", label: "Competitions" },
   { href: "/guest-lectures", label: "Guest lectures" },
   { href: "/playbooks", label: "Playbooks" },
+  { href: "/mba-colleges-tamilnadu", label: "MBA colleges" },
 ];
 
 export default function Nav() {

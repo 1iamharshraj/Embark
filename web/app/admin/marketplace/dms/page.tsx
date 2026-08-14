@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { checkPagePermission } from "@/lib/rbac";
 import { prisma } from "@/lib/prisma";
-import Container from "@/components/Container";
-import Eyebrow from "@/components/Eyebrow";
+import { AdminHeader } from "@/components/admin/AdminHeader";
+import { AdminDataTable } from "@/components/admin/AdminDataTable";
+import { StatusBadge } from "@/components/admin/StatusBadge";
 
 export default async function AdminMarketplaceDmsPage() {
   await checkPagePermission("dashboard.view");
@@ -17,52 +18,52 @@ export default async function AdminMarketplaceDmsPage() {
   });
 
   return (
-    <section className="bg-cream py-16 sm:py-24">
-      <Container>
-        <div className="max-w-6xl mx-auto">
-          <Link href="/admin/marketplace" className="text-sm font-semibold text-orange hover:underline mb-4 inline-block">
-            ← Back to marketplace
-          </Link>
-          <Eyebrow>Marketplace</Eyebrow>
-          <h1 className="font-display font-bold text-3xl text-charcoal mt-2 mb-8">Priority DMs</h1>
+    <>
+      <AdminHeader
+        eyebrow="Marketplace"
+        title="Priority DMs"
+        description="All priority DM requests sorted by most recent."
+        backHref="/admin/marketplace"
+      />
 
-          <div className="bg-white rounded-2xl border border-charcoal/8 overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-cream border-b border-charcoal/8">
-                <tr>
-                  <th className="text-left font-semibold text-charcoal px-5 py-3">Title</th>
-                  <th className="text-left font-semibold text-charcoal px-5 py-3">Expert</th>
-                  <th className="text-left font-semibold text-charcoal px-5 py-3">Student</th>
-                  <th className="text-left font-semibold text-charcoal px-5 py-3">Amount</th>
-                  <th className="text-left font-semibold text-charcoal px-5 py-3">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {dms.map((dm) => (
-                  <tr key={dm.id} className="border-b border-charcoal/8 last:border-0">
-                    <td className="px-5 py-4 font-semibold text-charcoal">
-                      <Link href={`/priority-dms/${dm.id}`} className="hover:text-orangeDeep transition">
-                        {dm.title}
-                      </Link>
-                    </td>
-                    <td className="px-5 py-4 text-inkSoft">{dm.expert.name}</td>
-                    <td className="px-5 py-4 text-inkSoft">{dm.student.name}</td>
-                    <td className="px-5 py-4 text-inkSoft">₹{(dm.amount / 100).toFixed(2)}</td>
-                    <td className="px-5 py-4 text-inkSoft">{dm.status}</td>
-                  </tr>
-                ))}
-                {dms.length === 0 && (
-                  <tr>
-                    <td colSpan={5} className="px-5 py-10 text-center text-inkSoft">
-                      No priority DMs found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </Container>
-    </section>
+      <AdminDataTable
+        title="All priority DMs"
+        count={dms.length}
+        empty={
+          dms.length === 0 && (
+            <div className="p-8 text-center text-inkSoft">No priority DMs found.</div>
+          )
+        }
+      >
+        <table className="w-full text-left text-sm">
+          <thead className="bg-cream border-b border-charcoal/8">
+            <tr>
+              <th className="px-5 py-3 font-semibold text-charcoal">Title</th>
+              <th className="px-5 py-3 font-semibold text-charcoal">Expert</th>
+              <th className="px-5 py-3 font-semibold text-charcoal">Student</th>
+              <th className="px-5 py-3 font-semibold text-charcoal">Amount</th>
+              <th className="px-5 py-3 font-semibold text-charcoal">Status</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-charcoal/8">
+            {dms.map((dm) => (
+              <tr key={dm.id} className="hover:bg-cream/50 transition">
+                <td className="px-5 py-4 font-semibold text-charcoal">
+                  <Link href={`/priority-dms/${dm.id}`} className="hover:text-orangeDeep transition">
+                    {dm.title}
+                  </Link>
+                </td>
+                <td className="px-5 py-4 text-inkSoft">{dm.expert.name}</td>
+                <td className="px-5 py-4 text-inkSoft">{dm.student.name}</td>
+                <td className="px-5 py-4 text-inkSoft">₹{(dm.amount / 100).toFixed(2)}</td>
+                <td className="px-5 py-4">
+                  <StatusBadge status={dm.status} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </AdminDataTable>
+    </>
   );
 }

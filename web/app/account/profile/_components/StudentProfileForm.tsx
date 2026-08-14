@@ -86,11 +86,15 @@ export function StudentProfileForm({ initial }: StudentProfileFormProps) {
           id={id}
           rows={3}
           {...register(id as keyof StudentProfileFormData)}
-          className={`w-full rounded-xl bg-cream border border-transparent px-4 py-3 text-charcoal placeholder-inkSoft/50 focus:bg-white focus:border-orange outline-none transition ${extra}`}
+          className={`w-full rounded-xl bg-white border border-charcoal/10 px-4 py-3 text-charcoal placeholder-inkSoft/50 focus:bg-white focus:border-orange outline-none transition ${extra}`}
         />
       ) : type === "checkbox" ? (
-        <label className="flex items-center gap-3 rounded-xl bg-cream border border-transparent px-4 py-3 cursor-pointer">
-          <input type="checkbox" {...register(id as keyof StudentProfileFormData)} className="rounded" />
+        <label className="flex items-center gap-3 rounded-xl bg-white border border-charcoal/10 px-4 py-3 cursor-pointer">
+          <input
+            type="checkbox"
+            {...register(id as keyof StudentProfileFormData)}
+            className="w-4 h-4 rounded border-charcoal/20 text-orangeDeep focus:ring-orange/40"
+          />
           <span className="text-sm text-charcoal">{label}</span>
         </label>
       ) : (
@@ -98,7 +102,7 @@ export function StudentProfileForm({ initial }: StudentProfileFormProps) {
           id={id}
           type={type}
           {...register(id as keyof StudentProfileFormData)}
-          className={`w-full rounded-xl bg-cream border border-transparent px-4 py-3 text-charcoal placeholder-inkSoft/50 focus:bg-white focus:border-orange outline-none transition ${extra}`}
+          className={`w-full rounded-xl bg-white border border-charcoal/10 px-4 py-3 text-charcoal placeholder-inkSoft/50 focus:bg-white focus:border-orange outline-none transition ${extra}`}
         />
       )}
       {errors[id as keyof StudentProfileFormData] && (
@@ -109,37 +113,66 @@ export function StudentProfileForm({ initial }: StudentProfileFormProps) {
     </div>
   );
 
+  const section = (title: string, children: React.ReactNode) => (
+    <div className="rounded-2xl bg-cream p-5 sm:p-6 space-y-5">
+      <h3 className="font-display font-bold text-lg text-charcoal">{title}</h3>
+      {children}
+    </div>
+  );
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {serverError && (
         <div className="rounded-xl bg-red-50 text-red-700 text-sm px-4 py-3">
           {serverError}
         </div>
       )}
 
-      <div className="grid sm:grid-cols-2 gap-5">
-        {field("College / Institute", "college")}
-        {field("Degree", "degree")}
-        {field("Specialization", "specialization")}
-        {field("Graduation year", "graduationYear", "number")}
-        {field("Current semester", "currentSemester")}
-        {field("Target industry", "targetIndustry")}
-      </div>
+      {section(
+        "Education",
+        <div className="grid sm:grid-cols-2 gap-5">
+          {field("College / Institute", "college")}
+          {field("Degree", "degree")}
+          {field("Specialization", "specialization")}
+          {field("Graduation year", "graduationYear", "number")}
+          {field("Current semester", "currentSemester")}
+        </div>
+      )}
 
-      {field("Target roles (comma-separated)", "targetRoles")}
-      {field("Skills (comma-separated)", "skills")}
-      {field("Interests (comma-separated)", "interests")}
-      {field("Resume URL", "resumeUrl", "url")}
-      {field("Portfolio", "portfolio", "url")}
-      {field("LinkedIn", "linkedIn", "url")}
-      {field("Website", "website", "url")}
-      {field("Location", "location")}
-      {field("Bio", "bio", "textarea")}
+      {section(
+        "Career goals",
+        <div className="grid sm:grid-cols-2 gap-5">
+          {field("Target industry", "targetIndustry")}
+          {field("Target roles (comma-separated)", "targetRoles")}
+          {field("Skills (comma-separated)", "skills")}
+          {field("Interests (comma-separated)", "interests")}
+        </div>
+      )}
 
-      <label className="flex items-center gap-3 rounded-xl bg-cream border border-transparent px-4 py-3 cursor-pointer">
-        <input type="checkbox" {...register("isPublic")} className="rounded" />
-        <span className="text-sm text-charcoal">Make my student profile visible to other users</span>
-      </label>
+      {section(
+        "Links",
+        <div className="grid sm:grid-cols-2 gap-5">
+          {field("Resume URL", "resumeUrl", "url")}
+          {field("Portfolio", "portfolio", "url")}
+          {field("LinkedIn", "linkedIn", "url")}
+          {field("Website", "website", "url")}
+        </div>
+      )}
+
+      {section(
+        "About",
+        <div className="space-y-5">
+          {field("Location", "location")}
+          {field("Bio", "bio", "textarea")}
+        </div>
+      )}
+
+      {section(
+        "Visibility",
+        <div className="space-y-5">
+          {field("Make my student profile visible to other users", "isPublic", "checkbox")}
+        </div>
+      )}
 
       <button
         type="submit"

@@ -1,7 +1,7 @@
 # Embark India — Website Context
 
 > Living reference for the Embark India website: what it is, how it's built, what's done, and what's left to do.
-> Last updated: 2026-08-09. Keep this file current when things change.
+> Last updated: 2026-08-12. Keep this file current when things change.
 
 ---
 
@@ -13,6 +13,32 @@
 - **Repo:** `NarentherMS/EmbarkIndia` (GitHub), branch `main`
 - **Founder:** non-technical, solo. AI/assistant does the coding.
 - **Guiding principle:** Pareto (80/20) — ship simple, ship working; don't build infra the site doesn't need yet.
+
+### 1.1 Embark 2.0.0 (Next.js PWA)
+
+The new target stack is a full-stack **Next.js 14 PWA** in `web/`.
+
+- **Framework:** Next.js 14 (App Router) + React 18 + TypeScript + Tailwind CSS
+- **Auth:** NextAuth v4 (credentials + Google OAuth)
+- **Database:** PostgreSQL via Prisma ORM
+- **Queues / background jobs:** BullMQ + Redis (certificate generation, emails)
+- **File storage:** S3-compatible (Cloudflare R2 / AWS S3) via presigned URLs
+- **Payments:** Razorpay (orders, webhooks, refunds, payouts, commissions)
+- **Email:** Resend via queue worker
+- **Monitoring:** Sentry + Vercel Analytics + PostHog (optional)
+- **Testing:** Jest (unit) + Playwright (E2E)
+- **CI/CD:** GitHub Actions (lint, type check, unit tests, build, security audit)
+
+Key v2.0.0 domains:
+
+| Area | Legacy URL | v2.0.0 URL |
+|------|-----------|-----------|
+| Competitions | `/competitions`, `/competition/:id` | `/hackathons`, `/hackathon/:slug` |
+| Mentors | `/mentor/:slug` | `/experts`, `/expert/:id` |
+| Marketplace | — | `/experts`, `/booking/:serviceId`, `/package/:id` |
+| Admin | — | `/admin/*` |
+
+Legacy paths are redirected in `web/next.config.mjs`.
 
 ---
 
@@ -167,7 +193,41 @@ All committed & pushed to `main`:
 
 ---
 
-## 9. Quick deploy checklist
+## 9. Testing (v2.0.0)
+
+Run unit tests:
+
+```bash
+cd web
+npm test
+```
+
+Run E2E tests (starts the dev server automatically):
+
+```bash
+cd web
+npm run test:e2e
+```
+
+Run lint + type check + build:
+
+```bash
+cd web
+npm run lint
+npx tsc --noEmit
+npm run build
+```
+
+Security audit:
+
+```bash
+cd web
+npm audit
+```
+
+> Note: Next.js 14.2.35 currently reports high-severity advisories that are only resolvable by upgrading to Next.js 16, which is a breaking change. This upgrade is tracked as a post-launch task.
+
+## 10. Quick deploy checklist
 
 1. Edit files locally.
 2. If `gl.css`/`.js` changed, bump `?v=` in every page that links it.

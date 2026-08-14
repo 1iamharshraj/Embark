@@ -217,6 +217,8 @@ model StudentProfile {
 model ExpertProfile {
   id                String   @id @default(cuid())
   userId            String   @unique
+  slug              String   @unique
+  image             String?
   headline          String?
   bio               String?
   location          String?
@@ -234,10 +236,25 @@ model ExpertProfile {
   verificationStatus String   @default("UNVERIFIED")
   verificationNote  String?
   sessionsCompleted Int      @default(0)
+  sessions          Int      @default(0)
   studentsHelped    Int      @default(0)
   rating            Float    @default(0)
   reviewCount       Int      @default(0)
+  price             Int      @default(1499)
+  batch             String?
+  guestLectures     Boolean  @default(false)
+  phases            Int[]    @default([])
+  streams           String[] @default([])
+  reviewText        String?
+  reviewWho         String?
+  isAvailable       Boolean  @default(true)
   isPublic          Boolean  @default(false)
+  socialLinks       Json?
+  country           String?  @default("IN")
+  currency          String?  @default("INR")
+  whatsappNumber    String?
+  onboardingComplete Boolean @default(false)
+  onboardingStep    Int      @default(0)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
@@ -1169,4 +1186,35 @@ model LectureRequest {
   updatedAt     DateTime @updatedAt
 
   user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model MbaCollege {
+  id              String   @id @default(cuid())
+  name            String
+  shortName       String?
+  city            String
+  state           String   @default("Tamil Nadu")
+  affiliation     String?
+  accreditation   String?
+  establishedYear Int?
+  campusType      String?
+  feesMin         Int?     // INR per year
+  feesMax         Int?
+  avgPackage      Int?     // INR per annum
+  highestPackage  Int?
+  specializations String[] @default([])
+  entranceExams   String[] @default([])
+  facilities      String[] @default([])
+  website         String?
+  phone           String?
+  email           String?
+  address         String?
+  isActive        Boolean  @default(true)
+  rankState       Int?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([state])
+  @@index([city])
+  @@index([specializations])
 }

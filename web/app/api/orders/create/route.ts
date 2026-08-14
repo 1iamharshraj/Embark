@@ -128,6 +128,24 @@ export async function POST(request: Request) {
 
   const amountPaise = order.amount * 100;
   const keyId = process.env.RAZORPAY_KEY_ID || "rzp_test_...";
+  const secret = process.env.RAZORPAY_KEY_SECRET || "";
+  const isMockMode = !keyId || !secret || secret === "..." || secret.startsWith("test_secret_") || secret.includes("placeholder");
+
+  if (isMockMode) {
+    return NextResponse.json({
+      orderId: `test_order_${order.id}`,
+      keyId,
+      amount: amountPaise,
+      currency: "INR",
+      dbOrderId: order.id,
+      type,
+      mock: true,
+      playbook:
+        type === "playbook"
+          ? { id: order.playbookId, slug: itemSlug, name: itemName, price: order.amount }
+          : undefined,
+    });
+  }
 
   try {
     const razorpay = getRazorpayInstance();
@@ -157,6 +175,7 @@ export async function POST(request: Request) {
       currency: "INR",
       dbOrderId: order.id,
       type,
+      mock: true,
       playbook:
         type === "playbook"
           ? { id: order.playbookId, slug: itemSlug, name: itemName, price: order.amount }

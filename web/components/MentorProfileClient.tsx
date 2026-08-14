@@ -11,22 +11,22 @@ interface MentorProfileClientProps {
   mentor: {
     slug: string;
     name: string;
-    image: string;
-    role: string;
-    company: string;
-    college: string;
-    batch: string;
-    rating: number;
-    sessions: number;
-    years: number;
-    price: number;
-    guestLectures: boolean;
-    expertise: string[];
-    streams: string[];
-    phases: number[];
-    bio: string;
-    reviewText: string;
-    reviewWho: string;
+    image?: string | null;
+    role?: string | null;
+    company?: string | null;
+    college?: string | null;
+    batch?: string | null;
+    rating?: number | null;
+    sessions?: number | null;
+    years?: number | null;
+    price?: number | null;
+    guestLectures?: boolean | null;
+    expertise?: string[] | null;
+    streams?: string[] | null;
+    phases?: number[] | null;
+    bio?: string | null;
+    reviewText?: string | null;
+    reviewWho?: string | null;
   };
 }
 
@@ -158,7 +158,26 @@ function BookingForm({ mentorSlug, mentorName }: BookingFormProps) {
 
 export default function MentorProfileClient({ mentor }: MentorProfileClientProps) {
   const [tab, setTab] = useState<"overview" | "mentorship" | "gl">("mentorship");
-  const firstName = mentor.name.split(" ")[0];
+  const safeMentor = {
+    ...mentor,
+    image: mentor.image ?? "",
+    role: mentor.role ?? "",
+    company: mentor.company ?? "",
+    college: mentor.college ?? "",
+    batch: mentor.batch ?? "",
+    rating: mentor.rating ?? 0,
+    sessions: mentor.sessions ?? 0,
+    years: mentor.years ?? 0,
+    price: mentor.price ?? 1499,
+    guestLectures: mentor.guestLectures ?? false,
+    expertise: mentor.expertise ?? [],
+    streams: mentor.streams ?? [],
+    phases: mentor.phases ?? [],
+    bio: mentor.bio ?? "",
+    reviewText: mentor.reviewText ?? "",
+    reviewWho: mentor.reviewWho ?? "",
+  };
+  const firstName = safeMentor.name.split(" ")[0];
 
   return (
     <>
@@ -166,8 +185,8 @@ export default function MentorProfileClient({ mentor }: MentorProfileClientProps
         <Container>
           <div className="flex flex-wrap gap-6 items-start">
             <Image
-              src={mentor.image}
-              alt={mentor.name}
+              src={safeMentor.image}
+              alt={safeMentor.name}
               width={128}
               height={128}
               className="w-28 h-28 sm:w-32 sm:h-32 rounded-[26px] object-cover shadow-[0_0_0_4px_#F4F7FC,0_12px_30px_rgba(22,22,22,0.18)] flex-none"
@@ -175,31 +194,31 @@ export default function MentorProfileClient({ mentor }: MentorProfileClientProps
             />
             <div className="flex-1 min-w-[200px]">
               <h1 className="font-display font-bold text-3xl sm:text-4xl text-charcoal mb-1 flex flex-wrap items-center gap-3">
-                {mentor.name}
+                {safeMentor.name}
                 <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-navy bg-navySoft rounded-full px-3 py-1">
                   <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="m9 12 2 2 4-4" /></svg>
                   Verified
                 </span>
               </h1>
               <p className="text-base text-inkSoft mb-3">
-                {mentor.role} · {mentor.company}
+                {safeMentor.role} · {safeMentor.company}
               </p>
               <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-navy bg-navySoft rounded-full px-3 py-1">
-                {mentor.college} {mentor.batch}
+                {safeMentor.college} {safeMentor.batch}
               </span>
               <div className="flex flex-wrap gap-8 mt-6">
                 <div className="flex flex-col">
                   <b className="font-display font-extrabold text-2xl text-charcoal">
-                    <span className="text-orangeDeep">★</span> {mentor.rating.toFixed(1)}
+                    <span className="text-orangeDeep">★</span> {safeMentor.rating.toFixed(1)}
                   </b>
                   <span className="text-sm text-inkSoft">mentee rating</span>
                 </div>
                 <div className="flex flex-col">
-                  <b className="font-display font-extrabold text-2xl text-charcoal">{mentor.sessions}</b>
+                  <b className="font-display font-extrabold text-2xl text-charcoal">{safeMentor.sessions}</b>
                   <span className="text-sm text-inkSoft">sessions delivered</span>
                 </div>
                 <div className="flex flex-col">
-                  <b className="font-display font-extrabold text-2xl text-charcoal">{mentor.years}</b>
+                  <b className="font-display font-extrabold text-2xl text-charcoal">{safeMentor.years}</b>
                   <span className="text-sm text-inkSoft">years in industry</span>
                 </div>
               </div>
@@ -210,7 +229,7 @@ export default function MentorProfileClient({ mentor }: MentorProfileClientProps
             {[
               { id: "overview", label: "Overview" },
               { id: "mentorship", label: "Mentorship" },
-              ...(mentor.guestLectures ? [{ id: "gl", label: "Guest lectures" }] : []),
+              ...(safeMentor.guestLectures ? [{ id: "gl", label: "Guest lectures" }] : []),
             ].map((t) => (
               <button
                 key={t.id}
@@ -237,12 +256,12 @@ export default function MentorProfileClient({ mentor }: MentorProfileClientProps
                 <div className="space-y-8">
                   <div>
                     <h2 className="font-display font-bold text-xl text-charcoal mb-3">About</h2>
-                    <p className="text-[#2C323E] leading-relaxed">{mentor.bio}</p>
+                    <p className="text-[#2C323E] leading-relaxed">{safeMentor.bio}</p>
                   </div>
                   <div>
                     <h2 className="font-display font-bold text-xl text-charcoal mb-3">Expertise</h2>
                     <div className="flex flex-wrap gap-2">
-                      {mentor.expertise.map((e) => (
+                      {safeMentor.expertise.map((e) => (
                         <span key={e} className="text-sm font-medium bg-white rounded-full px-4 py-2 shadow-[0_2px_8px_rgba(22,22,22,0.06)]">{e}</span>
                       ))}
                     </div>
@@ -250,16 +269,16 @@ export default function MentorProfileClient({ mentor }: MentorProfileClientProps
                   <div>
                     <h2 className="font-display font-bold text-xl text-charcoal mb-3">Streams</h2>
                     <div className="flex flex-wrap gap-2">
-                      {mentor.streams.map((s) => (
+                      {safeMentor.streams.map((s) => (
                         <span key={s} className="text-sm font-medium bg-white rounded-full px-4 py-2 shadow-[0_2px_8px_rgba(22,22,22,0.06)]">{s}</span>
                       ))}
                     </div>
                   </div>
                   <div className="bg-white rounded-2xl p-6 shadow-[0_2px_8px_rgba(22,22,22,0.06),0_12px_32px_rgba(22,22,22,0.07)]">
                     <blockquote className="font-serif italic text-base text-charcoal leading-relaxed">
-                      &ldquo;{mentor.reviewText}&rdquo;
+                      &ldquo;{safeMentor.reviewText}&rdquo;
                     </blockquote>
-                    <cite className="block mt-4 text-sm text-inkSoft not-italic">— {mentor.reviewWho}</cite>
+                    <cite className="block mt-4 text-sm text-inkSoft not-italic">— {safeMentor.reviewWho}</cite>
                   </div>
                 </div>
               )}
@@ -287,7 +306,7 @@ export default function MentorProfileClient({ mentor }: MentorProfileClientProps
                   <div>
                     <h2 className="font-display font-bold text-xl text-charcoal mb-3">Journey phases covered</h2>
                     <div className="flex flex-wrap gap-2">
-                      {mentor.phases.map((p) => (
+                      {safeMentor.phases.map((p) => (
                         <span key={p} className="text-sm font-medium bg-white rounded-full px-4 py-2 shadow-[0_2px_8px_rgba(22,22,22,0.06)]">
                           Phase {p} · {phaseNames[p]}
                         </span>
@@ -296,9 +315,9 @@ export default function MentorProfileClient({ mentor }: MentorProfileClientProps
                   </div>
                   <div className="bg-white rounded-2xl p-6 shadow-[0_2px_8px_rgba(22,22,22,0.06),0_12px_32px_rgba(22,22,22,0.07)]">
                     <blockquote className="font-serif italic text-base text-charcoal leading-relaxed">
-                      &ldquo;{mentor.reviewText}&rdquo;
+                      &ldquo;{safeMentor.reviewText}&rdquo;
                     </blockquote>
-                    <cite className="block mt-4 text-sm text-inkSoft not-italic">— {mentor.reviewWho}</cite>
+                    <cite className="block mt-4 text-sm text-inkSoft not-italic">— {safeMentor.reviewWho}</cite>
                   </div>
                 </div>
               )}
@@ -310,13 +329,13 @@ export default function MentorProfileClient({ mentor }: MentorProfileClientProps
                       Also available for guest lectures
                     </h2>
                     <p className="text-[#2C323E] leading-relaxed">
-                      {firstName} is part of the verified speaker community — available to institutes for guest lectures, workshops and webinars on {mentor.streams.join(", ").toLowerCase()}.
+                      {firstName} is part of the verified speaker community — available to institutes for guest lectures, workshops and webinars on {safeMentor.streams.join(", ").toLowerCase()}.
                     </p>
                   </div>
                   <div>
                     <h2 className="font-display font-bold text-xl text-charcoal mb-3">Lecture topics</h2>
                     <div className="flex flex-wrap gap-2">
-                      {mentor.expertise.map((e) => (
+                      {safeMentor.expertise.map((e) => (
                         <span key={e} className="text-sm font-medium bg-white rounded-full px-4 py-2 shadow-[0_2px_8px_rgba(22,22,22,0.06)]">{e}</span>
                       ))}
                     </div>
@@ -328,14 +347,14 @@ export default function MentorProfileClient({ mentor }: MentorProfileClientProps
             <div className="lg:sticky lg:top-24 space-y-5">
               <div className="bg-white rounded-3xl shadow-[0_2px_8px_rgba(22,22,22,0.06),0_12px_32px_rgba(22,22,22,0.07)] p-6">
                 <div className="font-display font-extrabold text-3xl text-charcoal mb-1">
-                  ₹{mentor.price.toLocaleString("en-IN")} <small className="font-body font-normal text-sm text-inkSoft">/ session</small>
+                  ₹{safeMentor.price.toLocaleString("en-IN")} <small className="font-body font-normal text-sm text-inkSoft">/ session</small>
                 </div>
                 <p className="text-sm text-inkSoft mb-5">
                   Indicative per-session price. Inside the Journey, sessions are bundled — <Link href="/mentorship#pricing" className="text-orangeDeep">see packaging</Link>.
                 </p>
-                <BookingForm mentorSlug={mentor.slug} mentorName={mentor.name} />
+                <BookingForm mentorSlug={safeMentor.slug} mentorName={safeMentor.name} />
               </div>
-              {mentor.guestLectures && (
+              {safeMentor.guestLectures && (
                 <div className="bg-navy text-cream rounded-3xl p-6">
                   <h3 className="font-display font-bold text-lg text-white mb-2">Bring {firstName} to your campus</h3>
                   <p className="text-sm text-cream/75 mb-4">Guest lectures are a B2B engagement for institutes — honorarium and logistics handled through the guest-lecture service.</p>

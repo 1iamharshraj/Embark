@@ -1,8 +1,7 @@
-import Link from "next/link";
 import { checkPagePermission } from "@/lib/rbac";
 import { prisma } from "@/lib/prisma";
-import Container from "@/components/Container";
-import Eyebrow from "@/components/Eyebrow";
+import { AdminHeader } from "@/components/admin/AdminHeader";
+import { AdminDataTable } from "@/components/admin/AdminDataTable";
 import ToggleService from "../_components/ToggleService";
 
 export default async function AdminMarketplaceServicesPage() {
@@ -17,50 +16,48 @@ export default async function AdminMarketplaceServicesPage() {
   });
 
   return (
-    <section className="bg-cream py-16 sm:py-24">
-      <Container>
-        <div className="max-w-6xl mx-auto">
-          <Link href="/admin/marketplace" className="text-sm font-semibold text-orange hover:underline mb-4 inline-block">
-            ← Back to marketplace
-          </Link>
-          <Eyebrow>Marketplace</Eyebrow>
-          <h1 className="font-display font-bold text-3xl text-charcoal mt-2 mb-8">Services</h1>
+    <>
+      <AdminHeader
+        eyebrow="Marketplace"
+        title="Services"
+        description="Manage all services listed on the marketplace."
+        backHref="/admin/marketplace"
+      />
 
-          <div className="bg-white rounded-2xl border border-charcoal/8 overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-cream border-b border-charcoal/8">
-                <tr>
-                  <th className="text-left font-semibold text-charcoal px-5 py-3">Name</th>
-                  <th className="text-left font-semibold text-charcoal px-5 py-3">Expert</th>
-                  <th className="text-left font-semibold text-charcoal px-5 py-3">Type</th>
-                  <th className="text-left font-semibold text-charcoal px-5 py-3">Price</th>
-                  <th className="text-left font-semibold text-charcoal px-5 py-3">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {services.map((service) => (
-                  <tr key={service.id} className="border-b border-charcoal/8 last:border-0">
-                    <td className="px-5 py-4 font-semibold text-charcoal">{service.name}</td>
-                    <td className="px-5 py-4 text-inkSoft">{service.expertProfile.user.name}</td>
-                    <td className="px-5 py-4 text-inkSoft">{service.type}</td>
-                    <td className="px-5 py-4 text-inkSoft">₹{(service.price / 100).toFixed(2)}</td>
-                    <td className="px-5 py-4">
-                      <ToggleService serviceId={service.id} initialIsActive={service.isActive} />
-                    </td>
-                  </tr>
-                ))}
-                {services.length === 0 && (
-                  <tr>
-                    <td colSpan={5} className="px-5 py-10 text-center text-inkSoft">
-                      No services found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </Container>
-    </section>
+      <AdminDataTable
+        title="All services"
+        count={services.length}
+        empty={
+          services.length === 0 && (
+            <div className="p-8 text-center text-inkSoft">No services found.</div>
+          )
+        }
+      >
+        <table className="w-full text-left text-sm">
+          <thead className="bg-cream border-b border-charcoal/8">
+            <tr>
+              <th className="px-5 py-3 font-semibold text-charcoal">Name</th>
+              <th className="px-5 py-3 font-semibold text-charcoal">Expert</th>
+              <th className="px-5 py-3 font-semibold text-charcoal">Type</th>
+              <th className="px-5 py-3 font-semibold text-charcoal">Price</th>
+              <th className="px-5 py-3 font-semibold text-charcoal">Status</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-charcoal/8">
+            {services.map((service) => (
+              <tr key={service.id} className="hover:bg-cream/50 transition">
+                <td className="px-5 py-4 font-semibold text-charcoal">{service.name}</td>
+                <td className="px-5 py-4 text-inkSoft">{service.expertProfile.user.name}</td>
+                <td className="px-5 py-4 text-inkSoft">{service.type}</td>
+                <td className="px-5 py-4 text-inkSoft">₹{(service.price / 100).toFixed(2)}</td>
+                <td className="px-5 py-4">
+                  <ToggleService serviceId={service.id} initialIsActive={service.isActive} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </AdminDataTable>
+    </>
   );
 }

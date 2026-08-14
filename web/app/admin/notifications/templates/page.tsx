@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import { AdminHeader } from "@/components/admin/AdminHeader";
+import { AdminCard } from "@/components/admin/AdminCard";
 
 interface Template {
   id: string;
@@ -100,15 +101,16 @@ export default function NotificationTemplatesPage() {
   }
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="font-display font-bold text-2xl text-charcoal">Notification templates</h1>
-        <Link href="/admin" className="text-sm font-semibold text-orangeDeep hover:underline">
-          Back to admin
-        </Link>
-      </div>
+    <div className="max-w-5xl mx-auto">
+      <AdminHeader
+        eyebrow="Communications"
+        title="Notification templates"
+        description="Create and manage email, in-app and WhatsApp message templates."
+        backHref="/admin"
+        backLabel="Back to admin"
+      />
 
-      <div className="bg-white border border-charcoal/8 rounded-2xl shadow-sm p-6 mb-8">
+      <AdminCard className="p-6 mb-8">
         <form onSubmit={save} className="space-y-4">
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
@@ -202,7 +204,7 @@ export default function NotificationTemplatesPage() {
             )}
           </div>
         </form>
-      </div>
+      </AdminCard>
 
       {loading ? (
         <p className="text-inkSoft">Loading templates…</p>
@@ -211,10 +213,7 @@ export default function NotificationTemplatesPage() {
       ) : (
         <div className="space-y-4">
           {templates.map((template) => (
-            <div
-              key={template.id}
-              className="bg-white border border-charcoal/8 rounded-xl p-5 transition hover:shadow-sm"
-            >
+            <AdminCard key={template.id} className="p-5 transition hover:shadow-sm">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
@@ -262,7 +261,7 @@ export default function NotificationTemplatesPage() {
                   </button>
                 </div>
               </div>
-            </div>
+            </AdminCard>
           ))}
         </div>
       )}

@@ -1,8 +1,7 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { checkPagePermission } from "@/lib/rbac";
 import { prisma } from "@/lib/prisma";
-import Eyebrow from "@/components/Eyebrow";
+import { AdminHeader } from "@/components/admin/AdminHeader";
 import RoleForm from "../../_components/RoleForm";
 
 export default async function EditRolePage({ params }: { params: { id: string } }) {
@@ -23,7 +22,13 @@ export default async function EditRolePage({ params }: { params: { id: string } 
   if (!role || !permissions.length) notFound();
 
   return (
-    <section className="bg-cream py-16 sm:py-24">
+    <div className="max-w-4xl mx-auto">
+      <AdminHeader
+        eyebrow="Edit role"
+        title={role.name}
+        backHref="/admin/roles"
+        backLabel="Back to roles"
+      />
       <RoleForm
         mode="edit"
         submitUrl={`/api/admin/roles/${role.id}`}
@@ -38,16 +43,7 @@ export default async function EditRolePage({ params }: { params: { id: string } 
           action: p.action,
           description: p.description,
         }))}
-        header={
-          <>
-            <Link href="/admin/roles" className="text-sm font-semibold text-orange hover:underline mb-4 inline-block">
-              ← Back to roles
-            </Link>
-            <Eyebrow>Edit role</Eyebrow>
-            <h1 className="font-display font-bold text-3xl text-charcoal mt-2">{role.name}</h1>
-          </>
-        }
       />
-    </section>
+    </div>
   );
 }

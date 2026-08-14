@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { AdminCard } from "@/components/admin/AdminCard";
+import { StatusBadge } from "@/components/admin/StatusBadge";
+import ClientDate from "@/components/ClientDate";
 
 interface Submission {
   id: string;
@@ -67,12 +70,17 @@ export default function SubmissionAssignments({
     <div className="space-y-4">
       {submissions.length === 0 && <p className="text-inkSoft">No submissions yet.</p>}
       {submissions.map((sub) => (
-        <div key={sub.id} className="bg-white rounded-2xl border border-charcoal/8 p-5">
+        <AdminCard key={sub.id} className="p-5">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
             <div>
-              <h3 className="font-semibold text-charcoal">{sub.title}</h3>
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="font-semibold text-charcoal">{sub.title}</h3>
+                <StatusBadge status={sub.status} />
+              </div>
               <p className="text-sm text-inkSoft">Team: {sub.team?.name || "Solo"}</p>
-              <p className="text-xs text-inkSoft mt-1">{new Date(sub.createdAt).toLocaleString()}</p>
+              <p className="text-xs text-inkSoft mt-1">
+                <ClientDate date={sub.createdAt} options={{ dateStyle: "medium", timeStyle: "short" }} />
+              </p>
               {sub.score !== null && <p className="text-sm text-charcoal mt-1 font-semibold">Score: {sub.score}</p>}
             </div>
             <div className="flex items-center gap-2">
@@ -124,7 +132,7 @@ export default function SubmissionAssignments({
           )}
 
           {message[sub.id] && <p className="text-sm mt-2 text-green-700">{message[sub.id]}</p>}
-        </div>
+        </AdminCard>
       ))}
     </div>
   );

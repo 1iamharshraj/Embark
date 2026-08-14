@@ -72,7 +72,7 @@ export default function NotificationBell() {
     if (n.entityType === "Booking" && n.entityId) return `/bookings/${n.entityId}`;
     if (n.entityType === "PriorityDM" && n.entityId) return `/priority-dms/${n.entityId}`;
     if (n.entityType === "ExpertProfile" && n.entityId) return `/expert/${n.entityId}`;
-    if (n.entityType === "Hackathon" && n.entityId) return `/competitions/${n.entityId}`;
+    if (n.entityType === "Hackathon" && n.entityId) return `/hackathon/${n.entityId}`;
     return null;
   }
 

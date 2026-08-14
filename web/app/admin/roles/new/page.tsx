@@ -1,8 +1,7 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { checkPagePermission } from "@/lib/rbac";
 import { prisma } from "@/lib/prisma";
-import Eyebrow from "@/components/Eyebrow";
+import { AdminHeader } from "@/components/admin/AdminHeader";
 import RoleForm from "../_components/RoleForm";
 
 export default async function NewRolePage() {
@@ -15,7 +14,13 @@ export default async function NewRolePage() {
   if (!permissions.length) notFound();
 
   return (
-    <section className="bg-cream py-16 sm:py-24">
+    <div className="max-w-4xl mx-auto">
+      <AdminHeader
+        eyebrow="New role"
+        title="Create a role"
+        backHref="/admin/roles"
+        backLabel="Back to roles"
+      />
       <RoleForm
         mode="create"
         submitUrl="/api/admin/roles"
@@ -25,16 +30,7 @@ export default async function NewRolePage() {
           action: p.action,
           description: p.description,
         }))}
-        header={
-          <>
-            <Link href="/admin/roles" className="text-sm font-semibold text-orange hover:underline mb-4 inline-block">
-              ← Back to roles
-            </Link>
-            <Eyebrow>New role</Eyebrow>
-            <h1 className="font-display font-bold text-3xl text-charcoal mt-2">Create a role</h1>
-          </>
-        }
       />
-    </section>
+    </div>
   );
 }

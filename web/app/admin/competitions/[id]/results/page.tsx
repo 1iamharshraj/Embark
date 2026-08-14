@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { checkPagePermission } from "@/lib/rbac";
 import { prisma } from "@/lib/prisma";
-import Container from "@/components/Container";
 import ResultsPageClient from "./_components/ResultsPageClient";
 
 export default async function ResultsPage({ params }: { params: { id: string } }) {
@@ -26,15 +25,11 @@ export default async function ResultsPage({ params }: { params: { id: string } }
   const lastRoundIndex = Math.max(0, rounds.length - 1);
 
   return (
-    <section className="bg-cream py-16 sm:py-24">
-      <Container>
-        <ResultsPageClient
-          competition={competition}
-          registrations={competition.registrations}
-          lastRoundIndex={lastRoundIndex}
-          winners={competition.winners}
-        />
-      </Container>
-    </section>
+    <ResultsPageClient
+      competition={competition}
+      registrations={competition.registrations}
+      lastRoundIndex={lastRoundIndex}
+      winners={competition.winners}
+    />
   );
 }

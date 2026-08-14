@@ -1,14 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AdminCard } from "@/components/admin/AdminCard";
 import Button from "@/components/Button";
 
 interface ConfigRow {
   id: string;
   key: string;
   value: string | null;
-  defaultCommissionRate: number;
-  currency: string;
 }
 
 export default function SettingsForm() {
@@ -63,14 +62,14 @@ export default function SettingsForm() {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-2xl border border-charcoal/8 p-8 text-center text-inkSoft">
+      <AdminCard className="p-8 text-center text-inkSoft">
         Loading settings…
-      </div>
+      </AdminCard>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-charcoal/8 p-6 sm:p-8">
+    <AdminCard className="p-6 sm:p-8">
       {message && (
         <div
           className={`mb-6 rounded-xl px-4 py-3 text-sm font-semibold ${
@@ -83,28 +82,30 @@ export default function SettingsForm() {
         </div>
       )}
 
-      <div className="space-y-4 mb-8">
-        {rows.length === 0 && (
-          <p className="text-inkSoft text-sm">No configuration entries found.</p>
-        )}
-        {rows.map((row) => (
-          <div key={row.id}>
-            <label className="block text-sm font-semibold text-charcoal mb-1.5">{row.key}</label>
-            <input
-              type="text"
-              value={row.value ?? ""}
-              onChange={(e) => updateValue(row.id, e.target.value)}
-              className="w-full rounded-xl border border-charcoal/12 px-4 py-2.5 text-charcoal focus:outline-none focus:border-orange focus:ring-1 focus:ring-orange"
-            />
-          </div>
-        ))}
-      </div>
+      <form onSubmit={handleSubmit}>
+        <div className="space-y-4 mb-8">
+          {rows.length === 0 && (
+            <p className="text-inkSoft text-sm">No configuration entries found.</p>
+          )}
+          {rows.map((row) => (
+            <div key={row.id}>
+              <label className="block text-sm font-semibold text-charcoal mb-1.5">{row.key}</label>
+              <input
+                type="text"
+                value={row.value ?? ""}
+                onChange={(e) => updateValue(row.id, e.target.value)}
+                className="w-full rounded-xl border border-charcoal/12 px-4 py-2.5 text-charcoal focus:outline-none focus:border-orange focus:ring-1 focus:ring-orange"
+              />
+            </div>
+          ))}
+        </div>
 
-      <div className="flex justify-end">
-        <Button type="submit" disabled={saving}>
-          {saving ? "Saving…" : "Save settings"}
-        </Button>
-      </div>
-    </form>
+        <div className="flex justify-end">
+          <Button type="submit" disabled={saving}>
+            {saving ? "Saving…" : "Save settings"}
+          </Button>
+        </div>
+      </form>
+    </AdminCard>
   );
 }

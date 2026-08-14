@@ -1,9 +1,7 @@
 import { notFound } from "next/navigation";
 import { checkPagePermission } from "@/lib/rbac";
 import { prisma } from "@/lib/prisma";
-import Container from "@/components/Container";
-import Eyebrow from "@/components/Eyebrow";
-import Button from "@/components/Button";
+import { AdminHeader } from "@/components/admin/AdminHeader";
 import SubmissionAssignments from "./_components/SubmissionAssignments";
 
 export default async function AdminHackathonSubmissionsPage({ params }: { params: { id: string } }) {
@@ -38,23 +36,19 @@ export default async function AdminHackathonSubmissionsPage({ params }: { params
   }));
 
   return (
-    <section className="bg-cream py-16 sm:py-24">
-      <Container>
-        <div className="max-w-6xl mx-auto">
-          <Button href={`/admin/hackathons/${params.id}/edit`} variant="ghost" size="sm">
-            ← Back to edit hackathon
-          </Button>
-          <Eyebrow className="mt-4">Submissions</Eyebrow>
-          <h1 className="font-display font-bold text-3xl text-charcoal mb-2">{hackathon.title}</h1>
-          <p className="text-inkSoft mb-8">Review submissions and assign them to judges.</p>
-
-          <SubmissionAssignments
-            submissions={submissions}
-            judges={hackathon.judges}
-            assignments={assignments}
-          />
-        </div>
-      </Container>
-    </section>
+    <>
+      <AdminHeader
+        eyebrow="Submissions"
+        title={hackathon.title}
+        description="Review submissions and assign them to judges."
+        backHref={`/admin/hackathons/${params.id}/edit`}
+        backLabel="Back to edit hackathon"
+      />
+      <SubmissionAssignments
+        submissions={submissions}
+        judges={hackathon.judges}
+        assignments={assignments}
+      />
+    </>
   );
 }

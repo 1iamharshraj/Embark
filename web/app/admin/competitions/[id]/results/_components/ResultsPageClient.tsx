@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Button from "@/components/Button";
+import { AdminHeader } from "@/components/admin/AdminHeader";
+import { AdminDataTable } from "@/components/admin/AdminDataTable";
 import { parseMembers } from "@/lib/competition";
 
 interface Registration {
@@ -75,14 +76,13 @@ export default function ResultsPageClient({ competition, registrations, lastRoun
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <Link href="/admin/competitions" className="text-sm font-semibold text-orange hover:underline mb-4 inline-block">
-        ← Back to competitions
-      </Link>
-      <div className="mb-6">
-        <div className="text-xs font-semibold uppercase tracking-wider text-orange mb-1">Results</div>
-        <h1 className="font-display font-bold text-3xl text-charcoal">{competition.title}</h1>
-      </div>
+    <>
+      <AdminHeader
+        eyebrow="Results"
+        title={competition.title}
+        description="Assign ranks to teams that reached the final round."
+        backHref="/admin/competitions"
+      />
 
       {message && (
         <div className={`rounded-xl px-4 py-3 text-sm mb-6 ${message.includes("failed") || message.includes("Failed") ? "bg-red-50 text-red-700" : "bg-green-50 text-green-700"}`}>
@@ -90,7 +90,16 @@ export default function ResultsPageClient({ competition, registrations, lastRoun
         </div>
       )}
 
-      <div className="bg-white rounded-2xl border border-charcoal/8 overflow-hidden mb-6">
+      <AdminDataTable
+        title="Eligible teams"
+        description="Select a rank for each team that advanced to the final round."
+        count={eligibleRegistrations.length}
+        empty={
+          eligibleRegistrations.length === 0 && (
+            <div className="p-8 text-center text-inkSoft">No eligible teams. Advance teams through the final round first.</div>
+          )
+        }
+      >
         <table className="w-full text-sm">
           <thead className="bg-cream border-b border-charcoal/8">
             <tr>
@@ -122,20 +131,15 @@ export default function ResultsPageClient({ competition, registrations, lastRoun
                 </tr>
               );
             })}
-            {eligibleRegistrations.length === 0 && (
-              <tr>
-                <td colSpan={2} className="px-5 py-10 text-center text-inkSoft">
-                  No eligible teams. Advance teams through the final round first.
-                </td>
-              </tr>
-            )}
           </tbody>
         </table>
-      </div>
+      </AdminDataTable>
 
-      <Button onClick={handleSave} disabled={saving}>
-        {saving ? "Saving…" : "Save results"}
-      </Button>
-    </div>
+      <div className="mt-6">
+        <Button onClick={handleSave} disabled={saving}>
+          {saving ? "Saving…" : "Save results"}
+        </Button>
+      </div>
+    </>
   );
 }
