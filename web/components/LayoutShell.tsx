@@ -9,14 +9,16 @@ import PwaInstallPrompt from "@/components/PwaInstallPrompt";
 export function LayoutShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAdmin = pathname?.startsWith("/admin");
+  const isExpertDash = pathname?.startsWith("/expert");
 
   return (
     <>
       {!isAdmin && <TopBar />}
       {!isAdmin && <Nav />}
       {children}
-      {!isAdmin && <Footer />}
-      {!isAdmin && <PwaInstallPrompt />}
+      {!isAdmin && !isExpertDash && <Footer />}
+      {!isAdmin && !isExpertDash && <PwaInstallPrompt />}
     </>
   );
 }
+

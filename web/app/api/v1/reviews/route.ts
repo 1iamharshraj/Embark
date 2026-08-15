@@ -34,13 +34,17 @@ export async function GET(request: NextRequest) {
       expertId?: string;
       status?: string;
       studentId?: string;
+      OR?: Array<{ studentId: string } | { expertId: string }>;
     } = {};
 
     if (expertId) where.expertId = expertId;
     if (status) where.status = status;
     if (!user.isAdmin && status !== "PUBLISHED") {
-      // non-admins can only see their own non-published reviews
-      where.studentId = user.id;
+      // Non-admins can see reviews they wrote or reviews written about them.
+      where.OR = [
+        { studentId: user.id },
+        { expertId: user.id },
+      ];
     }
 
     const reviews = await prisma.review.findMany({

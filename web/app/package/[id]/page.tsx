@@ -122,7 +122,7 @@ export default async function PackagePage({ params }: PackagePageProps) {
               <div>
                 <p className="font-semibold text-charcoal">{pkg.expertProfile.user.name}</p>
                 <Link
-                  href={`/experts/${pkg.expertProfile.id}`}
+                  href={`/mentor/${pkg.expertProfile.slug}`}
                   className="text-sm text-orangeDeep hover:text-[#1740A8] transition"
                 >
                   View expert profile

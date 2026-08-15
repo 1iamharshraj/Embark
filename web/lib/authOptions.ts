@@ -12,6 +12,8 @@ export interface AuthUser {
   name: string;
   college: string;
   isAdmin: boolean;
+  onboardingComplete: boolean;
+  onboardingRole: string | null;
   roles: string[];
   permissions: string[];
 }
@@ -119,6 +121,8 @@ export const authOptions: NextAuthOptions = {
           name: user.name,
           college: user.college,
           isAdmin: user.isAdmin,
+          onboardingComplete: user.onboardingComplete,
+          onboardingRole: user.onboardingRole,
           roles,
           permissions,
         };
@@ -144,11 +148,25 @@ export const authOptions: NextAuthOptions = {
         token.isAdmin = authUser.isAdmin ?? false;
         token.roles = authUser.roles || [];
         token.permissions = authUser.permissions || [];
+        token.onboardingComplete = authUser.onboardingComplete ?? false;
+        token.onboardingRole = authUser.onboardingRole ?? null;
       }
 
       // Support client-side session updates (e.g. profile changes).
-      if (trigger === "update" && session?.name) {
-        token.name = session.name;
+      if (trigger === "update") {
+        if (session?.name) token.name = session.name;
+        if (typeof session?.onboardingComplete === "boolean") {
+          token.onboardingComplete = session.onboardingComplete;
+        }
+        if (session?.onboardingRole !== undefined) {
+          token.onboardingRole = session.onboardingRole;
+        }
+        if (Array.isArray(session?.roles)) {
+          token.roles = session.roles;
+        }
+        if (Array.isArray(session?.permissions)) {
+          token.permissions = session.permissions;
+        }
       }
 
       return token;
@@ -161,6 +179,8 @@ export const authOptions: NextAuthOptions = {
         name: token.name as string,
         college: token.college as string,
         isAdmin: token.isAdmin as boolean,
+        onboardingComplete: (token.onboardingComplete as boolean) ?? false,
+        onboardingRole: (token.onboardingRole as string | null) ?? null,
         roles: (token.roles as string[]) || [],
         permissions: (token.permissions as string[]) || [],
       };

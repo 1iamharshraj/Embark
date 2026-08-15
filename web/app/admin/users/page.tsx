@@ -10,6 +10,7 @@ import { StatusBadge } from "@/components/admin/StatusBadge";
 import Button from "@/components/Button";
 import UserRoleAssign from "./_components/UserRoleAssign";
 import UserStatusToggle from "./_components/UserStatusToggle";
+import UserDeleteButton from "./_components/UserDeleteButton";
 
 const PER_PAGE = 25;
 
@@ -190,6 +191,7 @@ export default async function AdminUsersPage({
               <th className="text-left font-semibold text-charcoal px-5 py-3">Status</th>
               <th className="text-left font-semibold text-charcoal px-5 py-3">Current roles</th>
               <th className="text-left font-semibold text-charcoal px-5 py-3">Assign roles</th>
+              <th className="text-left font-semibold text-charcoal px-5 py-3">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-charcoal/8">
@@ -228,6 +230,13 @@ export default async function AdminUsersPage({
                       roles: u.roles.map((ur) => ({ id: ur.role.id, name: ur.role.name })),
                     }}
                     allRoles={roles}
+                  />
+                </td>
+                <td className="px-5 py-4">
+                  <UserDeleteButton
+                    userId={u.id}
+                    userName={u.name || u.email}
+                    disabled={u.id === session?.user?.id}
                   />
                 </td>
               </tr>

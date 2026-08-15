@@ -14,7 +14,7 @@ const registerSchema = z
   .object({
     name: z.string().min(1, "Name is required"),
     email: z.string().email("Please enter a valid email"),
-    college: z.string().min(1, "College is required"),
+    college: z.string().optional().default(""),
     password: z.string().min(8, "Password must be at least 8 characters"),
     confirmPassword: z.string().min(1, "Please confirm your password"),
   })
@@ -108,14 +108,14 @@ export default function RegisterPage() {
 
             <div className="flex flex-col gap-1.5">
               <label htmlFor="college" className="text-sm font-semibold text-charcoal">
-                College / Institute
+                College / Institute / Company <span className="text-inkSoft">(optional)</span>
               </label>
               <input
                 id="college"
                 type="text"
                 {...register("college")}
                 className="w-full rounded-xl bg-cream border border-transparent px-4 py-3 text-charcoal placeholder-inkSoft/50 focus:bg-white focus:border-orange outline-none transition"
-                placeholder="IIM Ahmedabad"
+                placeholder="e.g. IIM Ahmedabad or Acme Corp"
               />
               {errors.college && (
                 <span className="text-xs text-red-600">{errors.college.message}</span>

@@ -7,7 +7,7 @@ import { notifyWelcome } from "@/lib/notifications";
 const registerSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Please enter a valid email"),
-  college: z.string().min(1, "College is required"),
+  college: z.string().optional().default(""),
   password: z.string().min(8, "Password must be at least 8 characters"),
   confirmPassword: z.string().min(1, "Please confirm your password"),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -55,8 +55,21 @@ export async function POST(request: Request) {
         college: college.trim(),
         password: hashedPassword,
         isAdmin: ADMIN_EMAILS.has(normalizedEmail),
+        onboardingComplete: false,
       },
     });
+
+    // Every new account starts with the Student role so they can use the platform
+    // immediately; /getting-started will add the real persona role + profile.
+    const studentRole = await prisma.role.findUnique({ where: { name: "Student" } });
+    if (studentRole) {
+      await prisma.userRole.create({
+        data: {
+          userId: user.id,
+          roleId: studentRole.id,
+        },
+      });
+    }
 
     try {
       await notifyWelcome(user.id);

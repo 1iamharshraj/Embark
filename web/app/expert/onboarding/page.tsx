@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
-import Container from "@/components/Container";
 import ExpertOnboardingForm from "./_components/ExpertOnboardingForm";
 
 export const metadata = {
@@ -22,14 +21,10 @@ export default async function ExpertOnboardingPage() {
   if (existing?.onboardingComplete) redirect("/expert/dashboard");
 
   return (
-    <section className="bg-cream min-h-screen py-16 sm:py-24">
-      <Container>
-        <div className="max-w-3xl mx-auto">
-          <div className="bg-white rounded-2xl shadow-[0_2px_8px_rgba(22,22,22,0.06),0_12px_32px_rgba(22,22,22,0.07)] p-6 sm:p-10">
-            <ExpertOnboardingForm userName={session.user.name} />
-          </div>
-        </div>
-      </Container>
-    </section>
+    <div className="max-w-3xl mx-auto">
+      <div className="bg-white rounded-2xl shadow-[0_2px_8px_rgba(22,22,22,0.06),0_12px_32px_rgba(22,22,22,0.07)] p-6 sm:p-10">
+        <ExpertOnboardingForm userName={session.user.name} />
+      </div>
+    </div>
   );
 }

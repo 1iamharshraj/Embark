@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import Container from "@/components/Container";
 import Eyebrow from "@/components/Eyebrow";
@@ -127,7 +128,7 @@ export default function ExpertsPage() {
                           transition={{ duration: 0.2 }}
                         >
                           {expert.user.image ? (
-                            <img src={expert.user.image} alt={expert.user.name} className="w-full h-full object-cover" />
+                            <Image src={expert.user.image} alt={expert.user.name} fill className="object-cover" sizes="56px" />
                           ) : (
                             <span className="text-xl text-inkSoft">{expert.user.name.charAt(0)}</span>
                           )}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import Image from "next/image";
 import { toast } from "sonner";
 
 interface ImageUploadProps {
@@ -59,7 +60,7 @@ export function ImageUpload({ value, onChange, folder = "profiles" }: ImageUploa
     <div className="flex items-center gap-5">
       <div className="relative group w-24 h-24 rounded-full bg-cream overflow-hidden flex items-center justify-center border border-charcoal/8">
         {value ? (
-          <img src={value} alt="Profile" className="w-full h-full object-cover" />
+          <Image src={value} alt="Profile" fill className="object-cover" sizes="96px" />
         ) : (
           <span className="text-3xl text-inkSoft font-bold">{uploading ? "…" : "?"}</span>
         )}

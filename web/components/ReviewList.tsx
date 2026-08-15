@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 export type ReviewItem = {
   id: string;
@@ -56,10 +57,12 @@ export default function ReviewList({ expertUserId }: { expertUserId: string }) {
           <div className="flex items-center gap-3 mb-2">
             <div className="w-9 h-9 rounded-full bg-cream flex items-center justify-center text-sm font-semibold text-charcoal">
               {review.student.image ? (
-                <img
+                <Image
                   src={review.student.image}
                   alt={review.student.name}
-                  className="w-full h-full rounded-full object-cover"
+                  fill
+                  className="rounded-full object-cover"
+                  sizes="36px"
                 />
               ) : (
                 review.student.name.charAt(0)

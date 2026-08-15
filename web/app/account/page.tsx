@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
@@ -57,11 +58,19 @@ export default async function AccountPage() {
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    include: { studentProfile: true, expertProfile: true },
+    include: {
+      studentProfile: true,
+      expertProfile: true,
+      roles: { include: { role: true } },
+    },
   });
 
   if (!user) {
     redirect("/login");
+  }
+
+  if (user.roles.some((ur) => ur.role.name === "Expert")) {
+    redirect("/expert/dashboard");
   }
 
   const [registrations, hackathonRegistrations, orders, bookings, dms, purchases] = await Promise.all([
@@ -139,7 +148,7 @@ export default async function AccountPage() {
           <div className="shrink-0">
             <div className="w-28 h-28 rounded-full bg-cream overflow-hidden border border-charcoal/8 relative">
               {user.image ? (
-                <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
+                <Image src={user.image} alt={user.name} fill className="object-cover" sizes="112px" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-4xl text-inkSoft font-bold">
                   {user.name.charAt(0).toUpperCase()}

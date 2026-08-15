@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import Container from "@/components/Container";
 import Eyebrow from "@/components/Eyebrow";
@@ -51,7 +52,7 @@ export default async function ExpertPublicPage({ params }: { params: { id: strin
             <div className="flex flex-col sm:flex-row gap-6 items-start">
               <div className="w-24 h-24 rounded-full bg-cream overflow-hidden flex items-center justify-center border border-charcoal/8 flex-shrink-0">
                 {expert.user.image ? (
-                  <img src={expert.user.image} alt={expert.user.name} className="w-full h-full object-cover" />
+                  <Image src={expert.user.image} alt={expert.user.name} fill className="object-cover" sizes="96px" />
                 ) : (
                   <span className="text-3xl text-inkSoft">{expert.user.name.charAt(0)}</span>
                 )}

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import StepProgress from "./StepProgress";
 import ExpertiseChips from "./ExpertiseChips";
 import ServiceSelector from "./ServiceSelector";
@@ -41,22 +42,54 @@ function InputField({
   onChange,
   type = "text",
   placeholder,
+  optional,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   type?: string;
   placeholder?: string;
+  optional?: boolean;
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-sm font-semibold text-charcoal">{label}</label>
+      <label className="text-sm font-semibold text-charcoal">
+        {label} {optional && <span className="text-inkSoft">(optional)</span>}
+      </label>
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         className="w-full rounded-xl bg-cream border border-transparent px-4 py-3 text-charcoal placeholder-inkSoft/50 focus:bg-white focus:border-orange outline-none transition"
+      />
+    </div>
+  );
+}
+
+function TextAreaField({
+  label,
+  value,
+  onChange,
+  placeholder,
+  optional,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  optional?: boolean;
+}) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label className="text-sm font-semibold text-charcoal">
+        {label} {optional && <span className="text-inkSoft">(optional)</span>}
+      </label>
+      <textarea
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="w-full rounded-xl bg-cream border border-transparent px-4 py-3 text-charcoal placeholder-inkSoft/50 focus:bg-white focus:border-orange outline-none transition min-h-[100px]"
       />
     </div>
   );
@@ -94,6 +127,22 @@ function SelectField({
 // ─── Step components ───────────────────────────────────────────────────────
 
 function Step1Welcome({
+  currentRole,
+  setCurrentRole,
+  company,
+  setCompany,
+  yearsExperience,
+  setYearsExperience,
+  industry,
+  setIndustry,
+  headline,
+  setHeadline,
+  bSchool,
+  setBSchool,
+  location,
+  setLocation,
+  bio,
+  setBio,
   socials,
   setSocials,
   country,
@@ -101,6 +150,22 @@ function Step1Welcome({
   currency,
   setCurrency,
 }: {
+  currentRole: string;
+  setCurrentRole: (v: string) => void;
+  company: string;
+  setCompany: (v: string) => void;
+  yearsExperience: string;
+  setYearsExperience: (v: string) => void;
+  industry: string;
+  setIndustry: (v: string) => void;
+  headline: string;
+  setHeadline: (v: string) => void;
+  bSchool: string;
+  setBSchool: (v: string) => void;
+  location: string;
+  setLocation: (v: string) => void;
+  bio: string;
+  setBio: (v: string) => void;
   socials: { linkedIn: string; twitter: string; instagram: string };
   setSocials: (s: { linkedIn: string; twitter: string; instagram: string }) => void;
   country: string;
@@ -115,29 +180,100 @@ function Step1Welcome({
           Hello there! 👋
         </h2>
         <p className="text-inkSoft">
-          In a few moments you will be ready to share your expertise &amp; time.
+          Let&apos;s start with the basics so students know who you are.
         </p>
       </div>
 
       <div className="space-y-4">
+        <div className="grid sm:grid-cols-2 gap-4">
+          <InputField
+            label="Current role"
+            value={currentRole}
+            onChange={setCurrentRole}
+            placeholder="e.g. Product Manager"
+          />
+          <InputField
+            label="Company"
+            value={company}
+            onChange={setCompany}
+            placeholder="e.g. Google"
+          />
+        </div>
+
+        <div className="grid sm:grid-cols-2 gap-4">
+          <InputField
+            label="Years of experience"
+            type="number"
+            value={yearsExperience}
+            onChange={setYearsExperience}
+            placeholder="e.g. 5"
+          />
+          <InputField
+            label="Industry"
+            optional
+            value={industry}
+            onChange={setIndustry}
+            placeholder="e.g. Technology"
+          />
+        </div>
+
+        <InputField
+          label="Profile headline"
+          optional
+          value={headline}
+          onChange={setHeadline}
+          placeholder="e.g. Product Leader helping MBA students break into tech"
+        />
+
+        <div className="grid sm:grid-cols-2 gap-4">
+          <InputField
+            label="Business school"
+            optional
+            value={bSchool}
+            onChange={setBSchool}
+            placeholder="e.g. IIM Bangalore"
+          />
+          <InputField
+            label="Location"
+            optional
+            value={location}
+            onChange={setLocation}
+            placeholder="e.g. Bangalore"
+          />
+        </div>
+
+        <TextAreaField
+          label="Short bio"
+          optional
+          value={bio}
+          onChange={setBio}
+          placeholder="Tell students a little about your background and how you can help."
+        />
+
+        <div className="pt-2 border-t border-charcoal/8" />
+
         <InputField
           label="LinkedIn URL"
           value={socials.linkedIn}
           onChange={(v) => setSocials({ ...socials, linkedIn: v })}
           placeholder="https://linkedin.com/in/your-profile"
         />
-        <InputField
-          label="Twitter (optional)"
-          value={socials.twitter}
-          onChange={(v) => setSocials({ ...socials, twitter: v })}
-          placeholder="https://twitter.com/yourhandle"
-        />
-        <InputField
-          label="Instagram (optional)"
-          value={socials.instagram}
-          onChange={(v) => setSocials({ ...socials, instagram: v })}
-          placeholder="https://instagram.com/yourhandle"
-        />
+        <div className="grid sm:grid-cols-2 gap-4">
+          <InputField
+            label="Twitter"
+            optional
+            value={socials.twitter}
+            onChange={(v) => setSocials({ ...socials, twitter: v })}
+            placeholder="https://twitter.com/yourhandle"
+          />
+          <InputField
+            label="Instagram"
+            optional
+            value={socials.instagram}
+            onChange={(v) => setSocials({ ...socials, instagram: v })}
+            placeholder="https://instagram.com/yourhandle"
+          />
+        </div>
 
         <div className="grid sm:grid-cols-2 gap-4">
           <SelectField
@@ -315,46 +451,25 @@ function Step6Plan() {
   );
 }
 
-function Step7Success({ name }: { name?: string }) {
-  return (
-    <div className="text-center space-y-6 py-4">
-      <div className="w-20 h-20 rounded-full bg-green/10 flex items-center justify-center mx-auto">
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="w-10 h-10 text-green"
-          aria-hidden="true"
-        >
-          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-          <polyline points="22 4 12 14.01 9 11.01" />
-        </svg>
-      </div>
-      <div>
-        <h2 className="font-display font-bold text-2xl text-charcoal mb-2">
-          All set{name ? `, ${name.split(" ")[0]}` : ""}! 🎉
-        </h2>
-        <p className="text-inkSoft">
-          Your expert profile is ready. Head to your dashboard to customise further,
-          manage bookings, and start helping students.
-        </p>
-      </div>
-    </div>
-  );
-}
-
 // ─── Main Wizard ───────────────────────────────────────────────────────────
 
-export default function ExpertOnboardingForm({ userName }: { userName?: string }) {
+export default function ExpertOnboardingForm({ userName: _userName }: { userName?: string | null } = {}) {
   const router = useRouter();
+  const { update } = useSession();
   const [step, setStep] = useState(1); // 1-indexed
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  // Step 1 — Welcome / socials
+  // Step 1 — professional profile
+  const [currentRole, setCurrentRole] = useState("");
+  const [company, setCompany] = useState("");
+  const [yearsExperience, setYearsExperience] = useState("");
+  const [industry, setIndustry] = useState("");
+  const [headline, setHeadline] = useState("");
+  const [bSchool, setBSchool] = useState("");
+  const [location, setLocation] = useState("");
+  const [bio, setBio] = useState("");
   const [socials, setSocials] = useState({ linkedIn: "", twitter: "", instagram: "" });
   const [country, setCountry] = useState("IN");
   const [currency, setCurrency] = useState("INR");
@@ -371,6 +486,62 @@ export default function ExpertOnboardingForm({ userName }: { userName?: string }
   // Step 5 — WhatsApp
   const [phone, setPhone] = useState("");
 
+  // Load existing profile state on mount.
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await fetch("/api/v1/experts/onboarding");
+        const json = (await res.json()) as {
+          profile?: {
+            currentRole?: string | null;
+            currentCompany?: string | null;
+            yearsExperience?: number | null;
+            industry?: string | null;
+            headline?: string | null;
+            bSchool?: string | null;
+            location?: string | null;
+            bio?: string | null;
+            socialLinks?: { linkedIn?: string; twitter?: string; instagram?: string } | null;
+            country?: string | null;
+            currency?: string | null;
+            expertise?: string[];
+            onboardingStep?: number;
+            onboardingComplete?: boolean;
+          } | null;
+        };
+        const p = json.profile;
+        if (p) {
+          setCurrentRole(p.currentRole || "");
+          setCompany(p.currentCompany || "");
+          setYearsExperience(p.yearsExperience?.toString() || "");
+          setIndustry(p.industry || "");
+          setHeadline(p.headline || "");
+          setBSchool(p.bSchool || "");
+          setLocation(p.location || "");
+          setBio(p.bio || "");
+          setSocials({
+            linkedIn: p.socialLinks?.linkedIn || "",
+            twitter: p.socialLinks?.twitter || "",
+            instagram: p.socialLinks?.instagram || "",
+          });
+          setCountry(p.country || "IN");
+          setCurrency(p.currency || "INR");
+          setExpertise(Array.isArray(p.expertise) ? p.expertise : []);
+          // Resume at the last saved step (clamp between 1 and 6).
+          const savedStep = p.onboardingStep ?? 0;
+          if (!p.onboardingComplete && savedStep > 0 && savedStep < 7) {
+            setStep(savedStep + 1);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load onboarding state", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
+
   const persist = useCallback(
     async (stepNum: number, extra: Record<string, unknown> = {}) => {
       setSaving(true);
@@ -379,6 +550,14 @@ export default function ExpertOnboardingForm({ userName }: { userName?: string }
         const payload: Record<string, unknown> = {
           onboardingStep: stepNum,
           onboardingComplete: stepNum >= 7,
+          currentRole,
+          company,
+          yearsExperience: yearsExperience ? parseInt(yearsExperience, 10) : undefined,
+          industry,
+          headline,
+          bSchool,
+          location,
+          bio,
           socialLinks: {
             linkedIn: socials.linkedIn || undefined,
             twitter: socials.twitter || undefined,
@@ -399,12 +578,16 @@ export default function ExpertOnboardingForm({ userName }: { userName?: string }
           body: JSON.stringify(payload),
         });
 
-        const json = await res.json();
+        const json = (await res.json()) as {
+          message?: string;
+          roles?: string[];
+          permissions?: string[];
+        };
         if (!res.ok) {
           setError(json.message || "Failed to save. Please try again.");
           return false;
         }
-        return true;
+        return { ok: true, roles: json.roles, permissions: json.permissions };
       } catch {
         setError("Network error. Please try again.");
         return false;
@@ -412,35 +595,46 @@ export default function ExpertOnboardingForm({ userName }: { userName?: string }
         setSaving(false);
       }
     },
-    [socials, country, currency, expertise, services, availability, phone]
+    [currentRole, company, yearsExperience, industry, headline, bSchool, location, bio, socials, country, currency, expertise, services, availability, phone]
   );
 
   async function handleNext() {
-    const ok = await persist(step);
-    if (!ok) return;
+    const result = await persist(step);
+    if (!result || !result.ok) return;
     setStep((s) => s + 1);
   }
 
   async function handleFinish() {
-    const ok = await persist(7, { onboardingComplete: true });
-    if (!ok) return;
-    setStep(7);
-  }
+    const result = await persist(7, { onboardingComplete: true });
+    if (!result || !result.ok) return;
 
-  function handleGoToDashboard() {
+    // Refresh the session so the middleware recognises the Expert role and
+    // completed onboarding.
+    await update({
+      onboardingComplete: true,
+      onboardingRole: "Expert",
+      roles: result.roles,
+      permissions: result.permissions,
+    });
+
     router.push("/expert/dashboard");
     router.refresh();
   }
 
   const isLast = step === 6;
-  const isDone = step === 7;
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="w-8 h-8 border-2 border-orange border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
       {/* Progress bar */}
-      {!isDone && (
-        <StepProgress current={step} steps={STEPS} />
-      )}
+      <StepProgress current={step} steps={STEPS} />
 
       {/* Error */}
       {error && (
@@ -453,6 +647,22 @@ export default function ExpertOnboardingForm({ userName }: { userName?: string }
       <div>
         {step === 1 && (
           <Step1Welcome
+            currentRole={currentRole}
+            setCurrentRole={setCurrentRole}
+            company={company}
+            setCompany={setCompany}
+            yearsExperience={yearsExperience}
+            setYearsExperience={setYearsExperience}
+            industry={industry}
+            setIndustry={setIndustry}
+            headline={headline}
+            setHeadline={setHeadline}
+            bSchool={bSchool}
+            setBSchool={setBSchool}
+            location={location}
+            setLocation={setLocation}
+            bio={bio}
+            setBio={setBio}
             socials={socials}
             setSocials={setSocials}
             country={country}
@@ -473,53 +683,38 @@ export default function ExpertOnboardingForm({ userName }: { userName?: string }
             setAvailability={setAvailability}
           />
         )}
-        {step === 5 && (
-          <Step5WhatsApp phone={phone} setPhone={setPhone} />
-        )}
+        {step === 5 && <Step5WhatsApp phone={phone} setPhone={setPhone} />}
         {step === 6 && <Step6Plan />}
-        {step === 7 && <Step7Success name={userName} />}
       </div>
 
       {/* Navigation */}
       <div className="flex items-center justify-between pt-2 border-t border-charcoal/8">
-        {!isDone ? (
-          <>
-            <button
-              type="button"
-              onClick={() => setStep((s) => Math.max(1, s - 1))}
-              disabled={step === 1 || saving}
-              className="text-sm font-semibold text-charcoal hover:text-orange disabled:opacity-40 transition"
-            >
-              ← Back
-            </button>
+        <button
+          type="button"
+          onClick={() => setStep((s) => Math.max(1, s - 1))}
+          disabled={step === 1 || saving}
+          className="text-sm font-semibold text-charcoal hover:text-orange disabled:opacity-40 transition"
+        >
+          ← Back
+        </button>
 
-            {isLast ? (
-              <button
-                type="button"
-                onClick={handleFinish}
-                disabled={saving}
-                className="inline-flex items-center justify-center rounded-full font-semibold bg-orangeDeep text-white px-7 py-3.5 hover:bg-[#1740A8] transition disabled:opacity-60"
-              >
-                {saving ? "Finishing…" : "Finish setup"}
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={handleNext}
-                disabled={saving}
-                className="inline-flex items-center justify-center rounded-full font-semibold bg-orangeDeep text-white px-7 py-3.5 hover:bg-[#1740A8] transition disabled:opacity-60"
-              >
-                {saving ? "Saving…" : "Next →"}
-              </button>
-            )}
-          </>
+        {isLast ? (
+          <button
+            type="button"
+            onClick={handleFinish}
+            disabled={saving}
+            className="inline-flex items-center justify-center rounded-full font-semibold bg-orangeDeep text-white px-7 py-3.5 hover:bg-[#1740A8] transition disabled:opacity-60"
+          >
+            {saving ? "Finishing…" : "Finish setup"}
+          </button>
         ) : (
           <button
             type="button"
-            onClick={handleGoToDashboard}
-            className="w-full inline-flex items-center justify-center rounded-full font-semibold bg-orangeDeep text-white px-7 py-3.5 hover:bg-[#1740A8] transition"
+            onClick={handleNext}
+            disabled={saving}
+            className="inline-flex items-center justify-center rounded-full font-semibold bg-orangeDeep text-white px-7 py-3.5 hover:bg-[#1740A8] transition disabled:opacity-60"
           >
-            Go to my dashboard →
+            {saving ? "Saving…" : "Next →"}
           </button>
         )}
       </div>

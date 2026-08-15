@@ -9,6 +9,8 @@ declare module "next-auth" {
       name: string;
       college: string;
       isAdmin: boolean;
+      onboardingComplete: boolean;
+      onboardingRole: string | null;
       roles: string[];
       permissions: string[];
       image?: string | null;
@@ -21,6 +23,8 @@ declare module "next-auth" {
     name: string;
     college?: string;
     isAdmin?: boolean;
+    onboardingComplete?: boolean;
+    onboardingRole?: string | null;
     roles?: string[];
     permissions?: string[];
   }
@@ -33,6 +37,8 @@ declare module "next-auth/jwt" {
     name?: string;
     college?: string;
     isAdmin?: boolean;
+    onboardingComplete?: boolean;
+    onboardingRole?: string | null;
     roles?: string[];
     permissions?: string[];
   }

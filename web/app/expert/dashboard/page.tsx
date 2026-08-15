@@ -10,12 +10,6 @@ export const metadata = {
   title: "Expert Dashboard — Embark India",
 };
 
-const SAMPLE_EXPERTS = [
-  { name: "Priya Sharma", role: "Senior Product Manager, Zepto", sessions: 84, rating: 4.9 },
-  { name: "Rahul Mehta", role: "Strategy Consultant, McKinsey", sessions: 121, rating: 5.0 },
-  { name: "Ananya Bose", role: "Marketing Lead, Mamaearth", sessions: 56, rating: 4.8 },
-];
-
 export default async function ExpertDashboardPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/login");
@@ -30,7 +24,7 @@ export default async function ExpertDashboardPage() {
 
   if (!expertProfile) redirect("/expert/onboarding");
 
-  const [upcomingBookings, pendingDms] = await Promise.all([
+  const [upcomingBookings, pendingDms, walletStats] = await Promise.all([
     prisma.booking.findMany({
       where: {
         expertId: session.user.id,
@@ -53,6 +47,11 @@ export default async function ExpertDashboardPage() {
       orderBy: { createdAt: "desc" },
       take: 5,
     }),
+    prisma.walletTransaction.groupBy({
+      by: ["type"],
+      where: { userId: session.user.id },
+      _sum: { amount: true },
+    }),
   ]);
 
   // Derive checklist completion
@@ -62,10 +61,16 @@ export default async function ExpertDashboardPage() {
   if (expertProfile.image && expertProfile.headline) completedIds.push("page");
   if (expertProfile.whatsappNumber) completedIds.push("whatsapp");
 
+  const totalCredit =
+    walletStats.find((s) => s.type === "CREDIT")?._sum.amount || 0;
+  const totalDebit =
+    walletStats.find((s) => s.type === "DEBIT")?._sum.amount || 0;
+  const availableBalance = totalCredit - totalDebit;
+
   const firstName = session.user.name?.split(" ")[0] ?? "there";
 
   return (
-    <div className="max-w-5xl mx-auto space-y-7">
+    <div className="space-y-7">
       {/* Greeting */}
       <div>
         <h1 className="font-display font-bold text-2xl sm:text-3xl text-charcoal">
@@ -208,25 +213,37 @@ export default async function ExpertDashboardPage() {
             )}
           </div>
 
-          {/* Get inspired */}
+          {/* Earnings snapshot */}
           <div className="bg-white rounded-2xl shadow-[0_2px_8px_rgba(22,22,22,0.06),0_12px_32px_rgba(22,22,22,0.07)] p-6">
-            <h2 className="font-display font-bold text-base text-charcoal mb-4">Get inspired</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-display font-bold text-base text-charcoal">Earnings</h2>
+              <Link href="/expert/wallet" className="text-xs font-semibold text-orangeDeep hover:underline">
+                Wallet →
+              </Link>
+            </div>
             <div className="space-y-4">
-              {SAMPLE_EXPERTS.map((expert) => (
-                <div key={expert.name} className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-orangeDeep/15 flex items-center justify-center text-orangeDeep font-bold text-sm shrink-0">
-                    {expert.name.charAt(0)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm text-charcoal leading-snug">{expert.name}</p>
-                    <p className="text-xs text-inkSoft leading-snug truncate">{expert.role}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-[10px] text-inkSoft">{expert.sessions} sessions</span>
-                      <span className="text-[10px] text-orange font-semibold">★ {expert.rating}</span>
-                    </div>
-                  </div>
+              <div>
+                <p className="text-xs text-inkSoft uppercase tracking-wide font-semibold">Available balance</p>
+                <p className="font-display font-bold text-2xl text-charcoal">
+                  ₹{(availableBalance / 100).toFixed(2)}
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-xl bg-cream p-3">
+                  <p className="text-[10px] text-inkSoft uppercase tracking-wide font-semibold">Total earned</p>
+                  <p className="font-semibold text-sm text-green-700">₹{(totalCredit / 100).toFixed(2)}</p>
                 </div>
-              ))}
+                <div className="rounded-xl bg-cream p-3">
+                  <p className="text-[10px] text-inkSoft uppercase tracking-wide font-semibold">Withdrawn</p>
+                  <p className="font-semibold text-sm text-inkSoft">₹{(totalDebit / 100).toFixed(2)}</p>
+                </div>
+              </div>
+              <Link
+                href="/expert/wallet"
+                className="block w-full text-center rounded-full bg-orangeDeep text-white text-sm font-semibold py-2.5 hover:bg-[#1740A8] transition"
+              >
+                Request payout
+              </Link>
             </div>
           </div>
         </div>

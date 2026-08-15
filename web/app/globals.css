@@ -4009,3 +4009,45 @@ body {
     transition: none;
   }
 }
+
+
+/* Animated logo letters */
+@keyframes logo-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.group:hover .animate-logo-bounce {
+  animation-name: logo-bounce;
+  animation-duration: 0.5s;
+  animation-timing-function: ease-out;
+  animation-iteration-count: 1;
+}
+
+/* Mega menu entrance */
+@keyframes mega-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-mega-in {
+  animation: mega-in 0.2s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-logo-bounce,
+  .animate-mega-in {
+    animation: none !important;
+    transform: none !important;
+  }
+}

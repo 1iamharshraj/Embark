@@ -22,6 +22,8 @@ const systemRoles = [
   { name: "Evaluator", description: "Hackathon evaluation only" },
   { name: "Expert", description: "Expert marketplace access" },
   { name: "Student", description: "Student functionality" },
+  { name: "Institution", description: "College or institute requesting guest lectures" },
+  { name: "Recruiter", description: "Company or recruiter looking to hire students" },
   { name: "Support Agent", description: "Customer support functionality" },
 ];
 
@@ -124,9 +126,12 @@ const systemPermissions = [
   { resource: "mentorship", action: "view" },
   { resource: "mentorship", action: "update" },
   { resource: "lecture", action: "view" },
+  { resource: "lecture", action: "create" },
   { resource: "lecture", action: "update" },
   { resource: "speaker", action: "view" },
   { resource: "speaker", action: "update" },
+  { resource: "job", action: "view" },
+  { resource: "job", action: "create" },
 ];
 
 const rolePermissionMap: Record<string, string[]> = {
@@ -198,6 +203,14 @@ const rolePermissionMap: Record<string, string[]> = {
     "hackathon.submission.view",
     "certificate.view",
     "review.create",
+  ],
+  Institution: [
+    "user.view",
+    "lecture.view", "lecture.create",
+  ],
+  Recruiter: [
+    "user.view",
+    "job.view", "job.create",
   ],
   "Support Agent": [
     "user.view",
@@ -1447,6 +1460,8 @@ async function main() {
         name: "Ajay",
         college: "Admin",
         isAdmin: true,
+        onboardingComplete: true,
+        onboardingRole: "Super Admin",
       },
     }),
     prisma.user.create({
@@ -1456,6 +1471,8 @@ async function main() {
         name: "Test Student",
         college: "IIM Indore",
         isAdmin: false,
+        onboardingComplete: true,
+        onboardingRole: "Student",
       },
     }),
     prisma.user.create({
@@ -1465,6 +1482,8 @@ async function main() {
         name: "Riya Sen",
         college: "XLRI Jamshedpur",
         isAdmin: false,
+        onboardingComplete: true,
+        onboardingRole: "Student",
       },
     }),
   ]);

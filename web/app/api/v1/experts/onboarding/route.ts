@@ -228,6 +228,14 @@ export async function POST(request: Request) {
             data.onboardingComplete === true || (data.onboardingStep !== undefined && data.onboardingStep >= 6)
               ? true
               : undefined,
+          isPublic:
+            data.onboardingComplete === true || (data.onboardingStep !== undefined && data.onboardingStep >= 6)
+              ? true
+              : undefined,
+          verificationStatus:
+            data.onboardingComplete === true || (data.onboardingStep !== undefined && data.onboardingStep >= 6)
+              ? "VERIFIED"
+              : undefined,
         },
       });
 
@@ -280,7 +288,39 @@ export async function POST(request: Request) {
 
     const { profile: fullProfile } = await getOnboardingState(userId);
 
-    return NextResponse.json({ profile: fullProfile }, { status: create ? 201 : 200 });
+    const userWithRoles = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        roles: {
+          include: {
+            role: {
+              include: {
+                permissions: {
+                  include: { permission: true },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const roles = userWithRoles?.roles.map((ur) => ur.role.name) || [];
+    const permissionsSet = new Set<string>();
+    userWithRoles?.roles.forEach((ur) => {
+      ur.role.permissions.forEach((rp) => {
+        permissionsSet.add(`${rp.permission.resource}.${rp.permission.action}`);
+      });
+    });
+
+    return NextResponse.json(
+      {
+        profile: fullProfile,
+        roles,
+        permissions: Array.from(permissionsSet),
+      },
+      { status: create ? 201 : 200 }
+    );
   } catch (error) {
     console.error("POST onboarding error:", error);
     return NextResponse.json({ message: "Failed to save onboarding progress" }, { status: 500 });

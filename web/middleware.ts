@@ -7,6 +7,8 @@ const PUBLIC_PATHS = [
   "/register",
   "/reset-password",
   "/set-password",
+  "/getting-started",
+  "/expert/onboarding",
   "/api",
   "/_next",
   "/favicon.ico",
@@ -37,6 +39,11 @@ export async function middleware(request: NextRequest) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("callbackUrl", `${pathname}${search}`);
     return NextResponse.redirect(loginUrl);
+  }
+
+  // New users must finish the persona onboarding before using the app.
+  if (token.onboardingComplete === false) {
+    return NextResponse.redirect(new URL("/getting-started", request.url));
   }
 
   const roles = (token.roles as string[]) || [];
