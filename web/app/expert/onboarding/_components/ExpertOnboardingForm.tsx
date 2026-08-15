@@ -453,7 +453,7 @@ function Step6Plan() {
 
 // ─── Main Wizard ───────────────────────────────────────────────────────────
 
-export default function ExpertOnboardingForm({ userName: _userName }: { userName?: string | null } = {}) {
+export default function ExpertOnboardingForm(_props: { userName?: string | null } = {}) {
   const router = useRouter();
   const { update } = useSession();
   const [step, setStep] = useState(1); // 1-indexed

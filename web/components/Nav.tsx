@@ -183,15 +183,18 @@ export default function Nav() {
 
         {showExpertNav ? (
           <>
+            {/* Same public links in center — logo already covers "back to home" */}
             <ul className="hidden lg:flex items-center gap-6 ml-auto">
-              <li>
-                <Link
-                  href="/"
-                  className="relative text-sm font-medium text-inkSoft hover:text-navy transition pb-1 after:absolute after:left-0 after:right-0 after:-bottom-2 after:h-[3px] after:rounded-sm after:bg-orange after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition"
-                >
-                  Back to home
-                </Link>
-              </li>
+              {publicLinks.map((l) => (
+                <li key={l.href}>
+                  <Link
+                    href={l.href}
+                    className="relative text-sm font-medium text-inkSoft hover:text-navy transition pb-1 after:absolute after:left-0 after:right-0 after:-bottom-2 after:h-[3px] after:rounded-sm after:bg-orange after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition"
+                  >
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
 
             <div className="hidden lg:flex items-center gap-3 pl-4 border-l border-charcoal/10">
@@ -320,13 +323,17 @@ export default function Nav() {
         <div className="lg:hidden mt-2 mx-auto max-w-6xl bg-cream/97 backdrop-blur-md border border-charcoal/8 rounded-[22px] shadow-[0_14px_40px_rgba(11,31,58,0.16)] p-3">
           {showExpertNav ? (
             <>
-              <Link
-                href="/"
-                onClick={() => setOpen(false)}
-                className="block text-charcoal font-semibold text-base px-4 py-3 rounded-xl hover:bg-orange/8 hover:text-orangeDeep"
-              >
-                ← Back to home
-              </Link>
+              {/* Public links stay visible on mobile expert nav too */}
+              {publicLinks.map((l) => (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  onClick={() => setOpen(false)}
+                  className="block text-charcoal font-semibold text-base px-4 py-3 rounded-xl hover:bg-orange/8 hover:text-orangeDeep"
+                >
+                  {l.label}
+                </Link>
+              ))}
               <div className="px-4 py-2 mt-2 text-[10px] font-bold text-inkSoft/60 uppercase tracking-widest">Expert dashboard</div>
               {[...manageItems, ...pageItems, ...moreItems].map((item) => (
                 <Link
