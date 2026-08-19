@@ -20,15 +20,27 @@ interface PackageItemInput {
 interface PackageFormProps {
   expertProfileId: string;
   services: ServiceOption[];
+  initial?: {
+    id: string;
+    name: string;
+    description: string | null;
+    price: number;
+    validityDays: number;
+    items: { serviceId: string; quantity: number }[];
+  };
 }
 
-export default function PackageForm({ expertProfileId, services }: PackageFormProps) {
+export default function PackageForm({ expertProfileId, services, initial }: PackageFormProps) {
   const router = useRouter();
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
-  const [validityDays, setValidityDays] = useState("30");
-  const [items, setItems] = useState<PackageItemInput[]>([{ serviceId: "", quantity: "1" }]);
+  const [name, setName] = useState(initial?.name || "");
+  const [description, setDescription] = useState(initial?.description || "");
+  const [price, setPrice] = useState(initial ? (initial.price / 100).toFixed(2) : "");
+  const [validityDays, setValidityDays] = useState(initial?.validityDays.toString() || "30");
+  const [items, setItems] = useState<PackageItemInput[]>(
+    initial?.items.length
+      ? initial.items.map((i) => ({ serviceId: i.serviceId, quantity: String(i.quantity) }))
+      : [{ serviceId: "", quantity: "1" }]
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -71,18 +83,20 @@ export default function PackageForm({ expertProfileId, services }: PackageFormPr
     };
 
     try {
-      const res = await fetch("/api/v1/packages", {
-        method: "POST",
+      const url = initial ? `/api/v1/packages/${initial.id}` : "/api/v1/packages";
+      const method = initial ? "PUT" : "POST";
+      const res = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
       const json = await res.json();
       if (!res.ok) {
-        setError(json.message || "Failed to create package");
+        setError(json.message || `Failed to ${initial ? "update" : "create"} package`);
         setLoading(false);
         return;
       }
-      toast.success("Package created");
+      toast.success(initial ? "Package updated" : "Package created");
       router.push("/expert/packages");
       router.refresh();
     } catch {
@@ -203,7 +217,7 @@ export default function PackageForm({ expertProfileId, services }: PackageFormPr
         disabled={loading}
         className="inline-flex items-center justify-center rounded-full font-semibold bg-orangeDeep text-white px-7 py-3.5 hover:bg-[#1740A8] transition disabled:opacity-60"
       >
-        {loading ? "Saving..." : "Create package"}
+        {loading ? "Saving..." : initial ? "Update package" : "Create package"}
       </button>
     </form>
   );

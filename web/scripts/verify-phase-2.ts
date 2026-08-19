@@ -42,8 +42,8 @@ const expectedFiles = [
   "app/expert/verification/_components/DocumentUpload.tsx",
   "app/api/v1/expert-verifications/route.ts",
   // Public expert profile
-  "app/expert/[id]/page.tsx",
-  "app/api/v1/experts/[id]/route.ts",
+  "app/expert/[slug]/page.tsx",
+  "app/api/v1/experts/[slug]/route.ts",
   // Admin review
   "app/admin/experts/page.tsx",
   "app/admin/experts/[id]/page.tsx",

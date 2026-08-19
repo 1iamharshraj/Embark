@@ -6,7 +6,7 @@ async function login(page: Page, email: string, password: string) {
   await page.getByLabel(/email/i).first().fill(email);
   await page.getByLabel(/password/i).first().fill(password);
   await page.getByRole("button", { name: /sign in|login|log in/i }).first().click();
-  await page.waitForURL(/\/account|\/admin|\/$/);
+  await page.waitForURL(/\/account|\/expert\/dashboard|\/admin|\/$/);
 }
 
 test.describe("Expert application flow", () => {

@@ -34,6 +34,13 @@ const ITEMS: ChecklistItem[] = [
     actionLabel: "Edit profile",
   },
   {
+    id: "verification",
+    label: "Get verified",
+    description: "Submit credentials so Embark can approve your public profile.",
+    href: "/expert/verification",
+    actionLabel: "Verify",
+  },
+  {
     id: "payouts",
     label: "Set up payouts",
     description: "Add your bank account or UPI to receive earnings.",
@@ -49,16 +56,22 @@ const ITEMS: ChecklistItem[] = [
   },
 ];
 
+const CIRCUMFERENCE = 88;
+
 interface SetupChecklistProps {
   completedIds?: string[];
+  percent?: number;
 }
 
-export default function SetupChecklist({ completedIds = [] }: SetupChecklistProps) {
+export default function SetupChecklist({ completedIds = [], percent }: SetupChecklistProps) {
   const [open, setOpen] = useState(true);
 
   const doneCount = completedIds.length;
   const totalCount = ITEMS.length;
   const allDone = doneCount >= totalCount;
+
+  const completionPercent = Math.max(0, Math.min(100, percent ?? Math.round((doneCount / totalCount) * 100)));
+  const strokeDasharray = `${(completionPercent / 100) * CIRCUMFERENCE} ${CIRCUMFERENCE}`;
 
   return (
     <div className="bg-white rounded-2xl shadow-[0_2px_8px_rgba(22,22,22,0.06),0_12px_32px_rgba(22,22,22,0.07)] overflow-hidden">
@@ -87,12 +100,12 @@ export default function SetupChecklist({ completedIds = [] }: SetupChecklistProp
                 fill="none"
                 stroke={allDone ? "#22c55e" : "#FB4D0A"}
                 strokeWidth="4"
-                strokeDasharray={`${(doneCount / totalCount) * 88} 88`}
+                strokeDasharray={strokeDasharray}
                 strokeLinecap="round"
               />
             </svg>
             <span className="absolute inset-0 flex items-center justify-center text-[9px] font-bold text-charcoal">
-              {doneCount}/{totalCount}
+              {completionPercent}%
             </span>
           </div>
           <div className="text-left">

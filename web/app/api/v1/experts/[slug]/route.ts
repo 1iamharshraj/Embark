@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(_request: Request, { params }: { params: { id: string } }) {
+export async function GET(_request: Request, { params }: { params: { slug: string } }) {
   try {
     const expert = await prisma.expertProfile.findUnique({
-      where: { id: params.id },
+      where: { slug: params.slug },
       include: {
         user: {
           select: {
@@ -14,6 +14,8 @@ export async function GET(_request: Request, { params }: { params: { id: string 
             image: true,
           },
         },
+        educations: { orderBy: { displayOrder: "asc" } },
+        experiences: { orderBy: { displayOrder: "asc" } },
         verifications: {
           orderBy: { createdAt: "desc" },
           take: 1,
@@ -28,9 +30,11 @@ export async function GET(_request: Request, { params }: { params: { id: string 
     return NextResponse.json({
       expert: {
         id: expert.id,
+        slug: expert.slug,
         userId: expert.userId,
         name: expert.user.name,
         image: expert.user.image,
+        coverImage: expert.coverImage,
         headline: expert.headline,
         bio: expert.bio,
         location: expert.location,
@@ -45,6 +49,9 @@ export async function GET(_request: Request, { params }: { params: { id: string 
         industry: expert.industry,
         function: expert.function,
         expertise: expert.expertise,
+        educations: expert.educations,
+        experiences: expert.experiences,
+        pageSettings: expert.pageSettings,
         verificationStatus: expert.verificationStatus,
         rating: expert.rating,
         reviewCount: expert.reviewCount,

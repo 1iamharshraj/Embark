@@ -45,7 +45,7 @@ export default async function AcceptInvitePage({ params }: { params: { token: st
 
   const team = await prisma.hackathonTeam.findUnique({
     where: { id: payload.teamId },
-    include: { members: true, hackathon: { select: { slug: true } } },
+    include: { members: true, hackathon: { select: { slug: true, teamMax: true } } },
   });
 
   if (!team) {
@@ -63,6 +63,20 @@ export default async function AcceptInvitePage({ params }: { params: { token: st
 
   const alreadyMember = team.members.find((m) => m.userId === user.id);
   if (!alreadyMember) {
+    const teamMax = team.hackathon.teamMax || 4;
+    if (team.members.length >= teamMax) {
+      return (
+        <section className="bg-cream py-24">
+          <Container>
+            <div className="max-w-xl mx-auto bg-white rounded-2xl p-8 text-center">
+              <h1 className="font-display font-bold text-2xl text-charcoal mb-2">Team is full</h1>
+              <p className="text-inkSoft">This team has reached the maximum size of {teamMax} members.</p>
+            </div>
+          </Container>
+        </section>
+      );
+    }
+
     await prisma.hackathonTeamMember.create({
       data: {
         teamId: team.id,

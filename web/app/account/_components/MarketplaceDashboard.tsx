@@ -152,20 +152,23 @@ export default function MarketplaceDashboard({ bookings, dms, purchases }: Marke
         ) : (
           <div className="space-y-3">
             {purchases.slice(0, 5).map((purchase) => (
-              <div
+              <Link
                 key={purchase.id}
-                className="rounded-xl bg-cream p-4 flex items-center justify-between gap-2"
+                href={`/account/packages/${purchase.id}`}
+                className="block rounded-xl bg-cream p-4 hover:bg-orange/5 transition"
               >
-                <div>
-                  <p className="font-semibold text-charcoal">{purchase.package.name}</p>
-                  <p className="text-sm text-inkSoft">
-                    Valid until <ClientDate date={purchase.validUntil} options={{ timeZone: "Asia/Kolkata" }} />
-                  </p>
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <p className="font-semibold text-charcoal">{purchase.package.name}</p>
+                    <p className="text-sm text-inkSoft">
+                      Valid until <ClientDate date={purchase.validUntil} options={{ timeZone: "Asia/Kolkata" }} />
+                    </p>
+                  </div>
+                  <span className={`text-xs font-semibold uppercase tracking-wider rounded-full px-2.5 py-1 ${statusClass(purchase.status)}`}>
+                    {purchase.status}
+                  </span>
                 </div>
-                <span className={`text-xs font-semibold uppercase tracking-wider rounded-full px-2.5 py-1 ${statusClass(purchase.status)}`}>
-                  {purchase.status}
-                </span>
-              </div>
+              </Link>
             ))}
           </div>
         )}

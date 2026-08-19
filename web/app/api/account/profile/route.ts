@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 
 const profileSchema = z.object({
   name: z.string().min(1, "Name is required").optional(),
+  college: z.string().optional(),
   phone: z.string().optional(),
   image: z.string().optional(),
   bio: z.string().optional(),
@@ -32,11 +33,12 @@ export async function PATCH(request: Request) {
       );
     }
 
-    const { name, phone, image, bio, location, linkedIn, website, isPublic } = parsed.data;
+    const { name, college, phone, image, bio, location, linkedIn, website, isPublic } = parsed.data;
 
     const updated = await prisma.$transaction(async (tx) => {
-      const userData: { name?: string; phone?: string | null; image?: string | null } = {};
+      const userData: { name?: string; college?: string; phone?: string | null; image?: string | null } = {};
       if (name !== undefined) userData.name = name.trim();
+      if (college !== undefined) userData.college = college.trim();
       if (phone !== undefined) userData.phone = phone?.trim() || null;
       if (image !== undefined) userData.image = image?.trim() || null;
 

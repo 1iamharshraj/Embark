@@ -31,6 +31,37 @@ export default async function HackathonSubmitPage({ params }: { params: { slug: 
       })
     : null;
 
+  const settings = (hackathon.settings as Record<string, unknown> | undefined) ?? {};
+  const submissionFields = Array.isArray(settings.submissionFields)
+    ? settings.submissionFields
+        .filter(
+          (f): f is { name: string; label: string; type: string; required: boolean } =>
+            typeof f === "object" && f !== null && typeof (f as Record<string, unknown>).name === "string"
+        )
+        .map((f) => ({
+          name: f.name,
+          label: f.label,
+          type: f.type as "text" | "textarea" | "url",
+          required: f.required,
+        }))
+    : [];
+
+  const rawRestrictions = settings.fileRestrictions as Record<string, unknown> | undefined;
+  const fileRestrictions = rawRestrictions
+    ? {
+        allowedTypes: Array.isArray(rawRestrictions.allowedTypes)
+          ? rawRestrictions.allowedTypes.filter((v): v is string => typeof v === "string")
+          : undefined,
+        maxFileSize: typeof rawRestrictions.maxFileSize === "number" ? rawRestrictions.maxFileSize : undefined,
+        maxFiles: typeof rawRestrictions.maxFiles === "number" ? rawRestrictions.maxFiles : undefined,
+        requiredFiles: Array.isArray(rawRestrictions.requiredFiles)
+          ? rawRestrictions.requiredFiles.filter((v): v is string => typeof v === "string")
+          : undefined,
+      }
+    : {};
+
+  const locked = existing ? ["LOCKED", "UNDER_EVALUATION", "EVALUATED", "SHORTLISTED", "WINNER", "REJECTED"].includes(existing.status) : false;
+
   return (
     <section className="bg-cream py-16 sm:py-24">
       <Container>
@@ -44,6 +75,8 @@ export default async function HackathonSubmitPage({ params }: { params: { slug: 
               slug: hackathon.slug,
               title: hackathon.title,
               submissionOpen: submissionOpen(hackathon),
+              submissionFields,
+              fileRestrictions,
             }}
             team={team ? { id: team.id, name: team.name } : null}
             existing={
@@ -53,6 +86,8 @@ export default async function HackathonSubmitPage({ params }: { params: { slug: 
                     title: existing.title,
                     content: existing.content as Record<string, unknown>,
                     files: existing.files,
+                    status: existing.status,
+                    locked,
                   }
                 : null
             }

@@ -4,6 +4,8 @@ import { z } from "zod";
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, requirePermission, AuthorizedUser } from "@/lib/rbac";
+import { findActivePackageItem, consumePackageForBooking } from "@/lib/packageUsage";
+import { validateBookingSchedule } from "@/lib/bookingValidation";
 
 const createSchema = z.object({
   serviceId: z.string().min(1),
@@ -80,6 +82,11 @@ export async function POST(request: Request) {
 
     const scheduledAt = new Date(data.scheduledAt);
 
+    const scheduleValidation = validateBookingSchedule(scheduledAt);
+    if (!scheduleValidation.valid) {
+      return NextResponse.json({ message: scheduleValidation.message }, { status: 400 });
+    }
+
     const booking = await prisma.$transaction(async (tx) => {
       const existing = await tx.booking.findFirst({
         where: {
@@ -93,16 +100,26 @@ export async function POST(request: Request) {
         throw new Error("SLOT_TAKEN");
       }
 
-      return tx.booking.create({
+      const packageItem = await findActivePackageItem(
+        tx,
+        sessionUser.id,
+        data.serviceId,
+        service.expertProfileId
+      );
+
+      const status = packageItem ? "CONFIRMED" : "PENDING_PAYMENT";
+      const amount = packageItem ? 0 : service.price;
+
+      const created = await tx.booking.create({
         data: {
           serviceId: data.serviceId,
           clientId: sessionUser.id,
           expertId: service.expertProfile.userId,
           scheduledAt,
           durationMinutes: service.durationMinutes || 60,
-          amount: service.price,
+          amount,
           intakeResponses: data.intakeResponses,
-          status: "PENDING_PAYMENT",
+          status,
         },
         include: {
           service: { select: { id: true, name: true, durationMinutes: true, price: true } },
@@ -110,6 +127,18 @@ export async function POST(request: Request) {
           expert: { select: { id: true, name: true } },
         },
       });
+
+      if (packageItem) {
+        await consumePackageForBooking(
+          tx,
+          sessionUser.id,
+          data.serviceId,
+          service.expertProfileId,
+          created.id
+        );
+      }
+
+      return created;
     });
 
     return NextResponse.json({ booking }, { status: 201 });

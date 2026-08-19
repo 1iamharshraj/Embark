@@ -4,6 +4,7 @@ import { z } from "zod";
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, requirePermission, AuthorizedUser } from "@/lib/rbac";
+import { findActivePackageItem, consumePackageForDM } from "@/lib/packageUsage";
 
 const createSchema = z.object({
   expertId: z.string().min(1),
@@ -66,7 +67,7 @@ export async function POST(request: Request) {
       where: { userId: data.expertId },
       include: {
         services: {
-          where: { type: "PRIORITY_DM", isActive: true },
+          where: { type: "PRIORITY_DM", status: "PUBLISHED" },
           orderBy: { price: "asc" },
         },
       },
@@ -84,21 +85,40 @@ export async function POST(request: Request) {
       );
     }
 
-    const dm = await prisma.priorityDM.create({
-      data: {
-        expertId: data.expertId,
-        studentId: sessionUser.id,
-        title: data.title.trim(),
-        question: data.question.trim(),
-        context: data.context?.trim(),
-        attachments: data.attachments,
-        amount: dmService.price,
-        status: "PENDING_PAYMENT",
-      },
-      include: {
-        expert: { select: { id: true, name: true, email: true } },
-        student: { select: { id: true, name: true, email: true } },
-      },
+    const dm = await prisma.$transaction(async (tx) => {
+      const packageItem = await findActivePackageItem(
+        tx,
+        sessionUser.id,
+        dmService.id,
+        expertProfile.id
+      );
+
+      const status = packageItem ? "PAID" : "PENDING_PAYMENT";
+      const amount = packageItem ? 0 : dmService.price;
+
+      const created = await tx.priorityDM.create({
+        data: {
+          expertId: data.expertId,
+          studentId: sessionUser.id,
+          title: data.title.trim(),
+          question: data.question.trim(),
+          context: data.context?.trim(),
+          attachments: data.attachments,
+          amount,
+          dueHours: dmService.responseSlaHours,
+          status,
+        },
+        include: {
+          expert: { select: { id: true, name: true, email: true } },
+          student: { select: { id: true, name: true, email: true } },
+        },
+      });
+
+      if (packageItem) {
+        await consumePackageForDM(tx, sessionUser.id, dmService.id, expertProfile.id, created.id);
+      }
+
+      return created;
     });
 
     return NextResponse.json({ dm }, { status: 201 });

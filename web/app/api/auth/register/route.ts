@@ -3,6 +3,7 @@ import { z } from "zod";
 import { hash } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { notifyWelcome } from "@/lib/notifications";
+import { createEmailVerificationToken } from "@/lib/email-verification";
 
 const registerSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -59,17 +60,9 @@ export async function POST(request: Request) {
       },
     });
 
-    // Every new account starts with the Student role so they can use the platform
-    // immediately; /getting-started will add the real persona role + profile.
-    const studentRole = await prisma.role.findUnique({ where: { name: "Student" } });
-    if (studentRole) {
-      await prisma.userRole.create({
-        data: {
-          userId: user.id,
-          roleId: studentRole.id,
-        },
-      });
-    }
+    // Role selection now happens on /getting-started after the first login.
+    // We do not assign a default role here so the user can pick student, expert,
+    // institution, or recruiter during onboarding.
 
     try {
       await notifyWelcome(user.id);
@@ -77,7 +70,13 @@ export async function POST(request: Request) {
       console.error("Welcome notification failed:", err);
     }
 
-    return NextResponse.json({ ok: true }, { status: 200 });
+    try {
+      await createEmailVerificationToken(user.email);
+    } catch (err) {
+      console.error("Email verification token creation failed:", err);
+    }
+
+    return NextResponse.json({ ok: true, requiresEmailVerification: true }, { status: 200 });
   } catch (error) {
     console.error("Registration error:", error);
     return NextResponse.json(

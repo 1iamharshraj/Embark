@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
-import ExpertShell from "./_components/ExpertShell";
+import ExpertWorkspaceShell from "./_components/ExpertWorkspaceShell";
 
 export default async function ExpertLayout({
   children,
@@ -11,6 +11,5 @@ export default async function ExpertLayout({
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/login");
 
-  // ExpertShell is now a minimal page container (no sidebar) — safe to wrap all /expert/* pages including onboarding.
-  return <ExpertShell>{children}</ExpertShell>;
+  return <ExpertWorkspaceShell>{children}</ExpertWorkspaceShell>;
 }

@@ -69,6 +69,7 @@ model User {
   reviewsReceived  Review[]            @relation("ReviewExpert")
   payouts          Payout[]
   walletTransactions WalletTransaction[]
+  customerNotes    CustomerNote[]
 
   @@index([email])
   @@index([active])
@@ -222,6 +223,7 @@ model ExpertProfile {
   userId            String   @unique
   slug              String   @unique
   image             String?
+  coverImage        String?
   headline          String?
   bio               String?
   location          String?
@@ -253,6 +255,7 @@ model ExpertProfile {
   isAvailable       Boolean  @default(true)
   isPublic          Boolean  @default(false)
   socialLinks       Json?
+  pageSettings      Json?
   country           String?  @default("IN")
   currency          String?  @default("INR")
   whatsappNumber    String?
@@ -263,12 +266,85 @@ model ExpertProfile {
 
   user           User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
   verifications  ExpertVerification[]
+  educations     ExpertEducation[]
+  experiences    ExpertExperience[]
   services       Service[]             @relation("ServiceOwner")
   availabilities ServiceAvailability[] @relation("AvailabilityOwner")
+  blockedDates   BlockedDate[]
   packages       Package[]             @relation("PackageOwner")
+  customerNotes  CustomerNote[]
 
   @@index([userId])
   @@index([verificationStatus])
+}
+
+model CustomerNote {
+  id              String   @id @default(cuid())
+  expertProfileId String
+  studentId       String
+  content         String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  expertProfile ExpertProfile @relation(fields: [expertProfileId], references: [id], onDelete: Cascade)
+  student       User          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([expertProfileId, studentId])
+  @@index([expertProfileId])
+  @@index([studentId])
+}
+
+model AnalyticsEvent {
+  id          String   @id @default(cuid())
+  event       String   // PROFILE_VIEW | SERVICE_VIEW | CHECKOUT_START
+  expertId    String?
+  serviceId   String?
+  dmId        String?
+  bookingId   String?
+  userId      String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  @@index([event])
+  @@index([expertId])
+  @@index([serviceId])
+  @@index([createdAt])
+}
+
+model ExpertEducation {
+  id               String   @id @default(cuid())
+  expertProfileId  String
+  institution      String
+  degree           String?
+  specialization   String?
+  startYear        Int?
+  endYear          Int?
+  isCurrent        Boolean  @default(false)
+  displayOrder     Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  expertProfile ExpertProfile @relation(fields: [expertProfileId], references: [id], onDelete: Cascade)
+
+  @@index([expertProfileId])
+}
+
+model ExpertExperience {
+  id              String   @id @default(cuid())
+  expertProfileId String
+  company         String
+  role            String?
+  description     String?
+  startYear       Int?
+  endYear         Int?
+  isCurrent       Boolean  @default(false)
+  displayOrder    Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  expertProfile ExpertProfile @relation(fields: [expertProfileId], references: [id], onDelete: Cascade)
+
+  @@index([expertProfileId])
 }
 
 model ExpertVerification {
@@ -323,14 +399,18 @@ model Service {
   name            String
   description     String?
   category        String?
+  outcomes        String[] @default([])
   durationMinutes Int?
   price           Int      // INR paise
   currency        String   @default("INR")
   bufferMinutes   Int      @default(0)
   cancellationPolicy String?
-  intakeQuestions Json?
+  intakeQuestions Json?    // Array of { question: string, type: "text" | "long" | "dropdown" | "multi" | "file" | "url", options?: string[] }
   meetingMethod   String?  // GOOGLE_MEET | ZOOM | PHONE | OTHER
-  isActive        Boolean  @default(true)
+  responseSlaHours Int     @default(48) // For PRIORITY_DM services
+  status          String   @default("DRAFT") // DRAFT | PUBLISHED | PAUSED | ARCHIVED
+  isActive        Boolean  @default(false)
+  archivedAt      DateTime?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -338,10 +418,29 @@ model Service {
   createdBy     User?         @relation("ServiceCreator", fields: [createdById], references: [id], onDelete: SetNull)
   bookings      Booking[]
   packageItems  PackageItem[]
+  analytics     ServiceAnalytics?
 
   @@index([expertProfileId])
   @@index([type])
   @@index([isActive])
+  @@index([status])
+}
+
+model ServiceAnalytics {
+  id              String   @id @default(cuid())
+  serviceId       String   @unique
+  views           Int      @default(0)
+  bookingAttempts Int      @default(0)
+  bookings        Int      @default(0)
+  revenue         Int      @default(0) // INR paise
+  rating          Float    @default(0)
+  reviewCount     Int      @default(0)
+  updatedAt       DateTime @updatedAt
+  createdAt       DateTime @default(now())
+
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@index([serviceId])
 }
 
 model ServiceAvailability {
@@ -360,6 +459,21 @@ model ServiceAvailability {
 
   @@index([expertProfileId])
   @@index([dayOfWeek])
+}
+
+model BlockedDate {
+  id              String   @id @default(cuid())
+  expertProfileId String
+  date            DateTime @db.Date
+  reason          String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  expertProfile ExpertProfile @relation(fields: [expertProfileId], references: [id], onDelete: Cascade)
+
+  @@unique([expertProfileId, date])
+  @@index([expertProfileId])
+  @@index([date])
 }
 
 model Booking {
@@ -601,16 +715,17 @@ model Payout {
 // -------------------------
 
 model Review {
-  id        String   @id @default(cuid())
-  studentId String
-  expertId  String
-  bookingId String?  @unique
-  dmId      String?  @unique
-  rating    Int
-  text      String?
-  status    String   @default("PENDING") // PENDING PUBLISHED HIDDEN REMOVED
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  studentId   String
+  expertId    String
+  bookingId   String?  @unique
+  dmId        String?  @unique
+  rating      Int
+  text        String?
+  status      String   @default("PENDING") // PENDING PUBLISHED HIDDEN REMOVED
+  isFeatured  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   student User        @relation("ReviewStudent", fields: [studentId], references: [id], onDelete: Cascade)
   expert  User        @relation("ReviewExpert", fields: [expertId], references: [id], onDelete: Cascade)
@@ -620,6 +735,7 @@ model Review {
   @@index([expertId])
   @@index([studentId])
   @@index([status])
+  @@index([isFeatured])
 }
 
 // -------------------------
@@ -740,6 +856,7 @@ model HackathonSubmission {
   status      String   @default("DRAFT") // DRAFT SUBMITTED UPDATED LOCKED UNDER_EVALUATION EVALUATED SHORTLISTED WINNER REJECTED
   score       Float?
   rank        Int?
+  version     Int      @default(1)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -1158,6 +1275,16 @@ model BookingRequest {
 }
 
 model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
+
+model EmailVerificationToken {
   id        String   @id @default(cuid())
   email     String
   token     String   @unique

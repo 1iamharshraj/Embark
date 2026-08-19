@@ -5,20 +5,42 @@ import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, requirePermission, requireResourceOwner, AuthorizedUser } from "@/lib/rbac";
 
+const intakeQuestionSchema = z.object({
+  question: z.string().min(1),
+  type: z.enum(["text", "long", "dropdown", "multi", "file", "url"]),
+  options: z.array(z.string()).optional(),
+  required: z.boolean().optional(),
+});
+
 const serviceSchema = z.object({
   expertProfileId: z.string().min(1),
   type: z.enum(["ONE_ON_ONE", "PRIORITY_DM", "PACKAGE"]),
   name: z.string().min(1, "Name is required"),
   description: z.string().optional(),
   category: z.string().optional(),
+  outcomes: z.array(z.string()).default([]),
   durationMinutes: z.coerce.number().min(1).optional(),
   price: z.coerce.number().min(0),
   currency: z.string().default("INR"),
   bufferMinutes: z.coerce.number().min(0).default(0),
   cancellationPolicy: z.string().optional(),
-  intakeQuestions: z.array(z.string()).default([]),
+  intakeQuestions: z.union([z.array(z.string()), z.array(intakeQuestionSchema)]).default([]),
   meetingMethod: z.enum(["GOOGLE_MEET", "ZOOM", "PHONE", "OTHER"]).optional(),
+  responseSlaHours: z.coerce.number().int().min(1).default(48),
+  status: z.enum(["DRAFT", "PUBLISHED", "PAUSED", "ARCHIVED"]).default("DRAFT"),
 });
+
+function isActiveFromStatus(status: string) {
+  return status === "PUBLISHED";
+}
+
+function normalizeIntakeQuestions(questions: z.infer<typeof serviceSchema>["intakeQuestions"]) {
+  if (!questions || questions.length === 0) return [];
+  if (typeof questions[0] === "string") {
+    return (questions as string[]).map((q) => ({ question: q, type: "text", required: false }));
+  }
+  return questions as z.infer<typeof intakeQuestionSchema>[];
+}
 
 export async function GET() {
   try {
@@ -27,7 +49,10 @@ export async function GET() {
 
     const services = await prisma.service.findMany({
       where: user.isAdmin ? undefined : { expertProfile: { userId: user.id } },
-      include: { expertProfile: { select: { id: true, userId: true, headline: true } } },
+      include: {
+        expertProfile: { select: { id: true, userId: true, headline: true } },
+        analytics: true,
+      },
       orderBy: { createdAt: "desc" },
     });
 
@@ -76,6 +101,9 @@ export async function POST(request: Request) {
       requirePermission(user, "service.create");
     }
 
+    const isActive = isActiveFromStatus(data.status);
+    const archivedAt = data.status === "ARCHIVED" ? new Date() : null;
+
     const service = await prisma.service.create({
       data: {
         expertProfileId: data.expertProfileId,
@@ -84,14 +112,23 @@ export async function POST(request: Request) {
         name: data.name.trim(),
         description: data.description?.trim(),
         category: data.category?.trim(),
+        outcomes: data.outcomes.map((o) => o.trim()).filter(Boolean),
         durationMinutes: data.durationMinutes,
         price: data.price,
         currency: data.currency,
         bufferMinutes: data.bufferMinutes,
         cancellationPolicy: data.cancellationPolicy?.trim(),
-        intakeQuestions: data.intakeQuestions,
+        intakeQuestions: normalizeIntakeQuestions(data.intakeQuestions),
         meetingMethod: data.meetingMethod,
+        responseSlaHours: data.responseSlaHours,
+        status: data.status,
+        isActive,
+        archivedAt,
+        analytics: {
+          create: {},
+        },
       },
+      include: { analytics: true },
     });
 
     return NextResponse.json({ service }, { status: 201 });

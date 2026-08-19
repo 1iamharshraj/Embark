@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAuth, requirePermission } from "@/lib/rbac";
 import { prisma } from "@/lib/prisma";
 import { createAuditLog } from "@/lib/audit";
+import { getDefaultCommissionRate } from "@/lib/commission";
 import { z } from "zod";
 
 function normalizeError(error: unknown) {
@@ -24,7 +25,22 @@ export async function GET() {
     requirePermission(user, "settings.view");
 
     const configs = await prisma.platformConfig.findMany({ orderBy: { key: "asc" } });
-    return NextResponse.json({ settings: configs });
+    const hasRate = configs.some((c) => c.key === "defaultCommissionRate");
+    const settings = hasRate
+      ? configs
+      : [
+          ...configs,
+          {
+            id: "defaultCommissionRate",
+            key: "defaultCommissionRate",
+            value: String(await getDefaultCommissionRate()),
+            defaultCommissionRate: 0.2,
+            currency: "INR",
+            updatedAt: new Date(),
+            createdAt: new Date(),
+          },
+        ];
+    return NextResponse.json({ settings });
   } catch (error) {
     const normalized = normalizeError(error);
     if (normalized) return normalized;

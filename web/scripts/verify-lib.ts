@@ -91,6 +91,7 @@ export type SessionUser = {
   name: string;
   college: string;
   isAdmin: boolean;
+  onboardingComplete?: boolean;
 };
 
 export async function getSession(jar: CookieJar): Promise<{ user?: SessionUser }> {

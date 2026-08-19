@@ -8,6 +8,7 @@ import {
   getPublicUrl,
   isProductionStorage,
 } from "@/lib/storage";
+import { validateUploadRequest } from "@/lib/fileValidation";
 
 const allowedFolders = ["profiles", "resumes", "verifications", "hackathons", "submissions"] as const;
 
@@ -32,6 +33,11 @@ export async function POST(request: Request) {
     }
     if (!filename || typeof filename !== "string") {
       return NextResponse.json({ message: "Filename required" }, { status: 400 });
+    }
+
+    const validationError = validateUploadRequest(folder, filename, contentType || "application/octet-stream");
+    if (validationError) {
+      return NextResponse.json({ message: validationError }, { status: 400 });
     }
 
     const safeName = filename.replace(/[^a-zA-Z0-9.-]/g, "_");

@@ -7,9 +7,10 @@ import { toast } from "sonner";
 interface PriorityDmFormProps {
   expertId: string;
   price: number;
+  responseSlaHours: number;
 }
 
-export default function PriorityDmForm({ expertId, price }: PriorityDmFormProps) {
+export default function PriorityDmForm({ expertId, price, responseSlaHours }: PriorityDmFormProps) {
   const router = useRouter();
   const [form, setForm] = useState({
     title: "",
@@ -60,9 +61,15 @@ export default function PriorityDmForm({ expertId, price }: PriorityDmFormProps)
     <form onSubmit={submit} className="space-y-5">
       {error && <div className="rounded-xl bg-red-50 text-red-700 text-sm px-4 py-3">{error}</div>}
 
-      <div className="rounded-xl bg-cream p-4 flex items-center justify-between">
-        <span className="text-sm font-semibold text-charcoal">Priority DM fee</span>
-        <span className="font-display font-bold text-charcoal">₹{(price / 100).toFixed(2)}</span>
+      <div className="rounded-xl bg-cream p-4 space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-semibold text-charcoal">Priority DM fee</span>
+          <span className="font-display font-bold text-charcoal">₹{(price / 100).toFixed(2)}</span>
+        </div>
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-inkSoft">Response SLA</span>
+          <span className="font-semibold text-charcoal">{responseSlaHours} hours</span>
+        </div>
       </div>
 
       <div className="flex flex-col gap-1.5">

@@ -8,6 +8,7 @@ interface Review {
   rating: number;
   text: string | null;
   status: string;
+  isFeatured: boolean;
   createdAt: string;
   student: { name: string; image?: string | null };
 }
@@ -15,6 +16,7 @@ interface Review {
 export default function ExpertTestimonialsPage() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -35,6 +37,30 @@ export default function ExpertTestimonialsPage() {
     load();
   }, []);
 
+  async function toggleFeature(id: string, isFeatured: boolean) {
+    setUpdating(id);
+    try {
+      const res = await fetch(`/api/v1/reviews/${id}/feature`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isFeatured }),
+      });
+      const json = await res.json();
+      if (res.ok) {
+        setReviews((prev) =>
+          prev.map((r) => (r.id === id ? { ...r, isFeatured: json.review.isFeatured } : r))
+        );
+        toast.success(isFeatured ? "Featured testimonial" : "Removed from featured");
+      } else {
+        toast.error(json.message || "Failed to update testimonial");
+      }
+    } catch {
+      toast.error("Failed to update testimonial");
+    } finally {
+      setUpdating(null);
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16">
@@ -47,7 +73,9 @@ export default function ExpertTestimonialsPage() {
     <div className="max-w-5xl mx-auto space-y-6">
       <div>
         <h1 className="font-display font-bold text-2xl sm:text-3xl text-charcoal">Testimonials</h1>
-        <p className="text-inkSoft text-sm mt-1">Reviews from students you&apos;ve helped.</p>
+        <p className="text-inkSoft text-sm mt-1">
+          Reviews from students you&apos;ve helped. Feature your favorites to highlight them on your public profile.
+        </p>
       </div>
 
       {reviews.length === 0 ? (
@@ -60,20 +88,35 @@ export default function ExpertTestimonialsPage() {
           {reviews.map((review) => (
             <div
               key={review.id}
-              className="bg-white rounded-2xl shadow-[0_2px_8px_rgba(22,22,22,0.06),0_12px_32px_rgba(22,22,22,0.07)] p-6"
+              className={`bg-white rounded-2xl shadow-[0_2px_8px_rgba(22,22,22,0.06),0_12px_32px_rgba(22,22,22,0.07)] p-6 transition ${
+                review.isFeatured ? "ring-2 ring-orange/40" : ""
+              }`}
             >
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-full bg-orange/20 flex items-center justify-center text-orangeDeep font-bold text-sm">
-                  {review.student.name.charAt(0).toUpperCase()}
-                </div>
-                <div>
-                  <p className="font-semibold text-sm text-charcoal">{review.student.name}</p>
-                  <div className="flex text-orange text-xs">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <span key={i}>{i < review.rating ? "★" : "☆"}</span>
-                    ))}
+              <div className="flex items-center justify-between gap-2 mb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-orange/20 flex items-center justify-center text-orangeDeep font-bold text-sm">
+                    {review.student.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm text-charcoal">{review.student.name}</p>
+                    <div className="flex text-orange text-xs">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <span key={i}>{i < review.rating ? "★" : "☆"}</span>
+                      ))}
+                    </div>
                   </div>
                 </div>
+                <button
+                  onClick={() => toggleFeature(review.id, !review.isFeatured)}
+                  disabled={updating === review.id}
+                  className={`text-xs font-semibold px-3 py-1.5 rounded-full transition disabled:opacity-50 ${
+                    review.isFeatured
+                      ? "bg-orangeDeep text-white hover:bg-orange"
+                      : "bg-cream text-charcoal hover:bg-orange/10"
+                  }`}
+                >
+                  {review.isFeatured ? "Featured" : "Feature"}
+                </button>
               </div>
               {review.text && <p className="text-sm text-inkSoft">{review.text}</p>}
               <p className="text-[10px] text-inkSoft/60 mt-3">

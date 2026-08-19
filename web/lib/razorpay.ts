@@ -15,5 +15,5 @@ export function getRazorpayInstance() {
 
 export function isTestRazorpaySecret(): boolean {
   const secret = process.env.RAZORPAY_KEY_SECRET || "";
-  return secret.startsWith("test_secret_") || secret.includes("placeholder");
+  return !secret || secret === "..." || secret.startsWith("test_secret_") || secret.includes("placeholder");
 }

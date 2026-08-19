@@ -16,6 +16,9 @@ export default async function ExpertAvailabilityPage() {
       availabilities: {
         orderBy: [{ dayOfWeek: "asc" }, { startTime: "asc" }],
       },
+      blockedDates: {
+        orderBy: { date: "asc" },
+      },
     },
   });
 
@@ -33,7 +36,14 @@ export default async function ExpertAvailabilityPage() {
             Set your weekly hours. Students will see bookable slots based on these windows.
           </p>
           <div className="bg-white rounded-2xl shadow-[0_2px_8px_rgba(22,22,22,0.06),0_12px_32px_rgba(22,22,22,0.07)] p-6 sm:p-8">
-            <AvailabilityManager expertProfileId={expertProfile.id} initial={expertProfile.availabilities} />
+            <AvailabilityManager
+              expertProfileId={expertProfile.id}
+              initial={expertProfile.availabilities}
+              initialBlockedDates={expertProfile.blockedDates.map((bd) => ({
+                ...bd,
+                date: bd.date.toISOString().split("T")[0],
+              }))}
+            />
           </div>
         </div>
       </Container>

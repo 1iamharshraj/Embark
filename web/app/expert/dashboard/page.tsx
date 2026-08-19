@@ -17,14 +17,16 @@ export default async function ExpertDashboardPage() {
   const expertProfile = await prisma.expertProfile.findUnique({
     where: { userId: session.user.id },
     include: {
-      services: { where: { isActive: true }, select: { id: true, name: true, type: true } },
+      services: { select: { id: true, name: true, type: true, status: true } },
       availabilities: { select: { id: true }, take: 1 },
+      educations: { select: { id: true }, take: 1 },
+      experiences: { select: { id: true }, take: 1 },
     },
   });
 
   if (!expertProfile) redirect("/expert/onboarding");
 
-  const [upcomingBookings, pendingDms, walletStats] = await Promise.all([
+  const [upcomingBookings, pendingDms, walletStats, payouts] = await Promise.all([
     prisma.booking.findMany({
       where: {
         expertId: session.user.id,
@@ -52,6 +54,11 @@ export default async function ExpertDashboardPage() {
       where: { userId: session.user.id },
       _sum: { amount: true },
     }),
+    prisma.payout.findMany({
+      where: { userId: session.user.id },
+      select: { id: true },
+      take: 1,
+    }),
   ]);
 
   // Derive checklist completion
@@ -59,7 +66,36 @@ export default async function ExpertDashboardPage() {
   if (expertProfile.availabilities.length > 0) completedIds.push("availability");
   if (expertProfile.services.length > 0) completedIds.push("services");
   if (expertProfile.image && expertProfile.headline) completedIds.push("page");
+  if (expertProfile.verificationStatus === "VERIFIED") completedIds.push("verification");
+  if (payouts.length > 0) completedIds.push("payouts");
   if (expertProfile.whatsappNumber) completedIds.push("whatsapp");
+
+  const publishedServices = expertProfile.services.filter((s) => s.status === "PUBLISHED");
+
+  // Compute richer profile-completion percentage
+  let completionScore = 0;
+  const hasBasicProfile = Boolean(expertProfile.headline && expertProfile.bio && expertProfile.image);
+  const hasCoverImage = Boolean(expertProfile.coverImage);
+  const hasProfessionalBackground = Boolean(
+    expertProfile.industry && expertProfile.function && (expertProfile.currentRole || expertProfile.currentCompany)
+  );
+  const hasEducation = Boolean(
+    expertProfile.bSchool || expertProfile.degree || expertProfile.educations.length > 0
+  );
+  const hasExperience = expertProfile.experiences.length > 0;
+  const hasExpertise = expertProfile.expertise.length > 0;
+
+  if (hasBasicProfile) completionScore += 25;
+  if (hasCoverImage) completionScore += 5;
+  if (hasProfessionalBackground) completionScore += 15;
+  if (hasEducation) completionScore += 10;
+  if (hasExperience) completionScore += 10;
+  if (hasExpertise) completionScore += 5;
+  if (publishedServices.length > 0) completionScore += 10;
+  if (expertProfile.availabilities.length > 0) completionScore += 10;
+  if (expertProfile.verificationStatus === "VERIFIED") completionScore += 5;
+  if (payouts.length > 0) completionScore += 3;
+  if (expertProfile.whatsappNumber) completionScore += 2;
 
   const totalCredit =
     walletStats.find((s) => s.type === "CREDIT")?._sum.amount || 0;
@@ -80,7 +116,7 @@ export default async function ExpertDashboardPage() {
       </div>
 
       {/* Setup checklist */}
-      <SetupChecklist completedIds={completedIds} />
+      <SetupChecklist completedIds={completedIds} percent={completionScore} />
 
       {/* Stats */}
       <StatRow
@@ -119,7 +155,7 @@ export default async function ExpertDashboardPage() {
           },
           {
             label: "Active services",
-            value: expertProfile.services.length,
+            value: publishedServices.length,
             icon: (
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
                 <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />

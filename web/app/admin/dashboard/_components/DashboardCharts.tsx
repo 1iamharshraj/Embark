@@ -28,8 +28,10 @@ interface DashboardData {
     verifiedExperts: number;
     totalHackathons: number;
     publishedHackathons: number;
+    activeHackathons: number;
     totalRegistrations: number;
     totalSubmissions: number;
+    totalCertificates: number;
     totalOrders: number;
     paidOrders: number;
     grossRevenue: number;

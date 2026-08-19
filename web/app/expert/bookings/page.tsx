@@ -31,9 +31,17 @@ const STATUS_STYLES: Record<string, string> = {
   COMPLETED: "bg-charcoal/10 text-charcoal",
 };
 
+const tabs = [
+  { key: "upcoming", label: "Upcoming" },
+  { key: "past", label: "Past" },
+  { key: "cancelled", label: "Cancelled" },
+  { key: "noShows", label: "No-shows" },
+];
+
 export default function ExpertBookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("upcoming");
 
   useEffect(() => {
     async function load() {
@@ -54,6 +62,23 @@ export default function ExpertBookingsPage() {
     load();
   }, []);
 
+  const filteredBookings = bookings.filter((b) => {
+    const scheduled = new Date(b.scheduledAt);
+    const now = new Date();
+    switch (activeTab) {
+      case "upcoming":
+        return ["CONFIRMED", "RESCHEDULED", "PENDING_PAYMENT"].includes(b.status) && scheduled >= now;
+      case "past":
+        return b.status === "COMPLETED";
+      case "cancelled":
+        return b.status === "CANCELLED";
+      case "noShows":
+        return b.status === "COMPLETED" && scheduled >= now;
+      default:
+        return true;
+    }
+  });
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16">
@@ -69,7 +94,23 @@ export default function ExpertBookingsPage() {
         <p className="text-inkSoft text-sm mt-1">All your 1:1 sessions and consultations.</p>
       </div>
 
-      {bookings.length === 0 ? (
+      <div className="flex flex-wrap gap-2">
+        {tabs.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`text-sm font-semibold px-4 py-2 rounded-full transition ${
+              activeTab === tab.key
+                ? "bg-orangeDeep text-white"
+                : "bg-white text-charcoal border border-charcoal/12 hover:border-charcoal"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {filteredBookings.length === 0 ? (
         <div className="bg-white rounded-2xl shadow-[0_2px_8px_rgba(22,22,22,0.06),0_12px_32px_rgba(22,22,22,0.07)] p-8 text-center">
           <p className="text-inkSoft">No bookings yet.</p>
           <p className="text-xs text-inkSoft/60 mt-1">Students will appear here once they book a session.</p>
@@ -77,7 +118,7 @@ export default function ExpertBookingsPage() {
       ) : (
         <div className="bg-white rounded-2xl shadow-[0_2px_8px_rgba(22,22,22,0.06),0_12px_32px_rgba(22,22,22,0.07)] overflow-hidden">
           <div className="divide-y divide-charcoal/8">
-            {bookings.map((booking) => (
+            {filteredBookings.map((booking) => (
               <div key={booking.id} className="p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">

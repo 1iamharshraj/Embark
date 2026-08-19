@@ -15,7 +15,7 @@ export default async function PriorityDmPage({ params }: { params: { expertId: s
     include: {
       user: { select: { id: true, name: true, image: true } },
       services: {
-        where: { type: "PRIORITY_DM", isActive: true },
+        where: { type: "PRIORITY_DM", status: "PUBLISHED" },
         orderBy: { price: "asc" },
       },
     },
@@ -52,7 +52,11 @@ export default async function PriorityDmPage({ params }: { params: { expertId: s
             Submit a detailed question and get a written response.
           </p>
           <div className="bg-white rounded-2xl shadow-[0_2px_8px_rgba(22,22,22,0.06),0_12px_32px_rgba(22,22,22,0.07)] p-6 sm:p-8">
-            <PriorityDmForm expertId={params.expertId} price={dmService.price} />
+            <PriorityDmForm
+              expertId={params.expertId}
+              price={dmService.price}
+              responseSlaHours={dmService.responseSlaHours}
+            />
           </div>
         </div>
       </Container>

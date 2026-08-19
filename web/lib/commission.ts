@@ -1,10 +1,17 @@
 import { prisma } from "@/lib/prisma";
 
 export async function getDefaultCommissionRate(): Promise<number> {
-  const config = await prisma.platformConfig.findFirst({
-    orderBy: { createdAt: "asc" },
-  });
-  return config?.defaultCommissionRate ?? 0.2;
+  const [rateConfig, legacyConfig] = await Promise.all([
+    prisma.platformConfig.findUnique({ where: { key: "defaultCommissionRate" } }),
+    prisma.platformConfig.findFirst({ orderBy: { createdAt: "asc" } }),
+  ]);
+
+  if (rateConfig?.value) {
+    const parsed = parseFloat(rateConfig.value);
+    if (!Number.isNaN(parsed)) return parsed;
+  }
+
+  return legacyConfig?.defaultCommissionRate ?? 0.2;
 }
 
 export function calculateCommission(amount: number, rate: number) {

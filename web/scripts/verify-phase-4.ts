@@ -45,12 +45,29 @@ async function main() {
     assert(registerRes.res.status === 200, `Registration failed: ${JSON.stringify(registerRes.body)}`);
     console.log("✅ Test student created");
 
-    // 2. Login as student
-    const studentJar = new CookieJar();
+    // 2. Login as student and complete onboarding
+    let studentJar = new CookieJar();
     await nextAuthSignIn(testEmail, testPassword, studentJar);
     const session = await getSession(studentJar);
     assert(session.user?.email === testEmail, "Session email mismatch");
     console.log("✅ Student login succeeded");
+
+    const onboardingRes = await fetchJsonBody("/api/user/onboarding", {
+      method: "POST",
+      body: JSON.stringify({
+        persona: "student",
+        college: testCollege,
+        graduationYear: new Date().getFullYear() + 1,
+      }),
+      jar: studentJar,
+    });
+    assert(onboardingRes.res.status === 200, `Onboarding failed: ${JSON.stringify(onboardingRes.body)}`);
+    // Refresh session so middleware sees onboardingComplete=true
+    studentJar = new CookieJar();
+    await nextAuthSignIn(testEmail, testPassword, studentJar);
+    const onboardedSession = await getSession(studentJar);
+    assert(onboardedSession.user?.onboardingComplete === true, "Session should reflect onboarding complete");
+    console.log("✅ Student onboarding completed");
 
     // 3. Playbooks landing page returns 200
     const landingRes = await fetchJson("/playbooks", { redirect: "manual" });

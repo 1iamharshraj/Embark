@@ -20,7 +20,7 @@ export default async function NewPackagePage() {
   const services = await prisma.service.findMany({
     where: {
       expertProfileId: expertProfile.id,
-      isActive: true,
+      status: "PUBLISHED",
       type: { in: ["ONE_ON_ONE", "PRIORITY_DM"] },
     },
     select: { id: true, name: true, type: true, durationMinutes: true, price: true },

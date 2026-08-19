@@ -21,20 +21,36 @@ export default async function EditServicePage({ params }: { params: { id: string
     redirect("/account");
   }
 
+  const normalizeIntakeQuestions = () => {
+    if (!Array.isArray(service.intakeQuestions)) return [];
+    return service.intakeQuestions.map((q: unknown) => {
+      if (typeof q === "string") return { question: q, type: "text" as const, required: false };
+      const item = q as Record<string, unknown>;
+      return {
+        question: String(item.question || ""),
+        type: ["text", "long", "dropdown", "multi", "file", "url"].includes(String(item.type))
+          ? (String(item.type) as "text" | "long" | "dropdown" | "multi" | "file" | "url")
+          : ("text" as const),
+        options: Array.isArray(item.options) ? item.options.map(String) : undefined,
+        required: Boolean(item.required),
+      };
+    });
+  };
+
   const initial = {
     id: service.id,
     type: service.type,
     name: service.name,
     description: service.description || undefined,
     category: service.category || undefined,
+    outcomes: service.outcomes,
     durationMinutes: service.durationMinutes || undefined,
     price: service.price,
     bufferMinutes: service.bufferMinutes,
     cancellationPolicy: service.cancellationPolicy || undefined,
-    intakeQuestions: Array.isArray(service.intakeQuestions)
-      ? (service.intakeQuestions as string[])
-      : [],
+    intakeQuestions: normalizeIntakeQuestions(),
     meetingMethod: service.meetingMethod || undefined,
+    status: service.status as "DRAFT" | "PUBLISHED" | "PAUSED" | "ARCHIVED",
     isActive: service.isActive,
   };
 

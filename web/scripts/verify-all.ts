@@ -177,6 +177,24 @@ async function main() {
       testUserId = session.user.id;
     });
 
+    await runner.run("Auth: complete persona onboarding", async () => {
+      const res = await fetchJsonBody("/api/user/onboarding", {
+        method: "POST",
+        body: JSON.stringify({
+          persona: "student",
+          college: testCollege,
+          graduationYear: new Date().getFullYear() + 1,
+        }),
+        jar: studentJar,
+      });
+      assert(res.res.status === 200, `Onboarding failed: ${JSON.stringify(res.body)}`);
+      // Re-login so the JWT reflects onboardingComplete=true and account pages are reachable.
+      studentJar = new CookieJar();
+      await nextAuthSignIn(testEmail, testPassword, studentJar);
+      const session = await getSession(studentJar);
+      assert(session.user?.onboardingComplete === true, "Session should reflect onboarding complete");
+    });
+
     await runner.run("Auth: update profile", async () => {
       const newCollege = "IIM Updated";
       const res = await fetchJsonBody("/api/account/profile", {

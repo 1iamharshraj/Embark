@@ -13,8 +13,8 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      {!isAdmin && <TopBar />}
-      {!isAdmin && <Nav />}
+      {!isAdmin && !isExpertDash && <TopBar />}
+      {!isAdmin && !isExpertDash && <Nav />}
       {children}
       {!isAdmin && !isExpertDash && <Footer />}
       {!isAdmin && !isExpertDash && <PwaInstallPrompt />}

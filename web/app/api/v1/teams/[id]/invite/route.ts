@@ -29,7 +29,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
 
     const team = await prisma.hackathonTeam.findUnique({
       where: { id: params.id },
-      include: { hackathon: { select: { title: true, slug: true } }, members: { include: { user: { select: { email: true } } } } },
+      include: { hackathon: { select: { title: true, slug: true, teamMax: true } }, members: { include: { user: { select: { email: true } } } } },
     });
 
     if (!team) {
@@ -44,6 +44,14 @@ export async function POST(request: Request, { params }: { params: { id: string 
     const existing = team.members.find((m) => m.user?.email === normalizedEmail);
     if (existing) {
       return NextResponse.json({ message: "User is already a team member" }, { status: 409 });
+    }
+
+    const teamMax = team.hackathon.teamMax || 4;
+    if (team.members.length >= teamMax) {
+      return NextResponse.json(
+        { message: `Team is full (max ${teamMax} members)` },
+        { status: 400 }
+      );
     }
 
     const token = jwt.sign(

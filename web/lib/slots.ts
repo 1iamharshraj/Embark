@@ -17,13 +17,18 @@ function parseTime(time: string) {
   return { hours: hours || 0, minutes: minutes || 0 };
 }
 
+function isSameDate(a: Date, b: Date) {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+
 export function generateSlots(
   availabilities: ServiceAvailability[],
   durationMinutes: number,
   bufferMinutes = 0,
   existingBookings: Date[] = [],
   weeks = 4,
-  fromDate = new Date()
+  fromDate = new Date(),
+  blockedDates: Date[] = []
 ): BookingSlot[] {
   const slots: BookingSlot[] = [];
   const slotLength = durationMinutes + bufferMinutes;
@@ -32,6 +37,10 @@ export function generateSlots(
     for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
       const date = addDays(startOfDay(fromDate), week * 7 + dayOffset);
       const dayOfWeek = getDay(date);
+
+      if (blockedDates.some((blocked) => isSameDate(blocked, date))) {
+        continue;
+      }
 
       const daySchedules = availabilities.filter((a) => a.dayOfWeek === dayOfWeek);
       for (const schedule of daySchedules) {

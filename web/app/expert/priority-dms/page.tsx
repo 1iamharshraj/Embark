@@ -10,8 +10,30 @@ interface PriorityDM {
   status: string;
   createdAt: string;
   responseAt?: string;
+  dueHours: number;
   amount: number;
   student: { id: string; name: string; email: string };
+}
+
+function getDeadline(dm: PriorityDM) {
+  return new Date(new Date(dm.createdAt).getTime() + dm.dueHours * 60 * 60 * 1000);
+}
+
+function isExpired(dm: PriorityDM) {
+  if (["COMPLETED", "CANCELLED", "REFUNDED", "RESPONDED"].includes(dm.status)) return false;
+  if (dm.status === "EXPIRED") return true;
+  return new Date() > getDeadline(dm);
+}
+
+function formatDeadline(dm: PriorityDM) {
+  const deadline = getDeadline(dm);
+  return deadline.toLocaleString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -38,9 +60,17 @@ const STATUS_STYLES: Record<string, string> = {
   EXPIRED: "bg-red-100 text-red-700",
 };
 
+const tabs = [
+  { key: "pending", label: "Pending" },
+  { key: "inProgress", label: "In Progress" },
+  { key: "completed", label: "Completed" },
+  { key: "expired", label: "Expired" },
+];
+
 export default function ExpertPriorityDmsPage() {
   const [dms, setDms] = useState<PriorityDM[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("pending");
 
   useEffect(() => {
     async function load() {
@@ -61,6 +91,21 @@ export default function ExpertPriorityDmsPage() {
     load();
   }, []);
 
+  const filteredDms = dms.filter((dm) => {
+    switch (activeTab) {
+      case "pending":
+        return ["PAID", "ASSIGNED"].includes(dm.status) && !isExpired(dm);
+      case "inProgress":
+        return dm.status === "IN_PROGRESS" && !isExpired(dm);
+      case "completed":
+        return ["RESPONDED", "COMPLETED"].includes(dm.status);
+      case "expired":
+        return isExpired(dm);
+      default:
+        return true;
+    }
+  });
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16">
@@ -76,7 +121,23 @@ export default function ExpertPriorityDmsPage() {
         <p className="text-inkSoft text-sm mt-1">Student questions that need your response.</p>
       </div>
 
-      {dms.length === 0 ? (
+      <div className="flex flex-wrap gap-2">
+        {tabs.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`text-sm font-semibold px-4 py-2 rounded-full transition ${
+              activeTab === tab.key
+                ? "bg-orangeDeep text-white"
+                : "bg-white text-charcoal border border-charcoal/12 hover:border-charcoal"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {filteredDms.length === 0 ? (
         <div className="bg-white rounded-2xl shadow-[0_2px_8px_rgba(22,22,22,0.06),0_12px_32px_rgba(22,22,22,0.07)] p-8 text-center">
           <p className="text-inkSoft">No priority DMs yet.</p>
           <p className="text-xs text-inkSoft/60 mt-1">Questions from students will appear here.</p>
@@ -84,7 +145,7 @@ export default function ExpertPriorityDmsPage() {
       ) : (
         <div className="bg-white rounded-2xl shadow-[0_2px_8px_rgba(22,22,22,0.06),0_12px_32px_rgba(22,22,22,0.07)] overflow-hidden">
           <div className="divide-y divide-charcoal/8">
-            {dms.map((dm) => (
+            {filteredDms.map((dm) => (
               <div key={dm.id} className="p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
@@ -108,6 +169,12 @@ export default function ExpertPriorityDmsPage() {
                     })}
                     {" · "}₹{(dm.amount / 100).toFixed(2)}
                     {dm.responseAt && " · Responded " + new Date(dm.responseAt).toLocaleDateString("en-IN")}
+                    {activeTab === "expired" && (
+                      <span className="text-red-600"> · Expired on {formatDeadline(dm)}</span>
+                    )}
+                    {!["expired", "completed"].includes(activeTab) && (
+                      <span> · Due {formatDeadline(dm)}</span>
+                    )}
                   </p>
                 </div>
                 <Link

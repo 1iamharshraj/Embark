@@ -16,10 +16,59 @@ interface PriorityDM {
   responseAttachments: string[];
   status: string;
   amount: number;
+  dueHours: number;
   createdAt: string;
   responseAt: string | null;
   expert: { id: string; name: string; email: string };
   student: { id: string; name: string; email: string };
+}
+
+function getDeadline(dm: PriorityDM) {
+  return new Date(new Date(dm.createdAt).getTime() + dm.dueHours * 60 * 60 * 1000);
+}
+
+function useCountdown(target: Date) {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 60000);
+    return () => clearInterval(timer);
+  }, []);
+  const diffMs = target.getTime() - now.getTime();
+  if (diffMs <= 0) return { expired: true as const, text: "Overdue" };
+  const totalMinutes = Math.max(0, Math.ceil(diffMs / 60000));
+  const days = Math.floor(totalMinutes / 1440);
+  const hours = Math.floor((totalMinutes % 1440) / 60);
+  const minutes = totalMinutes % 60;
+  const text = days > 0 ? `${days}d ${hours}h ${minutes}m` : `${hours}h ${minutes}m`;
+  return { expired: false as const, text };
+}
+
+function DeadlineBlock({ dm }: { dm: PriorityDM }) {
+  const deadline = getDeadline(dm);
+  const isDone = ["COMPLETED", "CANCELLED", "REFUNDED", "RESPONDED"].includes(dm.status);
+  const countdown = useCountdown(deadline);
+
+  return (
+    <div className="rounded-xl bg-cream p-4">
+      <div className="text-xs font-semibold uppercase tracking-wider text-inkSoft mb-1">
+        Response deadline
+      </div>
+      <div className="text-charcoal font-semibold">
+        {deadline.toLocaleString("en-IN", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        })}
+      </div>
+      {!isDone && (
+        <div className={`text-sm mt-1 ${countdown.expired ? "text-red-600" : "text-inkSoft"}`}>
+          {countdown.expired ? "Response overdue" : `Response due in ${countdown.text}`}
+        </div>
+      )}
+    </div>
+  );
 }
 
 const STATUS_LABEL: Record<string, string> = {
@@ -171,6 +220,8 @@ export default function PriorityDmDetailPage({ params }: { params: { id: string 
               <div className="text-xs font-semibold uppercase tracking-wider text-inkSoft mb-1">Amount</div>
               <div className="text-charcoal font-semibold">₹{(dm.amount / 100).toFixed(2)}</div>
             </div>
+
+            <DeadlineBlock dm={dm} />
 
             <div>
               <h2 className="font-display font-bold text-lg text-charcoal mb-2">Question</h2>

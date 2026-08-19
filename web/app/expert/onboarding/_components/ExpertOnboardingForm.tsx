@@ -127,6 +127,7 @@ function SelectField({
 // ─── Step components ───────────────────────────────────────────────────────
 
 function Step1Welcome({
+  userName,
   currentRole,
   setCurrentRole,
   company,
@@ -150,6 +151,7 @@ function Step1Welcome({
   currency,
   setCurrency,
 }: {
+  userName?: string | null;
   currentRole: string;
   setCurrentRole: (v: string) => void;
   company: string;
@@ -177,7 +179,7 @@ function Step1Welcome({
     <div className="space-y-6">
       <div>
         <h2 className="font-display font-bold text-2xl text-charcoal mb-1">
-          Hello there! 👋
+          Hello{userName ? `, ${userName}` : " there"}! 👋
         </h2>
         <p className="text-inkSoft">
           Let&apos;s start with the basics so students know who you are.
@@ -453,7 +455,7 @@ function Step6Plan() {
 
 // ─── Main Wizard ───────────────────────────────────────────────────────────
 
-export default function ExpertOnboardingForm(_props: { userName?: string | null } = {}) {
+export default function ExpertOnboardingForm({ userName }: { userName?: string | null }) {
   const router = useRouter();
   const { update } = useSession();
   const [step, setStep] = useState(1); // 1-indexed
@@ -647,6 +649,7 @@ export default function ExpertOnboardingForm(_props: { userName?: string | null 
       <div>
         {step === 1 && (
           <Step1Welcome
+            userName={userName}
             currentRole={currentRole}
             setCurrentRole={setCurrentRole}
             company={company}

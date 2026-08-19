@@ -4,6 +4,7 @@ import { requireAuth, requirePermission } from "@/lib/rbac";
 import { certificateQueue } from "@/lib/queue";
 import { createAuditLog } from "@/lib/audit";
 import { calculateAverageScore, rankSubmissions } from "@/lib/evaluation";
+import { notifyHackathonResult } from "@/lib/notifications";
 
 function normalizeError(error: unknown) {
   if (error instanceof Error && error.message === "UNAUTHORIZED") {
@@ -109,6 +110,29 @@ export async function POST(request: Request, { params }: { params: { id: string 
         type: "PARTICIPATION",
         baseUrl,
       });
+    }
+
+    // Notify all registered participants about published results.
+    for (const reg of hackathon.registrations) {
+      try {
+        await notifyHackathonResult(reg.userId, hackathon.id, hackathon.title);
+      } catch (err) {
+        console.error("Failed to notify result:", err);
+      }
+    }
+
+    // Notify ranked team members with their specific award.
+    for (const sub of ranked) {
+      const memberIds = new Set<string>();
+      if (sub.team?.leaderId) memberIds.add(sub.team.leaderId);
+      sub.team?.members.forEach((m) => memberIds.add(m.userId));
+      for (const memberId of Array.from(memberIds)) {
+        try {
+          await notifyHackathonResult(memberId, hackathon.id, hackathon.title, sub.award || undefined);
+        } catch (err) {
+          console.error("Failed to notify award:", err);
+        }
+      }
     }
 
     return NextResponse.json({ results: results.count, ranked });

@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
@@ -39,12 +40,20 @@ export default async function StudentProfilePage() {
 
   return (
     <div className="max-w-4xl">
-      <div className="mb-8">
-        <Eyebrow>Profile</Eyebrow>
-        <h1 className="font-display font-bold text-3xl sm:text-4xl text-charcoal mt-2">Student profile</h1>
-        <p className="text-inkSoft mt-2 max-w-2xl">
-          Add details that help mentors, recruiters and competition panels understand you.
-        </p>
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div>
+          <Eyebrow>Profile</Eyebrow>
+          <h1 className="font-display font-bold text-3xl sm:text-4xl text-charcoal mt-2">Student profile</h1>
+          <p className="text-inkSoft mt-2 max-w-2xl">
+            Add details that help mentors, recruiters and competition panels understand you.
+          </p>
+        </div>
+        <Link
+          href={`/student/${user.id}`}
+          className="inline-flex items-center justify-center rounded-full font-semibold bg-cream text-charcoal border border-charcoal/15 px-5 py-2.5 hover:bg-orange/10 transition text-sm"
+        >
+          View public profile
+        </Link>
       </div>
 
       <div className="bg-white rounded-2xl border border-charcoal/8 shadow-[0_2px_8px_rgba(22,22,22,0.06),0_12px_32px_rgba(22,22,22,0.07)] p-6 sm:p-8">

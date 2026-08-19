@@ -8,6 +8,8 @@ import Button from "@/components/Button";
 import ClientDate from "@/components/ClientDate";
 import { ProfileForm } from "./_components/ProfileForm";
 import { PasswordForm } from "./_components/PasswordForm";
+import { EmailVerificationBanner } from "./_components/EmailVerificationBanner";
+import { LogoutAllButton } from "./_components/LogoutAllButton";
 import MarketplaceDashboard from "./_components/MarketplaceDashboard";
 
 function compStatus(now: Date, regOpen: Date, regClose: Date, endAt: Date) {
@@ -69,7 +71,9 @@ export default async function AccountPage() {
     redirect("/login");
   }
 
-  if (user.roles.some((ur) => ur.role.name === "Expert")) {
+  const isExpert =
+    user.roles.some((ur) => ur.role.name === "Expert") || user.expertProfile;
+  if (isExpert) {
     redirect("/expert/dashboard");
   }
 
@@ -141,6 +145,8 @@ export default async function AccountPage() {
           </Button>
         )}
       </div>
+
+      {!user.emailVerified && <EmailVerificationBanner email={user.email} />}
 
       {/* Profile card */}
       {sectionCard(
@@ -232,6 +238,17 @@ export default async function AccountPage() {
               <h2 className="font-display font-bold text-xl text-charcoal mb-1">Change password</h2>
               <p className="text-inkSoft text-sm mb-5">Update your password to keep your account secure.</p>
               <PasswordForm />
+            </>
+          )}
+
+          {/* Security */}
+          {sectionCard(
+            <>
+              <h2 className="font-display font-bold text-xl text-charcoal mb-1">Security</h2>
+              <p className="text-inkSoft text-sm mb-5">Manage active sessions and account security.</p>
+              <div className="flex flex-wrap items-center gap-3">
+                <LogoutAllButton />
+              </div>
             </>
           )}
         </div>

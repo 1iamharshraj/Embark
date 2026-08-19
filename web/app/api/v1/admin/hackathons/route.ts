@@ -3,8 +3,32 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, requirePermission } from "@/lib/rbac";
 
+const HACKATHON_STATUSES = [
+  "DRAFT",
+  "PUBLISHED",
+  "REGISTRATION_OPEN",
+  "REGISTRATION_CLOSED",
+  "HACKATHON_ACTIVE",
+  "SUBMISSION_OPEN",
+  "SUBMISSION_CLOSED",
+  "EVALUATION",
+  "RESULTS_FINALIZED",
+  "RESULTS_PUBLISHED",
+  "CERTIFICATES_ISSUED",
+  "CLOSED",
+] as const;
+
+const HACKATHON_TIMELINE_PHASES = [
+  "REGISTRATION",
+  "HACKATHON",
+  "SUBMISSION",
+  "EVALUATION",
+  "RESULT",
+  "CERTIFICATE",
+] as const;
+
 const timelineSchema = z.object({
-  phase: z.enum(["REGISTRATION", "SUBMISSION", "EVALUATION", "RESULT"]),
+  phase: z.enum(HACKATHON_TIMELINE_PHASES),
   startsAt: z.string().datetime(),
   endsAt: z.string().datetime().nullable().optional(),
 });
@@ -16,7 +40,7 @@ const hackathonSchema = z.object({
   banner: z.string().optional(),
   bannerUrl: z.string().optional(),
   logoUrl: z.string().optional(),
-  status: z.enum(["DRAFT", "PUBLISHED", "REGISTRATION_OPEN", "SUBMISSION_OPEN", "EVALUATION", "RESULTS_PUBLISHED", "CLOSED"]),
+  status: z.enum(HACKATHON_STATUSES),
   shortDescription: z.string().optional(),
   detailedDescription: z.string().optional(),
   organizer: z.string().optional(),

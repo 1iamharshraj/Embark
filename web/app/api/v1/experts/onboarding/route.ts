@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { z } from "zod";
+import { Prisma } from "@prisma/client";
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
 import { randomBytes } from "crypto";
@@ -51,6 +52,8 @@ const onboardingSchema = z.object({
   function: z.string().optional(),
   expertise: commaList,
   socialLinks: socialLinksSchema,
+  coverImage: z.string().optional(),
+  pageSettings: z.record(z.unknown()).optional(),
   country: z.string().optional(),
   currency: z.string().optional(),
   whatsappNumber: z.string().optional(),
@@ -127,6 +130,8 @@ async function getOnboardingState(userId: string) {
     include: {
       services: { orderBy: { createdAt: "desc" } },
       availabilities: { orderBy: [{ dayOfWeek: "asc" }, { startTime: "asc" }] },
+      educations: { orderBy: { displayOrder: "asc" } },
+      experiences: { orderBy: { displayOrder: "asc" } },
     },
   });
   return { profile };
@@ -194,7 +199,9 @@ export async function POST(request: Request) {
           industry: data.industry?.trim() || null,
           function: data.function?.trim() || null,
           expertise: data.expertise,
-          socialLinks: data.socialLinks || undefined,
+          socialLinks: (data.socialLinks as Prisma.InputJsonValue | undefined) || undefined,
+          coverImage: data.coverImage?.trim() || null,
+          pageSettings: (data.pageSettings as Prisma.InputJsonValue | undefined) || undefined,
           country: data.country?.trim() || "IN",
           currency: data.currency?.trim() || "INR",
           whatsappNumber: data.whatsappNumber?.trim() || null,
@@ -218,7 +225,10 @@ export async function POST(request: Request) {
           industry: data.industry?.trim() || undefined,
           function: data.function?.trim() || undefined,
           expertise: data.expertise.length ? data.expertise : undefined,
-          socialLinks: data.socialLinks ? data.socialLinks : undefined,
+          socialLinks: data.socialLinks ? (data.socialLinks as Prisma.InputJsonValue) : undefined,
+          coverImage: data.coverImage !== undefined ? (data.coverImage?.trim() || null) : undefined,
+          pageSettings:
+            data.pageSettings !== undefined ? (data.pageSettings as Prisma.InputJsonValue) : undefined,
           country: data.country?.trim() || undefined,
           currency: data.currency?.trim() || undefined,
           whatsappNumber: data.whatsappNumber?.trim() || undefined,

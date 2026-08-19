@@ -362,6 +362,83 @@ export async function notifyNewDM(expertId: string, dmId: string, title: string)
   });
 }
 
+export async function notifyHackathonSubmission(
+  userId: string,
+  hackathonId: string,
+  hackathonTitle: string,
+  submissionTitle: string
+) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { email: true, name: true },
+  });
+
+  await createNotification({
+    userId,
+    type: "HACKATHON_SUBMISSION",
+    title: "Submission received",
+    message: `Your submission "${submissionTitle}" for ${hackathonTitle} has been received.`,
+    entityType: "Hackathon",
+    entityId: hackathonId,
+    sendEmail: !!user,
+    email: user
+      ? {
+          to: user.email,
+          subject: "Submission received — Embark India",
+          html: `<p>Hi ${escapeHtml(user.name || "there")},</p><p>Your submission <strong>${escapeHtml(
+            submissionTitle
+          )}</strong> for <strong>${escapeHtml(hackathonTitle)}</strong> has been received.</p><p>— Embark India</p>`,
+          text: `Hi ${user.name || "there"},\n\nYour submission "${submissionTitle}" for ${hackathonTitle} has been received.\n\n— Embark India`,
+        }
+      : undefined,
+  });
+}
+
+export async function scheduleSubmissionDeadlineReminder(
+  userId: string,
+  hackathonId: string,
+  hackathonTitle: string,
+  deadline: Date
+) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { email: true, name: true },
+  });
+  if (!user) return;
+
+  const now = Date.now();
+  const deadlineTime = new Date(deadline).getTime();
+  const oneDayDelay = deadlineTime - now - 24 * 60 * 60 * 1000;
+  const oneHourDelay = deadlineTime - now - 60 * 60 * 1000;
+
+  const basePayload = {
+    to: user.email,
+    subject: `Reminder: ${hackathonTitle} submission deadline`,
+    html: `<p>Hi ${escapeHtml(user.name || "there")},</p><p>The submission deadline for <strong>${escapeHtml(
+      hackathonTitle
+    )}</strong> is approaching. Make sure your submission is complete.</p><p>— Embark India</p>`,
+    text: `Hi ${user.name || "there"},\n\nThe submission deadline for ${hackathonTitle} is approaching. Make sure your submission is complete.\n\n— Embark India`,
+  };
+
+  const opts = { attempts: 3, backoff: { type: "exponential" as const, delay: 5000 } };
+
+  if (oneDayDelay > 0) {
+    await emailQueue.add(
+      `submission-deadline-24h-${userId}-${hackathonId}`,
+      { ...basePayload, subject: `Reminder: ${hackathonTitle} submission deadline in 24 hours` },
+      { ...opts, delay: oneDayDelay }
+    );
+  }
+
+  if (oneHourDelay > 0) {
+    await emailQueue.add(
+      `submission-deadline-1h-${userId}-${hackathonId}`,
+      { ...basePayload, subject: `Reminder: ${hackathonTitle} submission deadline in 1 hour` },
+      { ...opts, delay: oneHourDelay }
+    );
+  }
+}
+
 export async function notifyHackathonRegistration(
   userId: string,
   hackathonId: string,

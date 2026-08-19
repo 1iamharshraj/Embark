@@ -48,6 +48,21 @@ export default function BookingPage({ params }: { params: { serviceId: string } 
 
         setService(serviceJson.service);
         setSlots(slotsJson.slots || []);
+
+        // Track service view for analytics
+        if (serviceJson.service?.expertProfile?.user?.id) {
+          fetch("/api/v1/analytics/events", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              event: "SERVICE_VIEW",
+              expertId: serviceJson.service.expertProfile.user.id,
+              serviceId: params.serviceId,
+            }),
+          }).catch(() => {
+            // Silently ignore analytics tracking errors
+          });
+        }
       } catch {
         setError("Failed to load booking details");
       } finally {

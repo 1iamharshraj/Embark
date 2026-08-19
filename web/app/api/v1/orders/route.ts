@@ -67,6 +67,21 @@ export async function POST(request: Request) {
 
     const order = await prisma.order.create({ data: orderData });
 
+    // Track checkout start for analytics
+    const checkoutExpertId = await resolveExpertIdForOrder(orderType, relatedId);
+    if (checkoutExpertId) {
+      prisma.analyticsEvent
+        .create({
+          data: {
+            event: "CHECKOUT_START",
+            expertId: checkoutExpertId,
+            userId,
+            metadata: { orderType, relatedId, orderId: order.id },
+          },
+        })
+        .catch(() => {});
+    }
+
     const keyId = process.env.RAZORPAY_KEY_ID || "rzp_test_...";
     const secret = process.env.RAZORPAY_KEY_SECRET || "";
     const isMockMode = !keyId || !secret || secret === "..." || secret.startsWith("test_secret_") || secret.includes("placeholder");
@@ -200,5 +215,41 @@ async function resolveOrderTarget(orderType: string, relatedId: string, userId: 
     }
     default:
       throw new Error("Unsupported order type");
+  }
+}
+
+async function resolveExpertIdForOrder(orderType: string, relatedId: string): Promise<string | null> {
+  try {
+    switch (orderType) {
+      case "BOOKING": {
+        const booking = await prisma.booking.findUnique({
+          where: { id: relatedId },
+          select: { expertId: true },
+        });
+        return booking?.expertId || null;
+      }
+      case "PRIORITY_DM": {
+        const dm = await prisma.priorityDM.findUnique({
+          where: { id: relatedId },
+          select: { expertId: true },
+        });
+        return dm?.expertId || null;
+      }
+      case "PACKAGE": {
+        const pkg = await prisma.package.findUnique({
+          where: { id: relatedId },
+          select: { expertProfile: { select: { userId: true } } },
+        });
+        return pkg?.expertProfile?.userId || null;
+      }
+      case "MENTORSHIP": {
+        // Mentors are legacy; no expert user mapping here
+        return null;
+      }
+      default:
+        return null;
+    }
+  } catch {
+    return null;
   }
 }

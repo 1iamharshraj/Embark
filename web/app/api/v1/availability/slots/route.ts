@@ -19,6 +19,7 @@ export async function GET(request: Request) {
         expertProfile: {
           include: {
             availabilities: true,
+            blockedDates: true,
           },
         },
       },
@@ -44,6 +45,7 @@ export async function GET(request: Request) {
     });
 
     const bookedStarts = existingBookings.map((b) => new Date(b.scheduledAt));
+    const blockedDates = service.expertProfile.blockedDates.map((d) => new Date(d.date));
 
     const slots = generateSlots(
       service.expertProfile.availabilities.map((a) => ({
@@ -56,7 +58,8 @@ export async function GET(request: Request) {
       bufferMinutes,
       bookedStarts,
       4,
-      new Date()
+      new Date(),
+      blockedDates
     );
 
     return NextResponse.json({

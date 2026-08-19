@@ -3,22 +3,24 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/rbac";
 import { submissionOpen, submissionDeadline } from "@/lib/hackathon";
+import { createAuditLog } from "@/lib/audit";
+import { notifyHackathonSubmission, scheduleSubmissionDeadlineReminder } from "@/lib/notifications";
+
+const fileSchema = z.object({
+  name: z.string(),
+  url: z.string(),
+  type: z.string().default("application/octet-stream"),
+  size: z.number().default(0),
+});
 
 const createSchema = z.object({
   hackathonId: z.string().min(1),
   title: z.string().min(1),
   content: z.record(z.any()).default({}),
-  files: z
-    .array(
-      z.object({
-        name: z.string(),
-        url: z.string(),
-        type: z.string().default("application/octet-stream"),
-        size: z.number().default(0),
-      })
-    )
-    .default([]),
+  files: z.array(fileSchema).default([]),
 });
+
+const LOCKED_STATUSES = ["LOCKED", "UNDER_EVALUATION", "EVALUATED", "SHORTLISTED", "WINNER", "REJECTED"];
 
 function normalizeError(error: unknown) {
   if (error instanceof Error && error.message === "UNAUTHORIZED") {
@@ -35,6 +37,48 @@ async function getUserTeamForHackathon(userId: string, hackathonId: string) {
     where: { hackathonId, members: { some: { userId } } },
     include: { members: true },
   });
+}
+
+function parseFileRestrictions(settings: unknown) {
+  const s = (settings || {}) as Record<string, unknown>;
+  const raw = s.fileRestrictions as Record<string, unknown> | undefined;
+  if (!raw) return null;
+  return {
+    allowedTypes: Array.isArray(raw.allowedTypes)
+      ? raw.allowedTypes.filter((v): v is string => typeof v === "string")
+      : [],
+    maxFileSize: typeof raw.maxFileSize === "number" ? raw.maxFileSize : undefined,
+    maxFiles: typeof raw.maxFiles === "number" ? raw.maxFiles : undefined,
+    requiredFiles: Array.isArray(raw.requiredFiles)
+      ? raw.requiredFiles.filter((v): v is string => typeof v === "string")
+      : [],
+  };
+}
+
+function validateFiles(
+  files: { name: string; size: number; type: string }[],
+  restrictions: ReturnType<typeof parseFileRestrictions>
+): string | null {
+  if (!restrictions) return null;
+
+  if (restrictions.maxFiles && files.length > restrictions.maxFiles) {
+    return `Maximum ${restrictions.maxFiles} files allowed.`;
+  }
+
+  for (const file of files) {
+    if (restrictions.maxFileSize && file.size > restrictions.maxFileSize * 1024 * 1024) {
+      return `${file.name} exceeds the ${restrictions.maxFileSize} MB size limit.`;
+    }
+    if (restrictions.allowedTypes && restrictions.allowedTypes.length > 0) {
+      const ext = "." + file.name.split(".").pop()?.toLowerCase();
+      const allowed = restrictions.allowedTypes.some(
+        (t) => t.toLowerCase() === ext || file.type.toLowerCase().includes(t.toLowerCase().replace(".", ""))
+      );
+      if (!allowed) return `${file.name} is not an allowed file type.`;
+    }
+  }
+
+  return null;
 }
 
 export async function POST(request: Request) {
@@ -76,18 +120,29 @@ export async function POST(request: Request) {
       where: { hackathonId, teamId: team.id },
     });
 
+    if (existing && LOCKED_STATUSES.includes(existing.status) && !user.isAdmin) {
+      return NextResponse.json({ message: "Submission is locked and cannot be changed" }, { status: 403 });
+    }
+
+    const restrictions = parseFileRestrictions(hackathon.settings);
+    const fileError = validateFiles(files, restrictions);
+    if (fileError) {
+      return NextResponse.json({ message: fileError }, { status: 400 });
+    }
+
     const submission = await prisma.$transaction(async (tx) => {
       let sub;
+      const nextVersion = existing ? existing.version + 1 : 1;
       if (existing) {
         sub = await tx.hackathonSubmission.update({
           where: { id: existing.id },
           data: {
             title,
             content,
-            status: "SUBMITTED",
+            status: "UPDATED",
+            version: nextVersion,
           },
         });
-        await tx.submissionFile.deleteMany({ where: { submissionId: existing.id } });
       } else {
         sub = await tx.hackathonSubmission.create({
           data: {
@@ -96,25 +151,48 @@ export async function POST(request: Request) {
             title,
             content,
             status: "SUBMITTED",
+            version: nextVersion,
           },
         });
       }
 
       if (files.length > 0) {
         await tx.submissionFile.createMany({
-          data: files.map((f, i) => ({
+          data: files.map((f) => ({
             submissionId: sub.id,
             name: f.name,
             url: f.url,
             type: f.type,
             size: f.size,
-            version: i + 1,
+            version: nextVersion,
           })),
         });
       }
 
       return sub;
     });
+
+    try {
+      await createAuditLog({
+        userId: user.id,
+        action: existing ? "SUBMISSION_UPDATE" : "SUBMISSION_CREATE",
+        resource: "HackathonSubmission",
+        resourceId: submission.id,
+        newValue: { hackathonId, teamId: team.id, version: submission.version },
+      });
+    } catch (err) {
+      console.error("Submission audit log failed:", err);
+    }
+
+    try {
+      await notifyHackathonSubmission(user.id, hackathon.id, hackathon.title, title);
+      const deadline = submissionDeadline(hackathon);
+      if (deadline) {
+        await scheduleSubmissionDeadlineReminder(user.id, hackathon.id, hackathon.title, deadline);
+      }
+    } catch (err) {
+      console.error("Submission notification failed:", err);
+    }
 
     return NextResponse.json({ submission }, { status: 201 });
   } catch (error) {

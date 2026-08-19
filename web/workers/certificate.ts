@@ -4,6 +4,7 @@ import { redis } from "@/lib/redis";
 import { prisma } from "@/lib/prisma";
 import { generateCertificateImage } from "@/lib/certificate";
 import { uploadFile, getUploadKey, getPublicUrl } from "@/lib/storage";
+import { notifyCertificateIssued } from "@/lib/notifications";
 
 function generateCertificateId(): string {
   return `cert_${randomBytes(6).toString("hex")}`;
@@ -74,6 +75,12 @@ const worker = new Worker(
         issuedAt,
       },
     });
+
+    try {
+      await notifyCertificateIssued(userId, certificate.certificateId, hackathon.title, type);
+    } catch (err) {
+      console.error(`[certificate-worker] notification failed for ${certificate.certificateId}:`, err);
+    }
 
     console.log(`[certificate-worker] generated certificate ${certificate.certificateId} for user ${userId}`);
     return { certificateId: certificate.certificateId };

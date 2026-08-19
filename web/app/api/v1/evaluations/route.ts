@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/rbac";
 import { calculateWeightedScore, calculateAverageScore } from "@/lib/evaluation";
+import { createAuditLog } from "@/lib/audit";
 
 const scoreSchema = z.object({
   criterionName: z.string().min(1),
@@ -18,11 +19,17 @@ const evaluationSchema = z.object({
   finalized: z.boolean().default(false),
 });
 
+const LOCKED_STATUSES = ["RESULTS_FINALIZED", "RESULTS_PUBLISHED", "CERTIFICATES_ISSUED", "CLOSED"];
+
 function normalizeError(error: unknown) {
   if (error instanceof Error && error.message === "UNAUTHORIZED") {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
   return null;
+}
+
+function isLocked(status: string | null | undefined): boolean {
+  return LOCKED_STATUSES.includes(status ?? "");
 }
 
 
@@ -48,6 +55,14 @@ export async function POST(request: Request) {
 
     if (!submission) {
       return NextResponse.json({ message: "Submission not found" }, { status: 404 });
+    }
+
+    const hackathonLocked = isLocked(submission.hackathon.status);
+    if (hackathonLocked && !user.isAdmin) {
+      return NextResponse.json(
+        { message: "Evaluation is locked for this hackathon" },
+        { status: 403 }
+      );
     }
 
     const judge = await prisma.judge.findUnique({
@@ -121,6 +136,25 @@ export async function POST(request: Request) {
       }
 
       return ev;
+    });
+
+    await createAuditLog({
+      userId: user.id,
+      action: existing ? "evaluation.updated" : "evaluation.created",
+      resource: "evaluation",
+      resourceId: evaluation.id,
+      oldValue: existing
+        ? { score: existing.score, comment: existing.comment, finalizedAt: existing.finalizedAt }
+        : undefined,
+      newValue: {
+        submissionId,
+        judgeId,
+        score: weightedScore,
+        comment,
+        finalizedAt: evaluation.finalizedAt,
+        scores,
+        lockedOverride: hackathonLocked && user.isAdmin ? true : undefined,
+      },
     });
 
     return NextResponse.json({ evaluation });
